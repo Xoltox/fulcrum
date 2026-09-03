@@ -1,0 +1,33 @@
+# Third-party clones, backups and local audit artifacts — not ours to publish
+_source/
+
+# Local working notes, not for publication
+NOTES-local.md
+scratch/
+
+# Secrets and environment
+.env
+.env.*
+*.pem
+*.key
+
+# Build and dependency output
+node_modules/
+dist/
+build/
+.cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs and transient files
+*.log
+*.tmp
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
