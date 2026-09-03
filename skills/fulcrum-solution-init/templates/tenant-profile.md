@@ -1,6 +1,6 @@
 # Tenant profile
 
-Written once by `odc-solution-init` step 3. **Every downstream skill reads this file
+Written once by `fulcrum-solution-init` step 3. **Every downstream skill reads this file
 instead of hardcoding a tenant fact.**
 
 Probe procedure and the rules for each row:

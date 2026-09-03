@@ -70,7 +70,7 @@ If a reset/teardown action is attempted:
 - Treat a reset action's own publish as unproven until it publishes clean
   *and* a subsequent live-data read-back shows the rows gone — Mentor's
   self-reported "deleted" is not sufficient (see
-  `../../odc-verification/SKILL.md`).
+  `../../fulcrum-verification/SKILL.md`).
 
 ## Exposure
 

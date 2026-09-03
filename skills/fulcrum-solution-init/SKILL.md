@@ -1,5 +1,5 @@
 ---
-name: odc-solution-init
+name: fulcrum-solution-init
 description: Turn raw source material (a BRD, product docs, a Figma or Stitch export, HTML mockups, screenshots, or any mix) into an ODC solution plan and a project repo that a cheaper orchestrator can build from across many unattended sessions. Decomposes the work into apps, agents and workflows, sizes phases and steps, probes the tenant for everything that varies, and scaffolds the plan, specs and handoff. Use when the user says "start a new OutSystems project", "build this BRD in ODC", "I have a Figma and want an ODC solution", "plan an ODC build", "turn these designs into an OutSystems app", "scaffold an ODC engagement", or hands over source artifacts and asks what to build. Run ONCE per project, before any Mentor build turn.
 version: "1.0.0"
 requires: ODC MCP server authenticated; Mentor enabled on the tenant; filesystem write access for the project repo; an image-inspection capability and an image-dimension scanner for visual source material; a subagent mechanism for parallel triage
@@ -29,11 +29,11 @@ scaffold, the handoff structure. Everything else belongs to a sibling:
 
 | Need | Owner |
 |---|---|
-| Mentor turn shape, polling, run-id durability, publish sequencing | `../odc-mentor-turns/SKILL.md` |
-| Why a construct fails (aggregates, repeaters, icons, dates, overlays) | `../odc-engine-traps/SKILL.md` |
-| Proof obligations and visual capture | `../odc-verification/SKILL.md` |
-| Loader idempotence, natural keys, static entity identifiers | `../odc-seed-data/SKILL.md` |
-| Stop conditions, fix-turn caps, delegation depth, model tier policy | `../odc-unattended-guardrails/SKILL.md` |
+| Mentor turn shape, polling, run-id durability, publish sequencing | `../fulcrum-mentor-turns/SKILL.md` |
+| Why a construct fails (aggregates, repeaters, icons, dates, overlays) | `../fulcrum-engine-traps/SKILL.md` |
+| Proof obligations and visual capture | `../fulcrum-verification/SKILL.md` |
+| Loader idempotence, natural keys, static entity identifiers | `../fulcrum-seed-data/SKILL.md` |
+| Stop conditions, fix-turn caps, delegation depth, model tier policy | `../fulcrum-unattended-guardrails/SKILL.md` |
 
 Cross-reference these; never restate their rules beyond a one-line pointer.
 
@@ -184,7 +184,7 @@ Route each app's first build by the source type available **for that app**:
 Both are single-app, single-source bootstraps producing draft scaffolds; neither
 decomposes a solution. Give each **one app, one shell, one spec** — shell from step 2,
 spec from step 6 — and never let either re-derive scope. Sessions after the bootstrap
-turn use `../odc-mentor-turns/SKILL.md` directly.
+turn use `../fulcrum-mentor-turns/SKILL.md` directly.
 
 ## Exit gate
 

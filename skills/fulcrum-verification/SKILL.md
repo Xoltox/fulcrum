@@ -1,18 +1,18 @@
 ---
-name: odc-verification
+name: fulcrum-verification
 description: Proves that a change to an ODC app actually landed and actually works, rather than trusting that the platform said so. Owns proof obligations, which instrument catches which defect class, visual capture and comparison, the diagnostic REST endpoint pattern for live data, and what the platform's own success signals do and do not mean. Use when asked to verify a change landed, "did the publish work", "check the screen renders correctly", "prove the data is right", "regression check my ODC app", or before marking any build step done.
 version: "1.0.0"
 requires: ODC MCP surface for model read-back and revision queries (context_*, app_revisions); a browser automation capability for visual and interaction proof (a browser MCP tool where the harness has one, a headless browser driver such as Playwright otherwise); a scripted HTTP client for API-level ground truth; ability to stand up a temporary diagnostic REST endpoint when tenant-profile.md shows no live model-layer path to row data.
 ---
 
-# odc-verification
+# fulcrum-verification
 
 ## Boundary
 
 This skill owns **proof**, not cause. For why a construct breaks, see
-`../odc-engine-traps/SKILL.md`. For turn/session mechanics, see
-`../odc-mentor-turns/SKILL.md`. For seed loaders and idempotency, see
-`../odc-seed-data/SKILL.md`. If you find yourself explaining *why* a widget
+`../fulcrum-engine-traps/SKILL.md`. For turn/session mechanics, see
+`../fulcrum-mentor-turns/SKILL.md`. For seed loaders and idempotency, see
+`../fulcrum-seed-data/SKILL.md`. If you find yourself explaining *why* a widget
 misbehaves, stop and cross-reference instead of writing it here.
 
 ## The central problem

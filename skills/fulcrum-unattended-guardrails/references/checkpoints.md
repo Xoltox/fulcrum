@@ -105,7 +105,7 @@ Brief: orchestrator message; spec summary is inlined there — do NOT re-read th
 
 Note the last gap line. That is the staleness guard surviving the agent's death:
 whoever resumes is told not to trust a revision number they did not observe.
-See `../../odc-mentor-turns/SKILL.md` for the guard itself.
+See `../../fulcrum-mentor-turns/SKILL.md` for the guard itself.
 
 ## Resuming after a death
 

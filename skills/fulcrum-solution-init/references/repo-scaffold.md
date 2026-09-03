@@ -113,7 +113,7 @@ context is lost, and an unpolled run's outcome is then unknowable while its effe
 already in the model.
 
 Minimum per line: timestamp, step number, run id, the operation, and the outcome once
-known. Durability mechanics: `../../odc-mentor-turns/SKILL.md`.
+known. Durability mechanics: `../../fulcrum-mentor-turns/SKILL.md`.
 
 ## Per-step build-pattern log
 

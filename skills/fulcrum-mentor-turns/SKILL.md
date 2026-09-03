@@ -1,5 +1,5 @@
 ---
-name: odc-mentor-turns
+name: fulcrum-mentor-turns
 description: >
   How to drive ODC Mentor turn by turn so a turn lands first try and nothing
   silently reverts — turn granularity and decomposition, prompt shape and the
@@ -20,10 +20,10 @@ requires: >
 # Driving Mentor, turn by turn
 
 This skill owns turn mechanics only, not:
-- what to build, or step sizing → `../odc-solution-init/SKILL.md`
-- construct-specific traps (aggregates, repeaters, icons, dates...) → `../odc-engine-traps/SKILL.md`
-- proving a change actually works → `../odc-verification/SKILL.md`
-- stop conditions, fix-turn caps, halt rules → `../odc-unattended-guardrails/SKILL.md`
+- what to build, or step sizing → `../fulcrum-solution-init/SKILL.md`
+- construct-specific traps (aggregates, repeaters, icons, dates...) → `../fulcrum-engine-traps/SKILL.md`
+- proving a change actually works → `../fulcrum-verification/SKILL.md`
+- stop conditions, fix-turn caps, halt rules → `../fulcrum-unattended-guardrails/SKILL.md`
 
 ## 1. Turn granularity — the headline rule
 

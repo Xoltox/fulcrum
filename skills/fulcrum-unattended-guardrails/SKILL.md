@@ -1,5 +1,5 @@
 ---
-name: odc-unattended-guardrails
+name: fulcrum-unattended-guardrails
 description: >
   Safety rails for long, largely unattended ODC Mentor build sessions — stop
   conditions, fix-turn caps, halt-and-report rules, subagent depth and
@@ -22,10 +22,10 @@ requires: >
 Load this **before** the first dispatch of an unattended session, and keep its
 rules in force for the whole session. It owns nothing about *what* to build.
 
-- ODC construct behaviour → `../odc-engine-traps/SKILL.md`
-- Turn granularity, prompt shape, polling cadence → `../odc-mentor-turns/SKILL.md`
-- Proof obligations and instruments → `../odc-verification/SKILL.md`
-- Plan, phases, handoff document structure → `../odc-solution-init/SKILL.md`
+- ODC construct behaviour → `../fulcrum-engine-traps/SKILL.md`
+- Turn granularity, prompt shape, polling cadence → `../fulcrum-mentor-turns/SKILL.md`
+- Proof obligations and instruments → `../fulcrum-verification/SKILL.md`
+- Plan, phases, handoff document structure → `../fulcrum-solution-init/SKILL.md`
 
 ## The premise
 
@@ -88,7 +88,7 @@ Repeated same-tier attempts repeat the same wrong guess; a higher tier mostly
 buys a more expensive version of the same guess. **Before any further fix
 attempt after the first failure, run a diagnostic step** — read the actual model
 state back, capture the running app, query live rows through the diagnostic
-endpoint pattern in `../odc-verification/SKILL.md`. A fix turn with no new
+endpoint pattern in `../fulcrum-verification/SKILL.md`. A fix turn with no new
 evidence behind it does not count as a new attempt; it is the same attempt again.
 
 ## Orchestrator prohibitions — categorical

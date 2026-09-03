@@ -1,5 +1,5 @@
 ---
-name: odc-seed-data
+name: fulcrum-seed-data
 description: >
   Seeds sample or demo data into an ODC app so screens have real rows to
   read against. Owns idempotent loaders, natural keys, relative timestamps,
@@ -17,14 +17,14 @@ requires: >
   to call the exposed loader endpoint on demand.
 ---
 
-# odc-seed-data
+# fulcrum-seed-data
 
 ## Boundary
 
 This skill owns **getting rows into the database safely and repeatably**. It
-does not own screen construction (see `../odc-engine-traps/SKILL.md`), turn
-sizing (see `../odc-mentor-turns/SKILL.md`), or the verification instruments
-themselves (see `../odc-verification/SKILL.md` — this skill states the
+does not own screen construction (see `../fulcrum-engine-traps/SKILL.md`), turn
+sizing (see `../fulcrum-mentor-turns/SKILL.md`), or the verification instruments
+themselves (see `../fulcrum-verification/SKILL.md` — this skill states the
 four-step seed-proof obligation, that sibling owns the tools that discharge
 it). Seed before building any screen that reads the data — an empty table
 hides its own screen bugs.
@@ -55,7 +55,7 @@ from a published-time trigger:
    `Assign` node from a real running total before the action ends — never a
    literal. A literal `RowsCreated = 0` in the output path is indistinguishable
    from a genuine zero once read back over REST (REST silently omits falsey
-   values — see `../odc-engine-traps/SKILL.md`).
+   values — see `../fulcrum-engine-traps/SKILL.md`).
 
 Worked structure and JSON-resource layout: `references/loader-pattern.md`.
 
@@ -151,7 +151,7 @@ with no error.
 ## Verifying a seed
 
 Four-step proof; discharge each step with the instruments in
-`../odc-verification/SKILL.md` (diagnostic REST endpoint pattern when there
+`../fulcrum-verification/SKILL.md` (diagnostic REST endpoint pattern when there
 is no direct query path — `[TENANT]`, check `tenant-profile.md`):
 
 1. Load on an empty/reset database → confirm real, non-zero row counts.
@@ -184,7 +184,7 @@ passing on an empty result.
 
 If a reset action does get built, do not trust Mentor's report that the
 delete succeeded — verify against the live schema or a live-data read-back,
-per `../odc-verification/SKILL.md`.
+per `../fulcrum-verification/SKILL.md`.
 
 ## What the platform's context tools do not show you
 

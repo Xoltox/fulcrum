@@ -133,7 +133,7 @@ Those are unfalsifiable, so they always pass.
 2. \<…\>
 
 Each item names its instrument. Which instrument catches which defect class:
-`../../odc-verification/SKILL.md`.
+`../../fulcrum-verification/SKILL.md`.
 
 ---
 

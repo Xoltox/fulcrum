@@ -31,7 +31,7 @@ Whatever drives Fulcrum needs, at minimum:
   of work at a chosen model tier, one depth level only.
 - **A browser automation capability for visual proof** — a browser MCP
   tool where your harness has one, otherwise a headless browser driver.
-  Needed for `odc-verification`'s screen-render checks.
+  Needed for `fulcrum-verification`'s screen-render checks.
 - **A shell** — for the diagnostic REST calls, seed-data loader calls, and
   sleep/poll loops the skills describe. Verify once at session start which
   sleep mechanism your harness will not swallow mid-wait, then reuse it.

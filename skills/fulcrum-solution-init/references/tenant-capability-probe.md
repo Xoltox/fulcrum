@@ -49,7 +49,7 @@ every status field reads healthy.
 
 Repeat this gate at the start of **every** session, not only at init. It costs one cheap
 read-only turn. Turn mechanics for the probe turn itself:
-`../../odc-mentor-turns/SKILL.md`.
+`../../fulcrum-mentor-turns/SKILL.md`.
 
 ## 1. `db_query` liveness
 
@@ -65,7 +65,7 @@ cannot depend on schema or data.
   diagnostic endpoint, which is roughly two Mentor turns and two revisions per seed step.
 
 Record the actual response shape you saw, not a summary of it. Verification consequences
-live in `../../odc-verification/SKILL.md`; seed consequences in `../../odc-seed-data/SKILL.md`.
+live in `../../fulcrum-verification/SKILL.md`; seed consequences in `../../fulcrum-seed-data/SKILL.md`.
 
 ## 2. Which UI blocks exist — and their real inputs
 
@@ -143,7 +143,7 @@ throwaway read-only turn.
 Record the number and how you obtained it. Spec turn blocks are sized against this, so
 an unknown ceiling means every long spec risks a truncation whose failure mode is a
 partial build reported as success. Turn-splitting rules live in
-`../../odc-mentor-turns/SKILL.md`.
+`../../fulcrum-mentor-turns/SKILL.md`.
 
 ## 9. Target app identity
 

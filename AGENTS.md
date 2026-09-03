@@ -12,12 +12,12 @@ Route by situation below, then open the named `skills/<name>/SKILL.md`.
 
 | Your situation | Load |
 |---|---|
-| Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/odc-solution-init` |
-| About to issue a Mentor turn, chunking a spec, unsure of session vs conversation, or a turn didn't land | `skills/odc-mentor-turns` |
-| Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/odc-engine-traps` |
-| Need to prove a change actually works, not just that publish was clean | `skills/odc-verification` |
-| Seeding, resetting, or debugging sample/demo data | `skills/odc-seed-data` |
-| Running many steps unattended, delegating to subagents, or defining stop/escalate rules | `skills/odc-unattended-guardrails` |
+| Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/fulcrum-solution-init` |
+| About to issue a Mentor turn, chunking a spec, unsure of session vs conversation, or a turn didn't land | `skills/fulcrum-mentor-turns` |
+| Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
+| Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
+| Seeding, resetting, or debugging sample/demo data | `skills/fulcrum-seed-data` |
+| Running many steps unattended, delegating to subagents, or defining stop/escalate rules | `skills/fulcrum-unattended-guardrails` |
 
 ## Non-negotiables
 
@@ -42,7 +42,7 @@ These hold even if no skill file is ever loaded:
 
 Facts that vary by tenant, licence, or platform version (UI-block
 availability, icon font, `db_query` liveness, and similar) live in the
-project's own `tenant-profile.md`, produced once by `odc-solution-init`.
+project's own `tenant-profile.md`, produced once by `fulcrum-solution-init`.
 Skills reference that file — they never hardcode the answer.
 
 ## Model tiers

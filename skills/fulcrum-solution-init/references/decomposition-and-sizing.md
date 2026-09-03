@@ -57,7 +57,7 @@ non-determinism to a build that already has plenty.
 
 State which apps and libraries ship together. That set is what "demoable" means at a
 phase boundary, and it is what the publish sequence at the end of each phase must cover.
-Publish sequencing itself: `../../odc-mentor-turns/SKILL.md`.
+Publish sequencing itself: `../../fulcrum-mentor-turns/SKILL.md`.
 
 ## Part 2 — Phase sizing
 
@@ -93,7 +93,7 @@ Practical consequences:
 Seed before building any screen that reads it. A screen built against an empty table
 looks identical whether the binding is correct or absent, so the build agent gets no
 signal and the fix turns get spent later at higher cost. Loader patterns:
-`../../odc-seed-data/SKILL.md`.
+`../../fulcrum-seed-data/SKILL.md`.
 
 ### Phase count and shape
 
@@ -127,7 +127,7 @@ Every clause carries weight:
   under-specified or drawn across a boundary.
 - **One build plus two fix turns** — if it habitually needs more, split it. The cap is a
   measuring instrument here; as a stop condition it belongs to
-  `../../odc-unattended-guardrails/SKILL.md`.
+  `../../fulcrum-unattended-guardrails/SKILL.md`.
 
 ### Cost anchors
 
@@ -147,7 +147,7 @@ Two things to take from this:
   step in its own right, never as a preamble bolted onto a screen step.
 - **A "one turn" spec is a fiction.** Steps that were sized to one Mentor turn ran ~14.
   Size steps by *scope*, and let turn decomposition inside the step be the build agent's
-  business under `../../odc-mentor-turns/SKILL.md`.
+  business under `../../fulcrum-mentor-turns/SKILL.md`.
 
 ### Splitting a step that fails the test
 

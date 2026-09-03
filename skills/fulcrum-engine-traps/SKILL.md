@@ -1,5 +1,5 @@
 ---
-name: odc-engine-traps
+name: fulcrum-engine-traps
 description: >
   Construct-indexed registry of known OutSystems ODC / Mentor engine traps —
   ways a screen, aggregate, widget or integration publishes with 0 validation
@@ -24,16 +24,16 @@ A lookup table, not a procedure. Every entry here is a construct that Mentor
 can build, validate, and publish cleanly while it is **functionally wrong**.
 That is the defining shape of every trap in this registry: **validation and
 publish are not proof of correctness.** For the instrument that actually
-proves correctness, see `../odc-verification/SKILL.md`. For turn sizing and
-prompt-length limits, see `../odc-mentor-turns/SKILL.md`. For loading seed
-rows, see `../odc-seed-data/SKILL.md`. This skill owns none of those — it
+proves correctness, see `../fulcrum-verification/SKILL.md`. For turn sizing and
+prompt-length limits, see `../fulcrum-mentor-turns/SKILL.md`. For loading seed
+rows, see `../fulcrum-seed-data/SKILL.md`. This skill owns none of those — it
 owns "does this construct have a known failure mode, and what is it."
 
 ## How to use this file
 
 1. Before a turn touching a construct below, read the matching reference
    file and restate the mechanism (not just the ban) in the Mentor prompt —
-   see `../odc-mentor-turns/SKILL.md` for prompt-shaping.
+   see `../fulcrum-mentor-turns/SKILL.md` for prompt-shaping.
 2. After a turn lands, verify against the trap's stated failure mode, not
    against `change_applied` or a clean publish — see the "Visible to
    validation?" column on every entry. If it says "no", validation and

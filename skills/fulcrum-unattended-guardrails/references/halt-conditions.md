@@ -5,7 +5,7 @@
 **Per step: 1 build turn + at most 2 fix turns.** [VERIFIED]
 
 Mentor is not a batch processor — one objective per turn (see
-`../../odc-mentor-turns/SKILL.md`). Past three turns on one step, the pattern
+`../../fulcrum-mentor-turns/SKILL.md`). Past three turns on one step, the pattern
 observed is not convergence: it is Mentor guessing, and each guess mutates the
 model. The cap exists because the cost of an extra turn is not a wasted turn, it
 is an unreviewed change to a live application.
@@ -34,7 +34,7 @@ What counts as a diagnostic: reading the actual model state back rather than
 trusting a success signal; capturing the running app and looking at it; querying
 live rows through the diagnostic REST endpoint pattern; reading the failing
 assertion's actual value rather than its expectation. See
-`../../odc-verification/SKILL.md` for which instrument catches which defect class.
+`../../fulcrum-verification/SKILL.md` for which instrument catches which defect class.
 
 What does not count: re-reading the spec, re-reading your own prior turn,
 rephrasing the same request, or asking Mentor whether it did the thing.
@@ -104,7 +104,7 @@ The three defences, all of which this skill mandates:
 - A **staleness guard before every mutating turn** — verify the session's view
   of current state against an independent read of the live revision, never
   against the session's own read-back
-  (`../../odc-mentor-turns/SKILL.md`).
+  (`../../fulcrum-mentor-turns/SKILL.md`).
 - A **checkpoint that survives the agent**, recording the revision observed
   before changes (`checkpoints.md`).
 - A **halt rule that fires early**, because an hour of lost time is

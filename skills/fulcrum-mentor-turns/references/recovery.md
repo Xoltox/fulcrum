@@ -25,7 +25,7 @@ check-only turn — that spends a turn to learn something you can get for
 free.
 
 Recovery: check the app **revision number**, and re-verify live (screenshot
-or equivalent runtime check per `../../odc-verification/SKILL.md`). If the
+or equivalent runtime check per `../../fulcrum-verification/SKILL.md`). If the
 revision reflects the expected work, it landed; if not, treat it as a normal
 incomplete turn and continue per the granularity and staleness rules in the
 main skill file.
@@ -48,7 +48,7 @@ every occurrence is a permanent restriction.**
 Recovery: confirm the underlying auth is healthy, then retry once. If it
 recurs after a clean retry with healthy auth, stop and report — do not
 iterate trying to route around a policy denial; see the hard-stop list in
-`../../odc-unattended-guardrails/SKILL.md`.
+`../../fulcrum-unattended-guardrails/SKILL.md`.
 
 ## Cross-cutting rule for all four
 

@@ -28,7 +28,7 @@ Code it is redundant with what the harness already does for you.
   reliably held. This is a harness artifact of Claude Code's subagent
   execution, not a platform truth about ODC, Mentor, or any other harness —
   verify your own harness's sleep behavior once at session start and reuse
-  whatever proves reliable, per `skills/odc-mentor-turns/SKILL.md`.
+  whatever proves reliable, per `skills/fulcrum-mentor-turns/SKILL.md`.
 
 ## Updating from the upstream `outsystems-mcp-skills` repo
 

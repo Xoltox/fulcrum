@@ -97,7 +97,7 @@ What survives from it, and is genuinely the rule:
 - Do **not** escalate model tier to break a stuck bug. Repeated attempts at the
   same tier repeat the same wrong guess, and a higher tier mostly buys a
   more expensive version of the same guess. Require a diagnostic step instead.
-  See `skills/odc-unattended-guardrails/references/halt-conditions.md`.
+  See `skills/fulcrum-unattended-guardrails/references/halt-conditions.md`.
 - "Stuck twice → stop and report to the user" is not a budget measure. It stays.
 - Keep the "correct my briefing — a correction beats agreement" line in every
   subagent prompt. The source build credits that single line with surfacing most

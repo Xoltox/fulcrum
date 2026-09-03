@@ -57,7 +57,7 @@ from one build and not one tenant's configuration.
 ### The tenant profile contract
 
 Facts that vary by tenant, licence, or platform version are resolved once per
-project by a read-only capability probe during `odc-solution-init`, which writes
+project by a read-only capability probe during `fulcrum-solution-init`, which writes
 `tenant-profile.md` into the project repo.
 
 Skills must **reference the profile, never hardcode the answer**:
@@ -132,7 +132,7 @@ made one of them unresolvable.
 
 ## Cross-references
 
-- Link by **relative path**: `see ../odc-verification/SKILL.md`, or
+- Link by **relative path**: `see ../fulcrum-verification/SKILL.md`, or
   `references/aggregates.md`.
 - **Never use `§`-numbered anchors.** Every `§` reference in the source corpus
   was dangling because the target files had no numbered headings.
@@ -168,12 +168,12 @@ Overlap causes mis-triggering. One topic, one owner:
 
 | Skill | Owns | Explicitly does NOT own |
 |---|---|---|
-| `odc-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; phase and step sizing; repo scaffold; the tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup |
-| `odc-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session vs conversation; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
-| `odc-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
-| `odc-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
-| `odc-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
-| `odc-unattended-guardrails` | Stop conditions; fix-turn caps; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific |
+| `fulcrum-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; phase and step sizing; repo scaffold; the tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup |
+| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session vs conversation; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
+| `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
+| `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
+| `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
+| `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific |
 
 ## Tone
 
