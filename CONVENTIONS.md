@@ -197,6 +197,33 @@ always-visible surface (`AGENTS.md`) and not only inside the guardrails skill.
   single-tier policy appears in the source corpus as a budget-exhaustion
   artifact — record it as history, never as the rule.
 
+**Gap analysis never assumes how the app got there.** An app under assessment may
+be fresh generator output, or years of work by many people and agents, or both.
+Establish provenance before judging anything, and classify findings into five
+kinds rather than one:
+
+- **Gap** — required, absent.
+- **Drift** — built, but not as specified. May be a deliberate decision nobody
+  wrote down. Look for a decision record before calling it a defect.
+- **Stale requirement** — the document no longer describes intended behaviour.
+  The document is the thing that is wrong.
+- **Undocumented addition** — present in the app, absent from the requirements.
+  Could be valuable, could be scope creep; never silently a defect.
+- **Unfalsifiable requirement** — the requirement cannot be assessed as written
+  (it defers the specifics, or states no observable outcome). Scoring an app
+  against one invents a gap. Report it against the document, naming what would
+  have to be decided before the requirement can be judged at all.
+
+Only the first kind is a defect by default. A mature codebase produces mostly the
+other three, and treating deviation as failure there manufactures work and
+destroys trust in the report.
+
+**A coverage figure must state its denominator.** "3 of 5 named sub-requirements
+present" is reproducible; a bare percentage is a judgement wearing the costume of
+a measurement. Charts and aggregate figures are wanted — they are what makes a
+report usable — but every number must be recomputable from the itemised evidence
+beside it.
+
 ## Skill boundaries — stay in your lane
 
 Overlap causes mis-triggering. One topic, one owner:
@@ -208,6 +235,7 @@ Overlap causes mis-triggering. One topic, one owner:
 | `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
+| `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: establishing build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, repair-versus-rebuild, sequencing remediation | How to build or prove any individual fix; trap causes |
 | `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific |
 
 ## Tone

@@ -92,6 +92,10 @@ mode, not an advanced option. This needs to be visible without the user
 having to load a skill first. If the user declines, installation still
 succeeded — do not treat this as a blocking step.
 
+Once installed, point the user to the right entry point: if an ODC app
+already exists and its requirements are known, that entry point is
+`fulcrum-gap-analysis`; if there is no app yet, it is `fulcrum-solution-init`.
+
 ## What to report back when done
 
 - The resolved skills directory path.

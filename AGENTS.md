@@ -13,6 +13,7 @@ Route by situation below, then open the named `skills/<name>/SKILL.md`.
 | Your situation | Load |
 |---|---|
 | Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/fulcrum-solution-init` |
+| An app already exists and you need to know how it compares to its requirements, what is missing, or what to build next | `skills/fulcrum-gap-analysis` |
 | About to issue a Mentor turn, chunking a spec, unsure of session vs conversation, or a turn didn't land | `skills/fulcrum-mentor-turns` |
 | Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
 | Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
@@ -40,6 +41,8 @@ These hold even if no skill file is ever loaded:
 - Stuck twice on the same problem means stop and report. Never escalate
   model tier to break a stuck bug.
 - Disclose overruns and deviations. Never absorb them silently.
+- Citing a Fulcrum skill means applying a named rule from it — never attribute
+  a standard, benchmark, or conclusion to Fulcrum that its text does not state.
 - Capture a run identifier durably before the first wait.
 - Poll cadence depends on who pays for it: with a discardable poller, 45s for
   answer-back turns and 90s for turns that mutate the model; with no

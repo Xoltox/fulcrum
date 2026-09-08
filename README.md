@@ -19,6 +19,7 @@ A harness-agnostic skill set for driving OutSystems ODC Mentor through long, lar
 | Skill | Owns | When it fires |
 |---|---|---|
 | `fulcrum-solution-init` | Ingesting source material; decomposing into apps, agents, workflows; sizing phases and steps; probing tenant capabilities; scaffolding repo and specs | Once per project, before any Mentor turn. Run on deep-reasoning tier. |
+| `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, remediation sequencing | When an app already exists (generated or inherited) and you need to know where it stands against its requirements before planning further work. |
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session vs conversation; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start` call and during turn-by-turn execution. |
 | `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming | When building or editing any screen component or model element. |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
@@ -75,7 +76,16 @@ answers into the skill files themselves or into `MODEL-TIERS.md`.
 
 ## How it is meant to be used
 
-1. **Solution init (once per project).** Run `fulcrum-solution-init` on the deep-reasoning tier with your source material (BRD, Figma, mockups, or raw requirements). It produces the plan, specs, `tenant-profile.md`, and project repo scaffold. This phase is expensive but happens once.
+1. **Solution init (once per project, no app yet).** Run `fulcrum-solution-init` on the deep-reasoning tier with your source material (BRD, Figma, mockups, or raw requirements). It produces the plan, specs, `tenant-profile.md`, and project repo scaffold. This phase is expensive but happens once.
+
+   **If an app already exists instead**, start with `fulcrum-gap-analysis`
+   rather than solution-init — this is a first-class entry point, not a
+   repair path for something that went wrong. It applies equally to fresh
+   generator output (the platform's web app-generation route optimises for
+   speed over depth, so large gaps there are expected and normal) and to an
+   inherited mature app assessed at any time. It establishes where the app
+   stands against its requirements; remediation then proceeds through the
+   normal spec-and-turn path below.
 
 2. **Every session after init.** Run on the workhorse tier. Read the written spec and execute it step by step. Do not re-derive the plan; the plan is already written.
 
@@ -92,6 +102,9 @@ fulcrum/
       SKILL.md                    # When to run, what it does
       references/                 # Depth docs: decomposition, repo scaffold, tenant probe
       templates/                  # Handoff and spec templates; tenant-profile skeleton
+    fulcrum-gap-analysis/
+      SKILL.md
+      references/                 # Traceability matrix, finding classification, coverage reporting
     fulcrum-mentor-turns/
       SKILL.md
       references/                 # Prompt scaffolds, turn recovery
