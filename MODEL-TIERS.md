@@ -104,3 +104,57 @@ What survives from it, and is genuinely the rule:
   of the corrections to its own documented claims — it is a **prompt
   mechanism, not a model-tier effect**, and it does not become unnecessary at a
   higher tier.
+
+## Resolution — how a tier becomes a concrete model
+
+A tier name (`deep-reasoning`, `workhorse`, `poller`) is not itself a model.
+At runtime it resolves to one, in this priority order, first match wins:
+
+1. **A project-level override**, if the project's own rules or handoff
+   document specifies one. Budget and vendor access are per-engagement, so a
+   project is allowed to pin tiers to something other than the default.
+2. **`MODEL-TIERS.local.md`**, written once by the install interview and kept
+   beside the installed skills. Available models and per-subagent capability
+   are per-machine and per-harness, so this is the second-most-specific
+   source.
+3. **The documented defaults in this file** — the vendor mapping above.
+4. **If none of the above resolve** — no project override, no local file, no
+   applicable default row — ask the user. Do not guess a model name.
+
+### The install interview must not edit installed files
+
+This is a hard constraint, not a style preference. The install interview
+(`INSTALL.md`) records its five answers into a separate, generated
+`MODEL-TIERS.local.md`. It must never rewrite the installed skill files or
+this file. An installer that edits installed content makes every future
+update fight the user's own edits, and lets the deployed copy silently drift
+from source — exactly the failure this file exists to prevent for model
+names generally.
+
+`MODEL-TIERS.local.md` is generated and machine-local. Do not commit it to a
+project repository — regenerate it per install instead.
+
+### `MODEL-TIERS.local.md` template
+
+```markdown
+# Model tiers — local resolution
+
+Recorded: <date>
+Harness: <harness name, as it identified itself>
+
+1. Per-subagent model assignment supported: <yes / no>
+2. deep-reasoning tier: <model>
+3. workhorse tier: <model>
+4. poller tier: <model>
+5. Native context-free wait primitive available at any depth: <yes / no>
+```
+
+### Degradation path
+
+If question 1 comes back "no" — the harness cannot assign a different model
+per subagent — do not leave the file implying three distinct models are in
+play. Record the fact plainly, collapse all three tiers to the single model
+the harness actually runs, and point at `CONVENTIONS.md`'s canonical polling
+rule: with no discardable poller, the cadence floor becomes 90 seconds for
+every poll, not just build turns, because every poll then persists in the
+orchestrator's own context.

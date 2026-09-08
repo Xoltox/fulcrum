@@ -1,12 +1,55 @@
 # Delegation boundaries
 
-## Depth is one level. Full stop.
+## Depth is one level, with one named exception
 
-The orchestrator dispatches. **Subagents never dispatch.** Parallel agents are
-siblings under the orchestrator — a builder and a poller run side by side, never
-one inside the other.
+The orchestrator dispatches. **Subagents never dispatch**, with the single
+exception below. Parallel agents are siblings under the orchestrator — a builder
+and a poller run side by side, never one inside the other.
 
-There is no dial, no per-task grant, no depth counter. One level.
+**Mutating work is depth 1, always.** No build agent spawns children: not to
+parallelise its own work, not to hand off, not to continue itself.
+
+There is no dial, no per-task grant, no depth counter.
+
+### The exception — a nested poller, and nothing else
+
+[SINGLE-OBSERVATION] A subagent may spawn **one** nested agent whose only
+permitted action is to **wait and report**, and only when both hold:
+
+- the parent's **own tier is expensive** — a `deep-reasoning` or `workhorse`
+  agent, not a `poller`; and
+- the **phase is long**, so the parent would otherwise carry the whole run's
+  poll traffic in its own context. Every poll is a request and a response, both
+  persisting in the issuer's context (`../../fulcrum-mentor-turns/SKILL.md`,
+  "Polling"), so an expensive parent polling for itself burns the window it
+  needs for the actual work.
+
+The nested agent does not call `mentor_start`, does not fix anything, does not
+verify, and does not dispatch. It waits, reads run state, and reports terminal
+state upward.
+
+**It buys nothing** when the poller tier is already cheap relative to the
+parent, or when the harness offers a native wait primitive that costs no context
+at any agent depth (`../../../HARNESS-NOTES.md`). Prefer the primitive. Nest
+only to isolate cost — never for convenience, parallelism, or continuation.
+
+Evidence strength is deliberate: this is one person's experience on one harness
+with an expensive orchestrator, and it was reported as uncertain. It is a
+cost-isolation escape hatch, not a licence to nest.
+
+### Why one exception does not reopen the dial
+
+The objection to nesting stands unchanged: **a depth dial is only as good as an
+agent's willingness to respect it**, which is exactly what cannot be trusted
+unattended. The exception survives that objection only because it is
+**mechanically checkable** — one permitted role, one permitted action, no
+configurable number anywhere. Either the nested agent only waits and reports, or
+the rule was broken; there is nothing to reason about at runtime.
+
+So the exception is **not** the "successor spawning with a depth dial" pattern
+below, and must never be cited to reinstate it. A permitted role is not a depth
+setting. If you find yourself computing a current depth, you are outside this
+exception.
 
 ### SUPERSEDED — "successor spawning"
 
@@ -96,7 +139,8 @@ Non-negotiable in every subagent brief:
    agents writing the same file. Shared project documents belong to the
    orchestrator; the agent reports what should go into them.
 7. **The Mentor concurrency status** — whether it is permitted to touch Mentor at
-   all in this dispatch.
+   all in this dispatch, and whether the nested-poller exception above is
+   granted. Default for nesting is **no**; say so rather than leaving it unsaid.
 8. **The turn cap and the halt rule** — 1 build + 2 fix turns; stuck twice after
    a diagnostic step means stop and report.
 9. **"Correct my briefing — a correction beats agreement."** Verbatim, in every

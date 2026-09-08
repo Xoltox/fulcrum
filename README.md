@@ -19,7 +19,7 @@ A harness-agnostic skill set for driving OutSystems ODC Mentor through long, lar
 | Skill | Owns | When it fires |
 |---|---|---|
 | `fulcrum-solution-init` | Ingesting source material; decomposing into apps, agents, workflows; sizing phases and steps; probing tenant capabilities; scaffolding repo and specs | Once per project, before any Mentor turn. Run on deep-reasoning tier. |
-| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session vs conversation; staleness guard before mutations; polling cadence (45s for read turns, 90s for write); run-id durability; publish sequencing | Before issuing any `mentor_start` call and during turn-by-turn execution. |
+| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session vs conversation; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start` call and during turn-by-turn execution. |
 | `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming | When building or editing any screen component or model element. |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static-entity identifiers; reset and teardown paths | Before building any screen that reads from data. |
@@ -27,12 +27,51 @@ A harness-agnostic skill set for driving OutSystems ODC Mentor through long, lar
 
 ## Install
 
-Copy the contents of `skills/` into your agent's skills directory:
+### Preferred: ask your agent
 
-- Claude Code: `~/.claude/skills/`
-- Other harnesses: `~/.agents/skills/`
+Point your coding agent at this repository and say:
 
-For per-harness setup (frontmatter, adapters, auto-triggering), see `adapters/`. A scripted install is available at `adapters/generic/install.sh`.
+> Install Fulcrum from this repo (use the latest released tag, not the
+> default branch) following `INSTALL.md`.
+
+Your agent knows where its own skills directory lives, better than any
+instruction here could guess, and following `INSTALL.md` runs the install
+interview that records which models serve which tier — a manual copy skips
+that interview entirely. Install from a released tag rather than the tip of
+the default branch: a tag is a revision someone reviewed and froze, and what
+your agent reads to drive itself should be one of those, not whatever is
+mid-edit on the default branch.
+
+### Fallback: manual install, for a person
+
+Use this if you are installing without an agent's help.
+
+1. **Find your skills directory.** Claude Code reads from `~/.claude/skills/`.
+   Other harnesses commonly use `~/.agents/skills/` by convention — check your
+   harness's own docs if unsure.
+2. **Copy the six skill directories in whole**, not just their `SKILL.md`
+   files: `fulcrum-solution-init`, `fulcrum-mentor-turns`,
+   `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-seed-data`,
+   `fulcrum-unattended-guardrails`. Each carries a `SKILL.md` plus a
+   `references/` directory, and some carry a `templates/` directory — a skill
+   missing its `references/` is broken even though it looks installed.
+3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo
+   root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`).
+   `--dry-run` prints what it would do without changing anything. It is
+   additive only — it never deletes anything already in the target directory.
+4. **Verify the install.** Confirm each of the six directories exists at the
+   target path with its `SKILL.md` and `references/` intact, and that your
+   agent's skill listing (or equivalent discovery mechanism) picks them up.
+5. **Update later** by re-running step 2 or 3 against a newer tag — both are
+   safe to re-run and only add or overwrite files this repo ships.
+
+**A manual install gets no install interview.** The interview is what decides
+which model serves which tier (`deep-reasoning`, `workhorse`, `poller`) and
+whether your harness supports per-subagent model assignment — installing by
+hand means you must make those calls yourself. Read `MODEL-TIERS.md` for what
+to decide and the resolution order, then record your answers in a
+`MODEL-TIERS.local.md` file beside the installed skills — never edit the
+answers into the skill files themselves or into `MODEL-TIERS.md`.
 
 ## How it is meant to be used
 
@@ -68,12 +107,11 @@ fulcrum/
     fulcrum-unattended-guardrails/
       SKILL.md
       references/                 # Halt conditions, budgeting, delegation rules
-  adapters/
-    claude-code/                  # Claude Code harness-specific wiring
-    antigravity/                  # Antigravity harness-specific wiring
-    generic/                      # Portable install script
+  install.sh                      # Portable installer: skills/ -> target dir
   CONVENTIONS.md                  # Authoring contract (binding)
   MODEL-TIERS.md                  # Tier vocabulary and vendor mapping
+  INSTALL.md                      # Agent-driven install contract
+  HARNESS-NOTES.md                # Observed per-harness behaviour (not requirements)
   LICENSE                         # MIT
 ```
 

@@ -27,6 +27,12 @@ rules in force for the whole session. It owns nothing about *what* to build.
 - Proof obligations and instruments → `../fulcrum-verification/SKILL.md`
 - Plan, phases, handoff document structure → `../fulcrum-solution-init/SKILL.md`
 
+**Delegation posture — the default, not an advanced mode.** Fulcrum is meant to
+run aggressively orchestrated: the orchestrator supervises and never executes,
+subagents do the work and absorb poll traffic, and tiers are set per dispatch.
+Run undelegated only when the harness offers no subagent capability. The rules
+for all of it are in this file and `references/delegation.md`.
+
 ## The premise
 
 Unattended does not mean autonomous. It means: **the agent is trusted to stop
@@ -41,10 +47,9 @@ gate caught it; a human noticed the app looked wrong. Rollback tooling could not
 reach the last clean state, and recovery was manual through the vendor portal.
 
 Read the consequences: platform success signals cannot detect this class of
-damage, an unattended run can therefore destroy verified work without emitting
-a single error, and the only defences are a staleness guard before every
-mutating turn, a checkpoint that survives the agent, and a halt rule that fires
-early.
+damage, so an unattended run can destroy verified work without emitting a
+single error. The only defences are a staleness guard before every mutating
+turn, a checkpoint that survives the agent, and a halt rule that fires early.
 
 ## Session-start checklist
 
@@ -55,9 +60,13 @@ Before the first dispatch:
    not on disk, stop — that is init work, not build work.
 2. **Set the model tier explicitly** per `../../MODEL-TIERS.md`. Do not rely on
    inheritance.
-3. **Verify the wait mechanism once.** Establish a sleep primitive your harness
-   will not swallow inside a subagent, and reuse it for the whole session. A
-   silently-failing sleep turns a poll loop into an unbounded spin.
+3. **Verify the wait mechanism once.** A wait must neither spin nor accumulate
+   context. Prefer a native scheduling or wait primitive the harness provides
+   (works at any depth, costs no context), then a delegated poller whose
+   context is discarded, then an in-process sleep call. Confirm the chosen one
+   actually suspends and reuse it all session — a silently-swallowed wait turns
+   a poll loop into an unbounded spin. Harness-specific findings:
+   `../../HARNESS-NOTES.md`.
 4. **Record the current app revision.** It is the baseline every later "did this
    land / did this revert" question is answered against.
 5. **Name the checkpoint path** and the handoff path. Agents do not invent them.
@@ -120,12 +129,24 @@ Full rationale, brief structure, and the mandatory prompt elements:
 ## Subagent depth is ONE LEVEL
 
 The orchestrator dispatches directly. **Subagents never spawn subagents.**
-Parallel agents are siblings under the orchestrator, never nested.
+Parallel agents are siblings under the orchestrator, never nested. **Mutating
+work is depth 1, always** — no build agent spawns children, for any reason.
 
-`references/delegation.md` marks the "successor spawning" pattern found in the
-source corpus **SUPERSEDED**, and states what to do instead. Read it before
-granting any agent the ability to dispatch — it is the one thing in the corpus
-that a future agent could cite to grant itself nesting.
+**One exception, polling only.** [SINGLE-OBSERVATION] A subagent may spawn a
+single nested poller when its *own* tier is expensive and the phase is long,
+because otherwise the expensive parent accumulates the whole run's poll traffic
+in its own context. The nested agent may **do nothing but wait and report**.
+The exception buys nothing when the poller tier is already cheap, or when the
+harness has a native wait primitive that costs no context at any depth — prefer
+the primitive; nest only to isolate cost.
+
+No other nesting, for the original reason: a depth dial is only as good as an
+agent's willingness to respect it, which is exactly what cannot be trusted
+unattended. This exception survives that objection only because it is
+mechanically checkable — one permitted role with exactly one permitted action.
+It is therefore **not** the corpus's "successor spawning with a depth dial",
+which `references/delegation.md` marks **SUPERSEDED** and which stays
+superseded. Read that file before granting any agent the ability to dispatch.
 
 ## Concurrency lock — one Mentor session per app
 

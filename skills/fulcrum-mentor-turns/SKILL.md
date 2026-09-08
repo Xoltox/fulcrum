@@ -13,8 +13,8 @@ description: >
 version: "1.0.0"
 requires: >
   ODC MCP server authenticated; Mentor enabled on the tenant; a durable log
-  file for run identifiers; a sleep mechanism verified not to be swallowed by
-  the harness.
+  file for run identifiers; a wait capability that suspends without spinning or
+  accumulating context; a subagent dispatch capability where available.
 ---
 
 # Driving Mentor, turn by turn
@@ -24,6 +24,12 @@ This skill owns turn mechanics only, not:
 - construct-specific traps (aggregates, repeaters, icons, dates...) → `../fulcrum-engine-traps/SKILL.md`
 - proving a change actually works → `../fulcrum-verification/SKILL.md`
 - stop conditions, fix-turn caps, halt rules → `../fulcrum-unattended-guardrails/SKILL.md`
+
+**Delegation posture — the default, not an advanced mode.** Fulcrum is meant to
+run aggressively orchestrated: the orchestrator reads state, briefs, dispatches
+and reads terse reports back; subagents drive turns and absorb poll traffic. Poll
+without delegation only when the harness gives you no subagent, and pay the
+slower cadence below when you do. Rules: `../fulcrum-unattended-guardrails/SKILL.md`.
 
 ## 1. Turn granularity — the headline rule
 
@@ -59,12 +65,12 @@ aggregate plus a new widget type plus a date filter is not, regardless of
 ## 2. Prompt shape and the length ceiling
 
 This is a **platform constraint, not just economics.** [VERIFIED] A first turn
-carrying full spec scaffolding at roughly 1,400 characters was rejected twice
-by a web-application-firewall rule — a raw CDN 403 "Request blocked" response
-before the request ever reached Mentor. A short diagnostic prompt sent on the
-same session immediately after succeeded. Distinct from an auth failure (auth
-stays healthy) and from a permission-classifier block (different error
-string) — do not misdiagnose one as another.
+carrying full spec scaffolding at roughly 1,400 characters was rejected twice by
+a web-application-firewall rule — a raw CDN 403 "Request blocked" before the
+request ever reached Mentor; a short diagnostic prompt on the same session
+immediately after succeeded. Distinct from an auth failure (auth stays healthy)
+and from a permission-classifier block (different error string) — do not
+misdiagnose one as another.
 
 Keep turn prompts to a few sentences plus a terse numbered checklist. Avoid
 long runs of backticks and nested quoting in inline code — this correlates
@@ -127,41 +133,51 @@ If the answers are not `<N>` / YES, say so and STOP."
 
 ## 5. Polling
 
-Use the two canonical rates from `../../CONVENTIONS.md` — do not reinvent a
-cadence here and ignore any different value another doc suggests:
+**Every poll is a request *and* a response, and both persist in the context of
+whoever issued them.** Token cost, not wall clock, is what the cadence
+optimises — hold that mechanism and you can derive the right rate for a
+situation this skill did not anticipate.
 
-- **45 s** for turns where Mentor *answers* (read-only inventory, invariant
-  checks, "report what you see").
-- **90 s** for turns where Mentor *changes the model* (every build and fix
-  turn) and for **all** publish polling.
-- Ignore the server's suggested-interval field.
+**With a discardable poller** (a delegated agent whose context dies with it, so
+the cost is quarantined): **45 s** for turns where Mentor *answers* — read-only
+inventory, invariant checks, "report what you see"; **90 s** for turns where
+Mentor *changes the model* — every build and fix turn — and for **all** publish
+polling.
 
-Poll lean: request minimal detail by default, pull full detail only on a
-stall or a failure. Verify your sleep mechanism once at session start, then
-reuse it — a mechanism the harness silently swallows turns a poll loop into
-an unbounded spin. (Harness-specific sleep quirks belong in `adapters/`, not
-here.)
+**With no delegation available**, the orchestrator polls in its own context:
+**90 s floor for everything**, answer-back turns included, and longer still for
+a turn already known to run long. Fast polling in an undelegated loop grows the
+orchestrator's context on every iteration, cumulatively and unrecoverably —
+nothing later gives the window back, and a spent window ends the session's
+ability to supervise anything.
+
+**Never carry the 45 s rate into an undelegated loop.** It is affordable only
+because a throwaway context absorbs it. Tightening the loop when there is
+nobody to delegate to optimises wall clock, which is not the scarce resource.
+
+Ignore the server's suggested-interval field. Poll lean: request minimal detail
+by default, pull full detail only on a stall or a failure.
+
+### Waiting is a capability, not a shell command
+
+A wait must **neither spin nor accumulate context**. Preference order:
+
+1. A **native scheduling or wait primitive the harness provides** — works at
+   any agent depth and costs no context.
+2. A **delegated poller whose context is discarded** when it returns.
+3. An **in-process sleep call**.
+
+Verify once per session that the chosen mechanism actually suspends — one the
+harness silently swallows turns a poll loop into an unbounded spin. Never
+mandate an implementation here; harness-specific wait and sleep observations
+live in `../../HARNESS-NOTES.md`.
 
 ### Precedence over other installed polling guidance
 
-Another skill catalog may also be installed that prescribes a different
-cadence — operation tiers keyed to the *kind* of call, with a synchronous
-tier and a drain-then-pause tier. **When both are present, the cadence above
-governs.** Do not average them, and do not switch mid-session.
-
-Two reasons, stated so a future reader can re-decide with the evidence rather
-than guess at intent:
-
-- Cost against wall clock is better at 45/90 across a long multi-turn build.
-- Two rates split on one question an agent can always answer — *is Mentor
-  answering me, or changing the model?* — are followed correctly more often
-  than three tiers split on operation type, which requires classifying the
-  call first. Robustness in an unattended loop beats theoretical precision.
-
-That other catalog records per-poll telemetry, so it may hold data this rule
-does not. If its cadence is ever shown to win on measured cost-to-wall-clock
-for the mutating case, this rule is the one to change — update it here, in
-`../../CONVENTIONS.md`, and in the sibling skills that defer to it.
+Another installed catalog may prescribe operation tiers keyed to the *kind* of
+call. **When both are present, the cadence above governs** — do not average
+them and do not switch mid-session. Rationale, and the conditions under which
+this rule should be changed: `references/polling.md`.
 
 ## 6. Run-id durability and orphaned runs
 

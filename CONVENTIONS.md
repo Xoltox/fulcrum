@@ -32,13 +32,13 @@ scripted agent loop. Therefore:
   `env_app`, `app_revisions`, `context_*`). These are the ODC surface itself, not
   a harness feature. Write them bare — no `mcp__outsystems__` prefix, which is
   Claude-Code-specific wiring.
-- **No harness-specific frontmatter in the body of a skill.** `allowed-tools`,
-  slash-command syntax, and `$ARGUMENTS` belong in `adapters/`, not here.
-- **Quirks of one harness go in `adapters/<harness>/notes.md`**, not in a skill.
-  Example: "sleep via `python3 -c 'import time; time.sleep(n)'`, never bash
-  `sleep`" is a Claude Code subagent quirk. The portable rule is: "sleep via a
-  mechanism your harness will not swallow — verify once at session start, then
-  reuse it."
+- **No harness-specific frontmatter or syntax in a skill.** `allowed-tools`,
+  slash-command syntax and `$ARGUMENTS` are one harness's wiring. Leave them
+  out entirely — an installing agent adds whatever its own harness needs.
+- **Quirks of one harness go in `HARNESS-NOTES.md`**, never in a skill, and are
+  written as one harness's observation that another may or may not share. A
+  skill states the capability it needs and the property that must hold; the
+  harness picks the implementation.
 
 ## Hard rule 2 — platform truth by default
 
@@ -124,7 +124,8 @@ requires: <capabilities in prose, e.g. "ODC MCP server authenticated; Mentor
 ```
 
 No `allowed-tools`, no `license`, no `compatibility`, no `metadata:` block.
-Harness-specific frontmatter is injected by `adapters/`.
+Anything a specific harness requires is added at install time by the agent
+doing the installing, never carried in the source.
 
 `name` must match the directory name exactly, and must be globally unique — the
 source corpus contains two skill directories declaring the same `name`, which
@@ -142,15 +143,29 @@ made one of them unresolvable.
 
 These were wrong or missing in the source corpus. They are correct here.
 
-**Mentor polling cadence — two rates, by turn type:**
+**Waiting is a capability, not a shell command.** A wait must neither spin nor
+accumulate context. Preference order: a native scheduling or wait primitive the
+harness provides (works at any agent depth) > a delegated poller whose context
+is discarded > an in-process sleep call. Verify once at session start that the
+chosen mechanism actually suspends — a mechanism the harness silently swallows
+turns a poll loop into an unbounded spin. Never mandate one implementation;
+harness-specific findings belong in `HARNESS-NOTES.md`.
 
-- **45 s** for turns where Mentor *answers* — read-only inventory, invariant
-  checks, "report what you see" turns.
-- **90 s** for turns where Mentor *changes the model* — any build or fix turn,
-  and all publish polling.
+**Mentor polling cadence — the rate depends on who is paying for the poll.**
+Each poll is a request *and* a response, and both persist in the context of
+whoever issued them. That cost, not wall clock, is what the cadence optimises.
+
+- **With a discardable poller** (a delegated agent whose context dies with it):
+  **45 s** for turns where Mentor *answers* — read-only inventory, invariant
+  checks, "report what you see"; **90 s** for turns where Mentor *changes the
+  model* — any build or fix turn, and all publish polling.
+- **With no delegation available** — the orchestrator polls in its own context:
+  **90 s floor for everything**, answer-back turns included, and longer still
+  for a turn known to run long. Polling fast here grows the orchestrator's
+  context on every iteration, which is cumulative and unrecoverable.
+- The 45 s rate is affordable *only* because a throwaway context absorbs it.
+  Never carry that rate into an undelegated loop.
 - Ignore the server's `pollAfterMs` field.
-- Never poll at a fixed short interval for a mutating turn; never poll a
-  read-back turn at 90 s and waste half the wall clock.
 
 **Model tiering — phase-based, not flat:**
 
@@ -158,6 +173,26 @@ These were wrong or missing in the source corpus. They are correct here.
   `deep-reasoning` tier, optionally `workhorse` if budget is tight.
 - Every session after init: `workhorse` tier orchestrator.
 - All poll loops and wait states: `poller` tier.
+- Tiers are resolved per install, and may be overridden per project. See
+  `MODEL-TIERS.md` for the resolution order and the local-override contract.
+
+**Subagent depth — one level, with a single narrow exception:**
+
+- Mutating work is **depth 1**, always: the orchestrator dispatches directly and
+  no build agent spawns its own children.
+- **Exception, polling only.** A subagent may spawn one nested poller when its
+  own tier is expensive and the phase is long — otherwise the expensive parent
+  accumulates poll traffic in its context for the whole run. The nested agent
+  may do nothing but wait and report. [SINGLE-OBSERVATION]
+- This exception buys nothing when the poller tier is already cheap, or when the
+  harness offers a native wait primitive that costs no context at any depth.
+  Prefer the primitive; nest only to isolate cost.
+- No other nesting. A depth dial is only as good as an agent's willingness to
+  respect it, which is exactly what cannot be trusted unattended.
+
+**Delegation posture is a default, not an advanced mode.** Aggressive
+orchestration is how this skill set is meant to run, so it belongs on the
+always-visible surface (`AGENTS.md`) and not only inside the guardrails skill.
 - Full rationale and the vendor mapping live in `MODEL-TIERS.md`. A flat
   single-tier policy appears in the source corpus as a budget-exhaustion
   artifact — record it as history, never as the rule.

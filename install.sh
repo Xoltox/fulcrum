@@ -15,7 +15,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-SRC="$SCRIPT_DIR/../../skills"
+SRC="$SCRIPT_DIR/skills"
 
 DEST="$HOME/.claude/skills"
 DRY_RUN=0
@@ -69,4 +69,4 @@ else
 fi
 
 echo "Done. Installed skills:"
-ls "$DEST" | grep '^odc-' || true
+ls "$DEST" | grep '^fulcrum-' || true

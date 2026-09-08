@@ -28,6 +28,10 @@ These hold even if no skill file is ever loaded:
   still advances.
 - One Mentor session at a time **per app** (concurrency across different apps
   is allowed; the ceiling is unpublished and may change server-side).
+- Aggressive orchestration is the default, not an advanced option: delegate
+  poll loops and read-only inspection to subagents; keep judgement and
+  verification verdicts in the orchestrator. Mutating work is depth 1 always.
+  See `skills/fulcrum-unattended-guardrails` for the rules.
 - One subagent depth level. No nesting.
 - The orchestrator never calls Mentor, publish, REST, or gate scripts itself
   — it dispatches.
@@ -37,6 +41,9 @@ These hold even if no skill file is ever loaded:
   model tier to break a stuck bug.
 - Disclose overruns and deviations. Never absorb them silently.
 - Capture a run identifier durably before the first wait.
+- Poll cadence depends on who pays for it: with a discardable poller, 45s for
+  answer-back turns and 90s for turns that mutate the model; with no
+  delegation, a 90s floor for everything. See `skills/fulcrum-mentor-turns`.
 
 ## Tenant-varying facts
 
