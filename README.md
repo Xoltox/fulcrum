@@ -1,6 +1,6 @@
 # Fulcrum
 
-A harness-agnostic skill set for driving OutSystems ODC Mentor through long, largely unattended build sessions with real guardrails. Derived from a 47-step production ODC build and its incident log — the traps are field-observed, not theoretical.
+A harness-agnostic skill set for driving OutSystems ODC Mentor through long, largely unattended build sessions with real guardrails. Derived from multiple zero-shot, one-shot, multi-shot, and long-running ODC builds and their incident/build logs — the traps are field-observed, not theoretical.
 
 ## Why this exists
 
@@ -140,7 +140,7 @@ Two headline rules:
 
 ## Status and provenance
 
-Derived from a single production ODC build on one tenant. The traps are field-observed but the skill set has been exercised on one harness only; other harnesses are untested.
+Derived from several ODC builds across different tenants and build styles (zero-shot, one-shot, multi-shot, long-running) — the oneshot stage build plus error and build logs from other, separate builds. The traps are field-observed but the skill set has been exercised on one harness only; other harnesses are untested.
 
 This skill set complements and does not replace the separate `outsystems-mcp-skills` catalog, which covers app bootstrap, architecture dependency analysis, and deploy workflows. Fulcrum layers long-run build discipline and construction correctness on top.
 
