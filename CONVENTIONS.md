@@ -5,9 +5,9 @@ Read this before writing or editing any skill in `skills/`. It is binding.
 ## What Fulcrum is
 
 A harness-agnostic skill set for driving **OutSystems ODC Mentor** through long,
-largely unattended build sessions with real guardrails. Derived from a 47-step,
-multi-week agentic build that shipped a working ODC app, plus the incident log
-from that build.
+largely unattended build sessions with real guardrails. Derived from several ODC
+builds across different tenants and build styles — zero-shot, one-shot,
+multi-shot and long-running — plus their incident and build logs.
 
 The unit of work is a **solution**, not an app: possibly several apps, agents and
 workflows under one plan.

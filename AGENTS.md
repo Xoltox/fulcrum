@@ -2,8 +2,9 @@
 
 Fulcrum is a harness-agnostic skill set for driving OutSystems ODC Mentor
 through long, largely unattended build sessions with real guardrails. It is
-derived from a 47-step production build and its incident log: the rules here
-encode what actually broke, and what proved a change had actually landed.
+derived from several ODC builds across different tenants and build styles, and
+their incident and build logs: the rules here encode what actually broke, and
+what proved a change had actually landed.
 
 This file is the entry point on harnesses without skill auto-triggering.
 
