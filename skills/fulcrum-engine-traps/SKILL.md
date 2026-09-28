@@ -15,7 +15,7 @@ version: "1.0.0"
 requires: >
   A construct to check against this registry; tenant-profile.md present or
   in progress for tenant-varying facts (icon font, UI-block availability,
-  meridiem tokens, db_query liveness).
+  meridiem tokens).
 ---
 
 # ODC engine traps

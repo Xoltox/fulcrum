@@ -69,4 +69,4 @@ else
 fi
 
 echo "Done. Installed skills:"
-ls "$DEST" | grep '^fulcrum-' || true
+ls "$DEST" | grep '^fulcrum\(-\|$\)' || true

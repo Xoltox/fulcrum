@@ -1,6 +1,6 @@
 # Recovery playbook for interrupted turns
 
-Four distinct interruption shapes. Diagnose which one before reacting — the
+Five distinct interruption shapes. Diagnose which one before reacting — the
 correct recovery differs for each, and applying the wrong one wastes a run or
 starts a competing one.
 
@@ -50,7 +50,45 @@ recurs after a clean retry with healthy auth, stop and report — do not
 iterate trying to route around a policy denial; see the hard-stop list in
 `../../fulcrum-unattended-guardrails/SKILL.md`.
 
-## Cross-cutting rule for all four
+## 5. Abandoning an in-flight prompt or a whole stale session
+
+Fulcrum previously named no cleanup call for this — "discard the session"
+had nowhere to point. Two distinct ops now cover it. `[SCHEMA]`
+
+- **`mentor_cancel_prompt(sessionId, runId)`** cancels the in-flight prompt on
+  that session **only if `runId` is the session's current run** — otherwise
+  it is a no-op. The session itself **stays open**. Use this when you want to
+  abandon one bad turn but keep the conversation (its prior consult-turn
+  proposal, its accepted corrections) for the next attempt.
+- **`mentor_close_session(sessionId)`** tears the session down outright: it
+  cancels any in-flight run, releases the workspace context, and stops
+  progress tracking. The `sessionId` is **not usable afterward.** This is the
+  call behind `../SKILL.md`'s staleness guard — "close the stale session,
+  then open a fresh one" means this call, not a bare abandonment.
+
+**Why this matters, not just hygiene:** `mentor_prompt` issued while a prior
+prompt is still running on that session is **silently ignored** — no error.
+`[VERIFIED]` An abandoned in-flight prompt is therefore not inert: a later
+prompt on the same session can be dropped with no signal, and the agent has
+no way to tell "ignored" apart from "landed" without re-reading state. Close
+or cancel before ever reusing a session you suspect is still mid-run.
+
+**Never assume abandoning a run without calling either op frees anything.**
+Nothing in the schema states that letting a session go idle releases its
+workspace context or its tenant slot. Treat an unclosed session as still
+consuming both until `mentor_close_session` confirms otherwise.
+
+### The staleness incident this guards against
+
+[SINGLE-OBSERVATION, worst case] Resuming a stale session and publishing from
+it once reverted a live app past six completed steps, wiping screens and
+entities while layering new work onto the stale base. No automated gate
+caught it — a human noticed the app looked wrong. Rollback tooling could not
+reach the clean state; recovery was manual through the vendor portal. A
+`mentor_close_session` call the moment staleness was suspected would have
+made the stale session unusable before any publish could reach it.
+
+## Cross-cutting rule for all five
 
 Never let an interruption become a reason to start a second turn or a second
 publish covering the same scope while the first might still be alive or

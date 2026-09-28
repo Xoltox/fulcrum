@@ -33,19 +33,16 @@ On FAIL: **halt.** Re-gate at the start of every session regardless of this row.
 
 ---
 
-## 1. `db_query` liveness
+## 1. Live row data — not a tenant fact
 
-| Field | Value |
-|---|---|
-| Fact | Is there a model-layer path to live row data? |
-| Answer | \<LIVE / DEAD\> |
-| Probe | Trivial constant select |
-| Observed | \<quote the response, including row count\> |
-| Date | \<date\> |
+No row here. There is no model-layer path to live row data on any tenant, so nothing
+varies and nothing is probed. `[SCHEMA]` Do not re-add a `db_query` row.
 
-If DEAD: there is **no** model-layer row read on this tenant. Row verification costs a
-temporary diagnostic endpoint — roughly two Mentor turns and two revisions per seed step.
-Budget accordingly.
+Consequence to carry into the plan: row verification needs a separate diagnostic
+instrument — historically a temporary diagnostic endpoint at roughly two Mentor turns and
+two revisions per seed step. Budget accordingly. The instrument for live row data is
+`exec_in_app` against a harness fork `[SCHEMA]`; the procedure lives in
+`fulcrum-verification`, not here.
 
 ---
 
@@ -157,6 +154,20 @@ An unknown ceiling means every long spec risks truncation, whose failure mode is
 | Can Mentor add screens to this application type? | \<observed answer\> |
 | Confusable apps on the tenant — NOT the target | \<list, or None\> |
 | Date | \<date\> |
+
+---
+
+## 10. Tool availability
+
+Three states only — never a plain yes/no. Full rules:
+`../references/tool-availability-and-fallback.md` and
+`../references/tenant-capability-probe.md`, heading "Tool availability — three
+states, not two". `Unknown` is correct and expected for a mutating op that a
+read-only probe never called — do not upgrade it to "available".
+
+| Op | State (callable / unavailable / unknown) | Evidence (result or exact error text) | Fallback if unavailable | Date |
+|---|---|---|---|---|
+| \<op name\> | \<…\> | \<…\> | \<see tool-availability-and-fallback.md, or "none — halt"\> | \<…\> |
 
 ---
 

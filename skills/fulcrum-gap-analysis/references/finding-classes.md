@@ -21,9 +21,11 @@ Running it in this order is what stops everything becoming a Gap. A pass that ch
 3. **Does the app do something in this area at all?** If nothing exists — no entity, no
    attribute, no screen, no action, no role assignment — it is a **Gap**.
 4. **It exists but differs.** It is **Drift**. Before calling any Drift a defect, sweep
-   for a decision record (see `provenance.md`). Found one → Drift, deliberate, not a
-   defect. None found → **Drift — undetermined**, and say that the absence of a record
-   is not evidence of a mistake.
+   `.fulcrum/DECISIONS.md` for a decision record (see `provenance.md`) — including a
+   `Decider: mentor` record from a Mentor turn accepted under `posture: collaborative`,
+   or a `Decider: user`/`agent` record from a `fulcrum-discovery` interview. Found one
+   → Drift, deliberate, not a defect. None found → **Drift — undetermined**, and say
+   that the absence of a record is not evidence of a mistake.
 5. **Separately, sweep the inventory for artifacts no requirement claims.** Each is an
    **Undocumented addition**. Judge each as valuable, neutral, or scope creep, with a
    reason. Never silently a defect; never silently deleted from the plan either.

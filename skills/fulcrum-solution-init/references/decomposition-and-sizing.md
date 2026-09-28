@@ -143,7 +143,7 @@ Two things to take from this:
 
 - **Seed steps are the most expensive class, not the cheapest.** They look trivial and
   are not, because verifying that rows actually landed is itself expensive when there is
-  no model-layer row read (see `db_query` in `tenant-profile.md`). Size a seed step as a
+  no model-layer row read on any tenant `[SCHEMA]`. Size a seed step as a
   step in its own right, never as a preamble bolted onto a screen step.
 - **A "one turn" spec is a fiction.** Steps that were sized to one Mentor turn ran ~14.
   Size steps by *scope*, and let turn decomposition inside the step be the build agent's

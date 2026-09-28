@@ -2,239 +2,199 @@
 name: fulcrum-mentor-turns
 description: >
   How to drive ODC Mentor turn by turn so a turn lands first try and nothing
-  silently reverts — turn granularity and decomposition, prompt shape and the
-  length ceiling, session vs conversation, the staleness guard before any
-  mutating turn, polling cadence, run-id durability, and publish sequencing.
-  Use when the user says "drive Mentor to build this", "my Mentor turn
-  failed", "Mentor isn't applying changes", "how should I chunk this spec for
-  Mentor", "Mentor stalled", "the turn didn't land", "how often should I poll
-  Mentor", "reuse the Mentor session or start fresh", or before issuing any
-  `mentor_start` call.
+  silently reverts — turn granularity, prompt shape and length ceiling,
+  posture (collaborative consult/review/build vs directive), session vs
+  conversation, the staleness guard, polling cadence, run-id durability,
+  session cleanup, and publish sequencing. Use when the user says "drive
+  Mentor to build this", "my Mentor turn failed", "Mentor isn't applying
+  changes", "how should I chunk this spec", "Mentor stalled", "how often
+  should I poll Mentor", "reuse the session or start fresh", or before any
+  `mentor_start_session` / `mentor_create_asset` / `mentor_load_asset` /
+  `mentor_prompt` call.
 version: "1.0.0"
 requires: >
   ODC MCP server authenticated; Mentor enabled on the tenant; a durable log
-  file for run identifiers; a wait capability that suspends without spinning or
-  accumulating context; a subagent dispatch capability where available.
+  file for run identifiers; a wait capability that suspends without spinning
+  or accumulating context; a subagent dispatch capability where available.
 ---
 
 # Driving Mentor, turn by turn
 
-This skill owns turn mechanics only, not:
-- what to build, or step sizing → `../fulcrum-solution-init/SKILL.md`
-- construct-specific traps (aggregates, repeaters, icons, dates...) → `../fulcrum-engine-traps/SKILL.md`
-- proving a change actually works → `../fulcrum-verification/SKILL.md`
-- stop conditions, fix-turn caps, halt rules → `../fulcrum-unattended-guardrails/SKILL.md`
+This skill owns turn mechanics only, not: what to build or step sizing
+(`../fulcrum-solution-init/SKILL.md`); construct-specific traps
+(`../fulcrum-engine-traps/SKILL.md`); proving a change works
+(`../fulcrum-verification/SKILL.md`); stop/halt rules
+(`../fulcrum-unattended-guardrails/SKILL.md`).
 
-**Delegation posture — the default, not an advanced mode.** Fulcrum is meant to
-run aggressively orchestrated: the orchestrator reads state, briefs, dispatches
-and reads terse reports back; subagents drive turns and absorb poll traffic. Poll
-without delegation only when the harness gives you no subagent, and pay the
-slower cadence below when you do. Rules: `../fulcrum-unattended-guardrails/SKILL.md`.
+**Delegation posture — the default, not an advanced mode.** The orchestrator
+reads state, briefs and dispatches; subagents drive turns and absorb poll
+traffic. Poll undelegated only when the harness gives no subagent, at the
+slower cadence below (`../fulcrum-unattended-guardrails/SKILL.md`).
+
+**The sequence, and why the branch is a rule.** `mentor_start_session` →
+`mentor_create_asset` for a brand-new asset **or** `mentor_load_asset` by id
+for an existing one → `mentor_prompt` → poll `mentor_get_run` to a terminal
+state. `[SCHEMA]` No asset mutation is possible before create or load has
+been called — decide which branch applies before the first prompt, not after
+a rejected one.
 
 ## 1. Turn granularity — the headline rule
 
 **Mentor is not a batch processor. One coherent unit of change per turn.**
+[VERIFIED] A monolithic 8-element turn ran ~50 minutes, went event-silent,
+lost its run and session token — **zero of the 8 had applied** on read-back.
+The same scope as **9 granular turns landed all 9**, faster overall, and
+surfaced a real spec defect the monolithic version would have silently
+absorbed. Full numbers: `references/granularity.md`.
 
-[VERIFIED] A single monolithic turn carrying 8 elements ran ~50 minutes, went
-event-silent for the last ~28 minutes, was evicted from the run registry, and
-lost its session token. Terminal result, validation state and refreshed token
-were gone permanently — a liveness probe proved the run was still alive
-shortly before eviction, so this was not a misread. Read back afterward: **zero
-of the 8 elements had applied.** The same scope, rebuilt as **9 granular turns**
-(786–5,057 chars each), landed all 9 — every one `change_applied: true`, 0
-errors — in **25m44 total wall clock, faster than the single failed monolithic
-attempt.** Decomposing the scope also surfaced a real spec defect (a foreign
-key resolved from the wrong natural key) that the monolithic version would
-have silently absorbed as a null foreign key on every affected row.
-
-[VERIFIED] Separately, two other steps' full-spec single-turn attempts stalled
-and were abandoned — one twice — before the same scope landed cleanly as
-batched turns (8 turns in one case).
-
-**Corollary — state this explicitly to any subagent:** a step's spec is the
-*orchestrator's checklist to work through*, not the text of one prompt. Never
-hand a subagent 250 lines and say "implement this spec." Tell it to decompose
-into turns and list them before starting.
-
-**Batch identical-shape work; never batch by count.** What makes a turn slow
-or wrong is a new widget type or many filters mixed together, not the number
-of elements. Six identical aggregates in one turn is cheap and safe; one
-aggregate plus a new widget type plus a date filter is not, regardless of
-"only 3 things." Split by shape, not by count.
+**Corollary:** a step's spec is the *orchestrator's checklist to work
+through*, not one prompt's text. Tell a subagent to decompose into turns and
+list them first — never hand it 250 lines and say "implement this spec."
+**Batch identical-shape work; never batch by count** — a new widget type or
+mixed filters make a turn slow or wrong, not the element count. Six identical
+aggregates in one turn is safe; one aggregate plus a widget type plus a date
+filter is not. Split by shape, not by count.
 
 ## 2. Prompt shape and the length ceiling
 
-This is a **platform constraint, not just economics.** [VERIFIED] A first turn
-carrying full spec scaffolding at roughly 1,400 characters was rejected twice by
-a web-application-firewall rule — a raw CDN 403 "Request blocked" before the
-request ever reached Mentor; a short diagnostic prompt on the same session
-immediately after succeeded. Distinct from an auth failure (auth stays healthy)
-and from a permission-classifier block (different error string) — do not
-misdiagnose one as another.
+This is a **platform constraint, not just economics.** [VERIFIED] A ~1,400
+character first turn was rejected twice by a web-application-firewall rule —
+a raw CDN 403 before the request ever reached Mentor; a short diagnostic
+prompt on the same session immediately after succeeded. Distinct from an auth
+failure (auth stays healthy) and a permission-classifier block (different
+error string) — do not misdiagnose one as another.
 
-Keep turn prompts to a few sentences plus a terse numbered checklist. Avoid
-long runs of backticks and nested quoting in inline code — this correlates
-with rejection.
-
-**The exact character ceiling is a [TENANT] fact.** Check `tenant-profile.md`
-for the Mentor prompt-length ceiling before assuming a number; do not hardcode
-one here.
+Keep prompts to a few sentences plus a terse numbered checklist. Avoid long
+runs of backticks and nested quoting — this correlates with rejection. **The
+exact character ceiling is a [TENANT] fact** — check `tenant-profile.md`
+before assuming a number.
 
 ## 3. Prompt scaffolds
 
 Measured-working templates (READ-then-MIRROR, the read-only stop-gate, forced
-itemized proof, no-silent-substitution...) plus the phrasings that measurably
-failed — in `references/prompt-scaffolds.md`. Load before authoring any
-non-trivial turn prompt.
+itemized proof, no-silent-substitution, the consult-turn opener...) plus
+phrasings that measurably failed, and the rule for quoting untrusted
+`app_logs` text before it goes into a `mentor_prompt` — all in
+`references/prompt-scaffolds.md`. Load before authoring any non-trivial turn.
+
+## 3a. Posture — what changes under `collaborative` vs `directive`
+
+Posture is defined and its rationale owned by `../../CONVENTIONS.md`, heading
+"Mode and posture" — not restated here. `collaborative` (default) opens a
+step with a read-only **consult turn**, a **review** against
+`../fulcrum-engine-traps/SKILL.md` correcting only the trap(s) actually
+tripped — never the whole proposal, which is `directive` wearing a consult
+turn — then the **build turn**, sharing the consult turn's conversation
+(section 4). `directive` drops the consult phase; nothing else changes. An
+accepted Mentor proposal is a decision (`Decider: mentor`,
+`../fulcrum-project-state/templates/DECISIONS.md`). Economics stay
+`[UNVERIFIED]` — never cite as a finding. Mechanics, scaffold, review failure
+mode: `references/posture.md`.
 
 ## 4. Session vs conversation, and the staleness guard
 
 **Reuse one Mentor session across agents. Open one conversation per
-step-level task**, by requesting fresh context on that step's first turn. Do
+step-level task**, by requesting fresh context on the step's first turn. Do
 **not** open a fresh session per step — that burns a tenant session slot. One
-build turn plus its fix turns within a step share a conversation.
+build turn plus its fix turns share a conversation.
 
-Never treat a session-reuse deviation as precedent. Re-issue this instruction
-explicitly every step — the incident below happened because a prior
-one-off instruction was assumed to carry forward.
+Never treat a session-reuse deviation as precedent — re-issue this
+instruction every step. **Under `collaborative` posture this is
+load-bearing:** the consult and build turns of one step must share a
+conversation, or Mentor re-derives an approach and the review's corrections
+are silently discarded (section 3a).
 
 ### The critical warning
 
 Requesting fresh context does **not** guarantee a current model. [VERIFIED]
-Staleness has been observed one step behind and two steps behind, with no
-warning signal. Publishing from a stale model **silently reverts completed
-work** while the revision number advances normally — revision-checking is
-blind to this class of damage. [SINGLE-OBSERVATION, worst case] Resuming a
-stale session and publishing from it reverted a live app past six completed
-steps, wiping screens and entities while layering new work onto the stale
-base. No automated gate caught it — a human noticed the app looked wrong.
-Rollback tooling could not reach the clean state; recovery was manual through
-the vendor portal.
+Staleness has been observed one and two steps behind, with no warning
+signal. Publishing from a stale model **silently reverts completed work**
+while the revision number advances normally — revision-checking is blind to
+this class of damage. [SINGLE-OBSERVATION, worst case] A stale publish once
+reverted a live app past six completed steps with no gate catching it. Full
+incident and the cleanup call that guards against it: `references/recovery.md`.
 
 ### The guard
 
 Every step's first turn is a **cheap, read-only invariant check** against
-known prior state, phrased so a mismatch halts the run immediately — e.g. "how
-many aggregates does screen `<X>` have, and does a widget named `<Y>` exist?
-If the answers are not `<N>` / YES, say so and STOP."
+known prior state, phrased so a mismatch halts the run — e.g. "how many
+aggregates does screen `<X>` have, and does a widget named `<Y>` exist? If
+the answers are not `<N>` / YES, say so and STOP."
 
-- Use the step's **own verified ground truth** — what you actually confirmed
-  the prior step produced — never a possibly-stale figure copied from a
-  handoff document.
-- **If it mismatches, discard the session and open a fresh one.** A
-  revision-number check does not substitute for this; the revision still
-  advances under a stale publish.
-- In a multi-screen step, **each sibling screen gets its own independent
-  check.** Never transfer a passing check from one mirrored screen to another.
-- Confound to hold in mind: Mentor's own arithmetic is independently
-  unreliable, so a wrong count on this check may be a read-back error rather
-  than true staleness. **The safe response is the same either way: discard
-  the session.**
+- Use the step's **own verified ground truth**, never a stale figure copied
+  from a handoff document.
+- **If it mismatches, close the stale session, then open a fresh one.** Call
+  `mentor_close_session` on the stale `sessionId` — it tears the session
+  down, cancels any in-flight run, and releases the workspace context in one
+  call; the `sessionId` is unusable afterward. `[SCHEMA]` A revision-number
+  check does not substitute for this. Detail: `references/recovery.md`.
+- Each sibling screen in a multi-screen step gets its **own independent
+  check** — never transfer a pass across mirrored screens. A wrong count may
+  be a read-back error rather than true staleness — **the safe response is
+  the same either way: close the session.**
 
 ## 5. Polling
 
-**Every poll is a request *and* a response, and both persist in the context of
-whoever issued them.** Token cost, not wall clock, is what the cadence
-optimises — hold that mechanism and you can derive the right rate for a
-situation this skill did not anticipate.
+**Every poll of `mentor_get_run` is a request *and* a response, and both
+persist in the context of whoever issued them.** Token cost, not wall clock,
+is what the cadence optimises. **With a discardable poller** (context dies
+with it): **45 s** for turns where Mentor *answers*; **90 s** for turns that
+*change the model* — every build/fix turn and all publish polling. **With no
+delegation available**, the orchestrator polls `mentor_get_run` in its own
+context: **90 s floor for everything**, answer-back included — never carry
+the 45 s rate into an undelegated loop, since it's affordable only because a
+throwaway context absorbs it.
 
-**With a discardable poller** (a delegated agent whose context dies with it, so
-the cost is quarantined): **45 s** for turns where Mentor *answers* — read-only
-inventory, invariant checks, "report what you see"; **90 s** for turns where
-Mentor *changes the model* — every build and fix turn — and for **all** publish
-polling.
+Ignore the server's suggested-interval field. Poll lean: minimal detail by
+default, full detail only on a stall or failure. Derivation: `references/polling.md`.
 
-**With no delegation available**, the orchestrator polls in its own context:
-**90 s floor for everything**, answer-back turns included, and longer still for
-a turn already known to run long. Fast polling in an undelegated loop grows the
-orchestrator's context on every iteration, cumulatively and unrecoverably —
-nothing later gives the window back, and a spent window ends the session's
-ability to supervise anything.
+**Waiting is a capability, not a shell command** — canonical preference order
+and the verify-once rule: `../../CONVENTIONS.md`, heading "Canonical facts —
+use these exact values"; harness notes: `../../HARNESS-NOTES.md`.
 
-**Never carry the 45 s rate into an undelegated loop.** It is affordable only
-because a throwaway context absorbs it. Tightening the loop when there is
-nobody to delegate to optimises wall clock, which is not the scarce resource.
-
-Ignore the server's suggested-interval field. Poll lean: request minimal detail
-by default, pull full detail only on a stall or a failure.
-
-### Waiting is a capability, not a shell command
-
-A wait must **neither spin nor accumulate context**. Preference order:
-
-1. A **native scheduling or wait primitive the harness provides** — works at
-   any agent depth and costs no context.
-2. A **delegated poller whose context is discarded** when it returns.
-3. An **in-process sleep call**.
-
-Verify once per session that the chosen mechanism actually suspends — one the
-harness silently swallows turns a poll loop into an unbounded spin. Never
-mandate an implementation here; harness-specific wait and sleep observations
-live in `../../HARNESS-NOTES.md`.
-
-### Precedence over other installed polling guidance
-
-Another installed catalog may prescribe operation tiers keyed to the *kind* of
-call. **When both are present, the cadence above governs** — do not average
-them and do not switch mid-session. Rationale, and the conditions under which
-this rule should be changed: `references/polling.md`.
+**Precedence.** Another installed catalog may prescribe operation-tier
+cadences instead — when both are present, the cadence above governs; do not
+average or switch mid-session. Rationale: `references/polling.md`.
 
 ## 6. Run-id durability and orphaned runs
 
-Capture the run identifier the instant a turn starts, and **write it to a
-durable log before the first sleep.** If the polling agent dies afterward, an
-uncaptured identifier dies with it and the work becomes permanently
-unreadable even though it may have completed.
+Capture the run identifier the instant a turn starts and **write it to a
+durable log before the first sleep** — an uncaptured id dies with a crashed
+polling agent even though the work may have completed. A "run not found"
+response can be spurious: never conclude the run died or start a competing
+turn on that basis. Re-issuing a start call is safe **only if it does not
+report a run already in flight**; a nonzero internal-retry count can appear
+with no visible defect — disclose it, don't treat it as failure.
 
-- A "run not found" response can be spurious. Never conclude the run died,
-  and never start a competing turn on that basis.
-- Re-issuing a start call is safe **only if it does not report a run already
-  in flight** — that absence is positive proof no competing run is alive. If
-  it does report one in flight, that is positive proof the original is still
-  alive; poll it, don't fight it.
-- An internal-retry count above zero can appear with no visible defect —
-  disclose it, do not treat it as failure.
-
-**Token rotation footgun.** The session token attached to a run's terminal
-result is **re-issued on every read of that run**, not frozen at completion.
-[VERIFIED] A token relayed second-hand out of a polling agent's report was
-rejected as having an invalid signature. After any poller reports a run
-terminal, make one direct read of that run yourself before the next start or
-publish call, and use only that freshly fetched token. Record the session
-identifier and its token as one pair, refreshed together, and confirm the
-token's embedded session claim matches the recorded identifier before handing
-off — a mismatch is rejected outright.
+**Token rotation footgun.** [VERIFIED] The session token attached to a run's
+terminal result is **re-issued on every read**, not frozen at completion — a
+token relayed second-hand out of a polling agent's report was rejected
+outright. After any poller reports a run terminal, make one direct read of
+`mentor_get_run` yourself before the next start or publish call, and use only
+that freshly fetched token, paired with its session identifier.
 
 ## 7. Publish sequencing
 
 Mentor has no in-turn publish capability. Publishing is a **separate call,
 never a request inside a Mentor prompt.**
 
-- Publish messages hard-cap around 500 characters. Compose to roughly 450
-  from the start — don't draft long prose and trim; that has cost repeated
-  wasted round-trips across multiple steps.
-- Publishes serialize cluster-wide. Budget them as wall clock, not as
-  something parallel agents can absorb.
-- Never trust Mentor's own prose about whether a publish landed — confirm the
-  revision number actually advanced.
-- A mid-flight publish is a live outage. Freeze all publishing before any
-  live demo.
+- Publish messages hard-cap around 500 characters. Compose to ~450 from the
+  start — drafting long and trimming costs repeated round-trips.
+- Publishes serialize cluster-wide — budget as wall clock, not parallelizable.
+- Never trust Mentor's prose about a publish landing — confirm the revision
+  number actually advanced.
+- A mid-flight publish is a live outage. Freeze publishing before a demo.
 
 ## 8. Recovery playbook
 
-Transport-auth expiry mid-turn, orchestrator interruptions after work already
-landed, token-less resume attempts, and permission-classifier blocks on
-publish, with the correct recovery for each, in `references/recovery.md`.
-Read before treating any interrupted turn as a failure.
+Transport-auth expiry, orchestrator interruptions after work already landed,
+token-less resume attempts, permission-classifier publish blocks, and
+abandoning an in-flight prompt or a stale session cleanly (via
+`mentor_cancel_prompt` / `mentor_close_session`) — recovery for each: `references/recovery.md`. Read before treating an interrupted turn as failed.
 
 ## 9. Turn economics
 
 Nominal budget per step: **1 build turn + up to 2 fix turns.** Disclose
-overages, never silently absorb them. Heavy steps have run 14 turns and
-~46 minutes including publishes — a known ceiling for a legitimately large
-step, not evidence something is wrong.
-
-Granular turns that succeeded ran up to ~5–7 minutes; the only turn to exceed
-that was the ~50-minute monolithic failure above. Flag any turn past **~7
-minutes** as a split-further candidate — check whether it carries more than
-one shape of change before letting it run longer.
+overages, never absorb them silently. Heavy steps have run 14 turns and ~46
+minutes including publishes — a known ceiling, not a problem signal.
+Granular turns ran ~5–7 minutes; flag past **~7 minutes** as split-further.

@@ -51,21 +51,24 @@ Repeat this gate at the start of **every** session, not only at init. It costs o
 read-only turn. Turn mechanics for the probe turn itself:
 `../../fulcrum-mentor-turns/SKILL.md`.
 
-## 1. `db_query` liveness
+## 1. Live row data — nothing to probe
 
-**Probe.** Issue the most trivial query the surface accepts — a constant select that
-cannot depend on schema or data.
+**Do not probe this. It does not vary by tenant.** There is no model-layer path to live
+row data on any tenant. `[SCHEMA]` `db_query` is not a general SQL path: it runs only
+against a test harness stood up by `test_setup_start`, accepts only SQL templates
+declared upfront in that call, and its own schema states that no template, `SELECT`
+included, returns rows in v1 — every template comes back with rowcount 0. A "trivial
+constant select" cannot be issued at all without first standing up that harness, so the
+probe that used to sit here could never execute.
 
-**Read.** Does it return a row?
+The conclusion the old probe reached still holds, and holds universally: **reading real
+rows needs a separate diagnostic instrument, and that cost belongs in the budget** —
+historically a temporary diagnostic endpoint at roughly two Mentor turns and two
+revisions per seed step.
 
-- Rows returned → a model-layer path to live row data exists. Record it.
-- Empty result for even a trivial constant select → **there is no model-layer path to
-  live row data on this tenant at all.** Not "the query was wrong". Record this plainly,
-  because it changes the whole verification budget: reading rows then costs a temporary
-  diagnostic endpoint, which is roughly two Mentor turns and two revisions per seed step.
-
-Record the actual response shape you saw, not a summary of it. Verification consequences
-live in `../../fulcrum-verification/SKILL.md`; seed consequences in `../../fulcrum-seed-data/SKILL.md`.
+The instrument for live row data is `exec_in_app` against a harness fork. `[SCHEMA]` The
+procedure is not written here — see `../../fulcrum-verification/SKILL.md`; seed
+consequences in `../../fulcrum-seed-data/SKILL.md`.
 
 ## 2. Which UI blocks exist — and their real inputs
 
@@ -159,6 +162,33 @@ Also record here the answer to the mobile-application-type question from step 2 
 `../SKILL.md`: whether Mentor can add screens to an app of the type you intend to use, as
 observed on this tenant.
 
+## 10. Tool availability — three states, not two
+
+**A schema that loads is not a tool that dispatches.** Tool discovery and tool
+dispatch are separate paths — an op whose schema is listed may still fail
+dispatch with a resolution error. Do not treat "the schema loaded" as
+confirmation the op works. Fallbacks and the halt rule for an op with none:
+`tool-availability-and-fallback.md`.
+
+Record exactly three states per op, never collapsed into a plain yes/no:
+
+| State | Means | How reached |
+|---|---|---|
+| **Confirmed callable** | Dispatched, and returned a real result | The op was actually called (read-only op only) and it worked |
+| **Confirmed unavailable** | Dispatched, and failed with a resolution/dispatch error (not a data-not-found or an inconclusive result) | The op was actually called and it failed at the dispatch layer |
+| **Unknown** | Never dispatched | Default state. **Every mutating op is unknown by construction** — a read-only probe must never call a mutating op just to learn whether it dispatches. This is correct and expected; do not silently upgrade it to "available" because nothing else has failed |
+
+**Keep the probe cheap.** Check only the read-only ops the planned engagement
+actually needs, not the whole tool surface. If a session never plans to call
+`context_graph`, do not probe it just because it exists.
+
+**Probe procedure:** for each read-only op the plan depends on, dispatch it
+against the real target app with a trivial, cheap argument and record which of
+the three states resulted, plus the exact error text on a failure. An
+inconclusive result (e.g. a 404 that could equally mean "no data" as "broken
+dispatch") is not confirmed-unavailable — record it as unresolved with the
+ambiguity stated, never as a broken op.
+
 ## Evidence format
 
 Every row in `tenant-profile.md` carries five fields. A row missing any of them is not
@@ -178,7 +208,11 @@ the result, or the row is unresolved.
 ## Exit criteria
 
 - The liveness gate passed against the real target app.
-- Every section above has a row in `tenant-profile.md` with all five fields.
+- Every section above that names a probe has a row in `tenant-profile.md` with all
+  five fields. Section 1 names no probe and gets no row.
 - Any unresolved row is marked **UNRESOLVED** with what blocked it and which planned step
   it gates.
 - No mutating operation was run and no revision was bumped.
+- Every read-only op the plan depends on has a tool-availability row in one of the three
+  states. Every mutating op the plan depends on is recorded **unknown** — not called, not
+  guessed.

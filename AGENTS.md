@@ -6,14 +6,30 @@ derived from a 47-step production build and its incident log: the rules here
 encode what actually broke, and what proved a change had actually landed.
 
 This file is the entry point on harnesses without skill auto-triggering.
-Route by situation below, then open the named `skills/<name>/SKILL.md`.
 
-## Routing table
+## Entry point
+
+**Load `skills/fulcrum` first.** It detects engagement state from the
+filesystem and the tenant — no `.fulcrum/`, source material present, an app
+already existing, a halt, an open task — and dispatches to the right skill
+itself. It never asks the user to self-classify. In almost every case this is
+the only routing decision you need to make.
+
+## Manual routing table (fallback)
+
+Use this table instead of the router only when you already know exactly which
+skill applies and want to skip detection — for example, resuming mid-task with
+the target skill already named, or an expert-mode user invoking a skill
+directly. Otherwise, load `skills/fulcrum`.
 
 | Your situation | Load |
 |---|---|
+| Unsure which skill applies, or resuming an engagement | `skills/fulcrum` |
+| Have an idea for an app but nothing written down yet | `skills/fulcrum-discovery` |
 | Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/fulcrum-solution-init` |
 | An app already exists and you need to know how it compares to its requirements, what is missing, or what to build next | `skills/fulcrum-gap-analysis` |
+| Where durable project state lives — `.fulcrum/` file set, the session lease, the halt record | `skills/fulcrum-project-state` |
+| Working through the task list — selecting, dispatching, polling, verifying, recording, advancing | `skills/fulcrum-loop-engine` |
 | About to issue a Mentor turn, chunking a spec, unsure of session vs conversation, or a turn didn't land | `skills/fulcrum-mentor-turns` |
 | Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
 | Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
@@ -33,11 +49,19 @@ These hold even if no skill file is ever loaded:
   poll loops and read-only inspection to subagents; keep judgement and
   verification verdicts in the orchestrator. Mutating work is depth 1 always.
   See `skills/fulcrum-unattended-guardrails` for the rules.
-- One subagent depth level. No nesting.
+- One subagent depth level, with a single narrow exception: a subagent may
+  spawn one nested poller when its own tier is expensive and the phase is
+  long, and that poller does nothing but wait and report. No other nesting.
+  See `skills/fulcrum-unattended-guardrails`.
 - The orchestrator never calls Mentor, publish, REST, or gate scripts itself
   — it dispatches.
 - Zero validation errors and a clean publish prove nothing about rendering
   or logic.
+- A schema that loads is not a tool that dispatches — tool availability is
+  probed, not assumed, and the result is recorded in `tenant-profile.md`.
+- A halt record is never resumed past without a new human decision.
+- Project state lives in `.fulcrum/` in the project repository, never in the
+  installed skills.
 - Stuck twice on the same problem means stop and report. Never escalate
   model tier to break a stuck bug.
 - Disclose overruns and deviations. Never absorb them silently.
@@ -51,7 +75,7 @@ These hold even if no skill file is ever loaded:
 ## Tenant-varying facts
 
 Facts that vary by tenant, licence, or platform version (UI-block
-availability, icon font, `db_query` liveness, and similar) live in the
+availability, icon font, and similar) live in the
 project's own `tenant-profile.md`, produced once by `fulcrum-solution-init`.
 Skills reference that file — they never hardcode the answer.
 

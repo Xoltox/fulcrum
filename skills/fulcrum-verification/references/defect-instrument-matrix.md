@@ -12,7 +12,7 @@ build hit them once.
 | Auto-numbered static-entity Ids that only fail at deploy time | The platform's own deploy-time error, surfaced via the revision/deploy history query | 0 validation errors — validation is not a deploy gate |
 | Seed/loader actions writing blank rows or null foreign keys | Running the action, then reading the written rows back | A clean publish with 0 validation errors |
 | A permanently empty nested list panel | Click-through / interaction test | Screen renders fine; the panel is simply empty and nothing static sees that |
-| Whether a CRUD action actually persisted | click → reload → confirm (rung 6) | Any confirmation banner shown immediately after the click |
+| Whether a CRUD action actually persisted | click → reload → confirm (rung 7) | Any confirmation banner shown immediately after the click |
 | A destructive action behind a native confirm dialog silently doing nothing | Registering a dialog handler before the click, then reload + re-verify | The click "succeeds" with no error, because an unhandled dialog is auto-dismissed by the driver — the harness itself lied |
 | A monolithic turn that applied nothing | A read-only model inventory probe | The turn's own run-status lookup, once the run record is evicted or summarized away |
 | A natural key wired to the wrong source field | Verbatim model read-back against the actual source resource, in a small isolated turn | Would publish clean while producing rows with a null foreign key |
@@ -42,6 +42,27 @@ build hit them once.
 | Low-contrast link-styled text on a colored background | Screenshot | A text check reads the correct string out of the DOM successfully — correctness of content says nothing about legibility |
 | A stale hardcoded expected count or value in a test fixture | Cross-reading against live data, not the platform | A text/screenshot gate flags it as a NEW app defect rather than a stale fixture |
 
+## Runtime-telemetry rows
+
+`[SCHEMA]` These rows are **not** from the source build. They are derived from
+the ODC runtime-telemetry tool schemas (`app_logs`, `app_traces`, `app_health`)
+and have not been observed live in a Fulcrum run. Same columns, different
+provenance — kept separate so the table above keeps its empirical claim. Depth
+and traps: `runtime-telemetry.md`.
+
+| Defect class | Only caught by | What cheaper checks missed |
+|---|---|---|
+| A server action that throws at runtime while the screen it sits behind still renders normally | `app_logs` at severity `Error` over the window in which the action was invoked | Model read-back (the action is correctly wired), 0 validation errors, a clean publish, and a screenshot — the screen looks right; the failure is behind a control |
+| A REST/integration call failing only in the deployed app (bad credential, 4xx/5xx, connection refused) | `app_traces` at status `Error` for the failing span, plus the `app_logs` Error body naming the cause | Everything at the model layer: the integration is wired exactly as specified, so read-back, validation and publish are all clean |
+| A path slow enough to time out under real conditions but not under a fast dev dataset | `app_traces` filtered by `min_duration_ms`, corroborated by `app_health` `responseTimeP95`/`P99` | An interaction test that simply waited longer, and any screenshot taken after the wait completed |
+| A runtime failure on a user path the verification pass never walked | `app_logs` at severity `Error` over a window wider than the agent's own exercise | Every browser-driven rung — their coverage is exactly the set of paths the agent chose to drive, and nothing else |
+| A change that raises the app's error rate without breaking the specific path under test | `app_health` `errors` / `errorPercent` / `lastErrorOccurred`, compared across a before window and an after window bracketing the step | Per-screen proof of the changed screen; the regression is elsewhere in the app |
+
+**The anti-row.** There is no defect class for which an *empty* telemetry sweep
+is the proof. A silent rendering defect writes no log line, so an empty sweep
+is indistinguishable from a correct app. Telemetry fails a change; it never
+passes one.
+
 ## Conclusions
 
 1. A green text-only check says nothing about whether the app looks right.
@@ -69,3 +90,8 @@ build hit them once.
    container, corrupting every screenshot taken before the bug is found — see
    `visual-verification.md`. A verification tool can have a silent no-op bug
    exactly like the app under test can.
+8. Telemetry silence is not a signal. `[SCHEMA]` An empty error sweep, a
+   perfect `appScore` and a zero-traffic reading are the same picture a
+   freshly published, never-touched, completely broken app produces. Absence
+   of logged errors belongs in a report as "no runtime errors logged in the
+   window", never as a pass.

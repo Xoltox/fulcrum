@@ -1,6 +1,6 @@
 # Visual verification
 
-Rung 5 of the proof ladder catches defect classes nothing cheaper can reach
+Rung 6 of the proof ladder catches defect classes nothing cheaper can reach
 (see `defect-instrument-matrix.md`). This file is how to run that rung
 without fooling yourself.
 
@@ -43,7 +43,7 @@ completely unreachable to the user. The source build hit a case where an
 overlay was collapsed to an invisible strip by a style override, yet text
 extraction returned its entire correct content — a text-only gate passed
 outright on a UI nobody could see. Never accept a passing text extraction as
-proof of visibility. Pair it with rung 5 (an actual rendered capture) for
+proof of visibility. Pair it with rung 6 (an actual rendered capture) for
 anything involving an overlay, a modal, a sheet, or any container whose
 visibility depends on a style class rather than DOM presence.
 

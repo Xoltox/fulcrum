@@ -12,11 +12,12 @@ reads it cold, every time, with no conversational history. Design it for that re
 ```
 <project>/
   DOMAIN.md             derived domain source of truth (step 1)
-  PLAN.md               phases, steps, apps/agents/workflows, entity owners
-  tenant-profile.md     the capability probe result (step 3)
-  HANDOFF.md            two parts: RULES (stable) + BRIEF (replaced each session)
-  BUILD-LOG.md          append-only: what happened, per step
-  RUN-IDS.md            durable run-id log
+  .fulcrum/
+    plan.md              phases, steps, apps/agents/workflows, entity owners
+    tenant-profile.md    the capability probe result (step 3)
+    HANDOFF.md           two parts: RULES (stable) + BRIEF (replaced each session)
+    JOURNAL.md           session index; per-session detail in journal/<session-id>.md
+    RUN-IDS.md           durable run-id log
   specs/
     step-<NN>-<slug>.md one spec per step (step 6)
   buildpatterns/
@@ -24,16 +25,20 @@ reads it cold, every time, with no conversational history. Design it for that re
   assets/               source artifacts + the asset list from step 1
 ```
 
+`plan.md`, `tenant-profile.md`, `HANDOFF.md` and `RUN-IDS.md` live in `.fulcrum/`, not
+at the project root — full layout and file contracts:
+`../../fulcrum-project-state/SKILL.md`, `../../fulcrum-project-state/references/file-schemas.md`.
+
 ## File roles — one owner per fact
 
 | File | Owns | Never contains |
 |---|---|---|
 | `DOMAIN.md` | Domain truth: personas, entities, screen inventory, resolved questions | Build mechanics, phase order |
-| `PLAN.md` | Scope and ordering: phases, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
-| `tenant-profile.md` | Every tenant-varying fact, with evidence | Anything not probed |
-| `HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
-| `BUILD-LOG.md` | Append-only history, including withdrawn claims | Rules, plans |
-| `RUN-IDS.md` | Run ids and their outcomes | Anything else |
+| `.fulcrum/plan.md` | Scope and ordering: phases, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
+| `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence | Anything not probed |
+| `.fulcrum/HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
+| `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history — session index plus per-session action lines, including withdrawn claims | Rules, plans |
+| `.fulcrum/RUN-IDS.md` | Run ids and their outcomes | Anything else |
 | `specs/*` | Everything one step's build agent needs | Cross-step context |
 | `buildpatterns/*` | What was reliable or unreliable for one step | Rules for other steps |
 
@@ -54,7 +59,8 @@ one next step, and what that step needs. Never appended to.
 **Why the split.** A handoff that accumulates step narrative grows without bound and
 buries the rules under history. The fresh agent then reads mostly-irrelevant past-step
 detail and mis-weights it as current instruction. The append-only history belongs in
-`BUILD-LOG.md`, which nobody is required to read to act.
+`.fulcrum/JOURNAL.md` and its per-session files, which nobody is required to read to
+act.
 
 Hard rules:
 
@@ -102,15 +108,18 @@ One claim in the corpus had to be formally withdrawn after being written down as
 when it was an inference.
 
 **Rule.** Tag evidence strength on every non-obvious claim, per the evidence tags in the
-authoring contract. When a claim is withdrawn, **withdraw it in place in `BUILD-LOG.md`**
-rather than deleting it — a silently deleted claim gets re-derived.
+authoring contract. When a claim is withdrawn, **append a withdrawing line to the
+session file that carries it** (`.fulcrum/journal/<session-id>.md` — see
+`../../fulcrum-project-state/references/file-schemas.md`, heading
+"journal/<session-id>.md") rather than deleting it — a silently deleted claim gets
+re-derived.
 
 ## Durable run-id log
 
-Every Mentor run and every publish gets a line in `RUN-IDS.md` at the moment it is
-started, before it is polled. A run id held only in an agent's context is lost when the
-context is lost, and an unpolled run's outcome is then unknowable while its effects are
-already in the model.
+Every Mentor run and every publish gets a line in `.fulcrum/RUN-IDS.md` at the moment
+it is started, before it is polled. A run id held only in an agent's context is lost when
+the context is lost, and an unpolled run's outcome is then unknowable while its effects
+are already in the model.
 
 Minimum per line: timestamp, step number, run id, the operation, and the outcome once
 known. Durability mechanics: `../../fulcrum-mentor-turns/SKILL.md`.
@@ -133,6 +142,6 @@ stub explaining what belongs there:
 - [ ] No fact appears in two files at two strengths.
 - [ ] No rule list is duplicated by hand.
 - [ ] No `§` anchor and no line-number reference anywhere.
-- [ ] `HANDOFF.md` has both parts, and the BRIEF names one next step.
-- [ ] `RUN-IDS.md` exists and is empty rather than absent.
+- [ ] `.fulcrum/HANDOFF.md` has both parts, and the BRIEF names one next step.
+- [ ] `.fulcrum/RUN-IDS.md` exists and is empty rather than absent.
 - [ ] Phase-one specs are written and each passes the right-sizing test.

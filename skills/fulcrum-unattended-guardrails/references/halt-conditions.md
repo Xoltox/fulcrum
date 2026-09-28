@@ -13,13 +13,23 @@ is an unreviewed change to a live application.
 On exceeding the cap: write the checkpoint, park the step with an honest status,
 report. Do not carry the overrun silently into the next step.
 
-## The escalation ladder — in order, no skipping
+## The escalation ceiling
 
-1. **Build turn.** Fails.
-2. **Diagnostic step.** Mandatory. Not a fix — an observation.
-3. **Fix turn 1**, informed by what the diagnostic actually showed.
-4. If it fails: **a second diagnostic**, then **fix turn 2**.
-5. Still failing → **stuck twice → halt and report to the user.**
+This file owns the **ceiling and the terminal condition**. Running the attempts
+— issuing the turns, re-verifying, recording each one — is the loop's:
+`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`, heading
+"The fix-loop". Do not iterate from this file.
+
+Three rules bound every escalation, in force whoever is running it:
+
+- **A diagnostic step is mandatory before every fix attempt after the first
+  failure.** Not a fix — an observation.
+- **At most two fix attempts** after the build turn. That is the turn cap above.
+- **Still failing after the second → stuck twice → halt and report to the
+  user.** Detected mechanically, by scanning the session index rather than by an
+  agent remembering: `../../fulcrum-loop-engine/SKILL.md`, heading "Oscillation
+  detection — mechanical, not remembered". **The loop detects; this file
+  decides.**
 
 ### The diagnostic step is not optional
 
@@ -56,7 +66,7 @@ Write the checkpoint, then stop and report. Do not work around any of these.
 
 | Trigger | Detail |
 |---|---|
-| Stuck twice after a diagnostic step | The escalation ladder is exhausted |
+| Stuck twice after a diagnostic step | The escalation ceiling is exhausted. Two `:fail` entries for one task id in the session index is this firing mechanically |
 | Turn cap exceeded on one step | 1 build + 2 fix |
 | A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
 | A previously verified behaviour now fails | Regression. Continuing builds on a corrupted state |
@@ -64,7 +74,91 @@ Write the checkpoint, then stop and report. Do not work around any of these.
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
 | The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause — if so, fix it and disclose prominently"* |
 | Two candidate actions would both touch Mentor concurrently | Serialise, or stop and ask |
+| A step depends on an op **confirmed unavailable** with **no fallback** recorded in `tenant-profile.md` | See "Halt on an unavailable op with no fallback" below |
 | The plan for the current step does not exist in writing | Deriving a plan mid-unattended-run is the highest-risk act available |
+| **Runtime error step-change across a build step** | `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` falling inside the after window. See below |
+
+## The runtime-shaped stop
+
+Every other stop above is model- or turn-shaped: it fires on what the platform
+said about a turn. This one fires on what the deployed app actually did, and it
+is the only stop here that can catch a change that published cleanly, verified
+against the model, and then broke the running app.
+
+**The rule.** Take an `app_health` reading bracketing the step. If, across that
+step, `errors` or `errorPercent` steps up, or `lastErrorOccurred` falls inside
+the after window, **halt and report.** `[SCHEMA]` — those fields and their
+meanings are asserted by the ODC MCP tool schema, not observed in a Fulcrum run.
+
+- The before/after window comparison is **instrument selection and belongs to
+  verification**: `../../fulcrum-verification/references/runtime-telemetry.md`,
+  heading "Which op answers which question". Take the reading from there. This
+  file adds only the stop.
+- It is a **hard stop, not a fix trigger.** A new class of runtime error means
+  the live app is now failing for real users in a way the build turn did not
+  predict. Continuing builds the next step on top of it.
+- **Bracket tightly.** `app_health` returns aggregates and a wide window
+  averages the incident away. `[SCHEMA]`
+- **Absence of a step-change is not a pass.** Telemetry fails a change on its
+  own and can never pass one; a silent defect writes no log line. `[SCHEMA]`
+- `app_health` requires an environment key explicitly and has no default.
+  `[SCHEMA]` A figure read from the wrong stage is not evidence about this one.
+
+## Halt on an unavailable op with no fallback
+
+**The rule.** When a step depends on an op recorded **confirmed unavailable**
+in `tenant-profile.md` (`../../fulcrum-solution-init/references/tenant-capability-probe.md`,
+heading "Tool availability — three states, not two") and no fallback is
+recorded for it (`../../fulcrum-solution-init/references/tool-availability-and-fallback.md`),
+**halt and report. Do not improvise a workaround.**
+
+**The mechanism.** An unattended agent that works around a missing capability
+invents an unreviewed approach on the spot and records it nowhere durable. The
+deviation does not surface at the moment it happens — it surfaces later as
+unexplainable drift: a screen built a different way than the plan describes, a
+data path that does not match the spec, with no decision record explaining
+why. A halt costs one interruption. A silent improvisation costs a future
+session trying to reconcile behaviour against a plan that never mentioned it.
+
+This is distinct from the ordinary fix-loop: a fix turn retries the *same* op
+after gathering evidence. This halt fires when the op itself has no working
+path at all — there is nothing to retry.
+
+Do not confuse **unavailable** with **unknown**. An op that is merely unknown
+(never dispatched — the default and correct state for every mutating op) is
+not a halt condition by itself; dispatch it as the plan calls for and record
+the outcome. This rule fires only once dispatch has actually failed with a
+resolution error and no fallback exists.
+
+## Never report an untouched app as healthy
+
+**An unattended run must never emit a "healthy" verdict for an app that has had
+no traffic.** This is the most dangerous false green available to an unattended
+session, because it is the app's default state immediately after every publish.
+
+**The mechanism.** `appScore` is an Apdex-style **latency** score computed from
+response times. It ignores errors entirely. An app with no traffic has no
+response times, and no response times **scores 100** `[SCHEMA]` — identical to a
+fast, correct, heavily-used app. So a freshly published app nobody has touched
+reports perfect health from zero evidence, and an agent with nobody watching
+reports it onward as a pass.
+
+The guardrail:
+
+- Request `requests` in `metrics` on every `app_health` call.
+- If `requests` is present in the echo and reads `0`, the only permitted verdict
+  is **"no traffic in the window"**. Never "healthy", never "no errors", never a
+  pass on any rung.
+- If the app has had no traffic, **exercise it first**, then re-read. A reading
+  over traffic nobody generated measures nothing.
+- A metric absent from the row is an **absent reading, not a zero** `[SCHEMA]`.
+  Report it as unavailable. Reading a missing `errors` as `errors: 0` converts a
+  blind spot into a clean bill of health.
+- Never synthesise availability or uptime — the platform exposes neither
+  `[SCHEMA]`, and every candidate proxy lets a zero-traffic app report as up.
+
+Full trap detail, including the paging and sampling cases:
+`../../fulcrum-verification/references/runtime-telemetry.md`.
 
 ## Not reasons to continue
 

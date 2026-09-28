@@ -6,13 +6,15 @@ do not treat it as background reading.
 
 ## The goal, stated plainly
 
-Fulcrum is six skill directories under `skills/` (`fulcrum-solution-init`,
-`fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`,
-`fulcrum-seed-data`, `fulcrum-unattended-guardrails`). Each contains a
-`SKILL.md` plus a `references/` directory and sometimes `templates/`. Your
-job: find where your own harness looks for skills, and copy each of those six
-directories there **whole** — the directory, not just `SKILL.md`. A skill
-missing its `references/` is broken even though it looks installed.
+Fulcrum is eleven skill directories under `skills/` (`fulcrum`,
+`fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-gap-analysis`,
+`fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`,
+`fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-seed-data`,
+`fulcrum-unattended-guardrails`). Each contains a `SKILL.md` plus a
+`references/` directory and sometimes `templates/`. Your job: find where your
+own harness looks for skills, and copy each of those eleven directories there
+**whole** — the directory, not just `SKILL.md`. A skill missing its
+`references/` is broken even though it looks installed.
 
 You already know, or can discover, how your harness resolves a skills
 directory. That is the entire mechanism. There is no per-harness script here
@@ -30,8 +32,8 @@ directories.
 - **Report exactly what happened**: where you installed (the resolved path),
   what was newly added, what was updated in place, and what was skipped and
   why. A silent half-install is worse than a loud partial one — if you could
-  not resolve a skills directory, or copied four of six skills before hitting
-  a problem, say so explicitly rather than declaring success.
+  not resolve a skills directory, or copied four of eleven skills before
+  hitting a problem, say so explicitly rather than declaring success.
 
 ## Safety — read this even if you skim the rest
 
@@ -92,14 +94,14 @@ mode, not an advanced option. This needs to be visible without the user
 having to load a skill first. If the user declines, installation still
 succeeded — do not treat this as a blocking step.
 
-Once installed, point the user to the right entry point: if an ODC app
-already exists and its requirements are known, that entry point is
-`fulcrum-gap-analysis`; if there is no app yet, it is `fulcrum-solution-init`.
+Once installed, point the user to the entry point: `fulcrum`. It detects
+whether an app already exists, whether source material is present, or
+whether there's only an idea, and dispatches to the right skill itself.
 
 ## What to report back when done
 
 - The resolved skills directory path.
-- Which of the six directories were added, which were updated, which were
+- Which of the eleven directories were added, which were updated, which were
   skipped, and the reason for each skip.
 - The five interview answers and where you recorded them
   (`MODEL-TIERS.local.md`'s path).

@@ -34,6 +34,7 @@ scaffold, the handoff structure. Everything else belongs to a sibling:
 | Proof obligations and visual capture | `../fulcrum-verification/SKILL.md` |
 | Loader idempotence, natural keys, static entity identifiers | `../fulcrum-seed-data/SKILL.md` |
 | Stop conditions, fix-turn caps, delegation depth, model tier policy | `../fulcrum-unattended-guardrails/SKILL.md` |
+| No source material exists at all — nothing written, no designs, no mockups | `../fulcrum-discovery/SKILL.md` |
 
 Cross-reference these; never restate their rules beyond a one-line pointer.
 
@@ -83,7 +84,7 @@ application type; mobile-first vs desktop layout; existing app or fresh shell; w
 
 One read-only pass that resolves everything tenant-varying and writes `tenant-profile.md`
 into the repo. After this, **no downstream skill hardcodes a tenant fact** — they all read
-the profile. Must resolve, at minimum: `db_query` liveness; which UI blocks exist and
+the profile. Must resolve, at minimum: which UI blocks exist and
 their real input properties; icon font family and name casing; available `ModelFeature_*`
 flags; date and meridiem format-token behaviour; whether server actions can be marked
 public; the Mentor backend identifier; the Mentor prompt-length ceiling. Two hard rules:

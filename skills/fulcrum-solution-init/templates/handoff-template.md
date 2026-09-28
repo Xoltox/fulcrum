@@ -1,10 +1,11 @@
 # HANDOFF template
 
-Copy to `<project>/HANDOFF.md`. Two parts, with different lifecycles.
+Copy to `<project>/.fulcrum/HANDOFF.md`. Two parts, with different lifecycles.
 
 **PART 1 — RULES** is stable and accumulates slowly. **PART 2 — BRIEF** is replaced
 wholesale every session. Never append session narrative to either; that is what
-`BUILD-LOG.md` is for.
+`.fulcrum/JOURNAL.md` and its per-session files (`.fulcrum/journal/<session-id>.md`)
+are for.
 
 Rationale and the failures this shape prevents: `../references/repo-scaffold.md`,
 heading "The handoff document — two parts, one replaced".
@@ -15,7 +16,8 @@ heading "The handoff document — two parts, one replaced".
 
 Two parts. **PART 1 RULES** — stable, rarely changes. **PART 2 BRIEF** — replaced
 wholesale each handoff; read this every resume. Append-only history:
-`BUILD-LOG.md` plus `buildpatterns/step-<NN>-*.md`.
+`.fulcrum/JOURNAL.md` (session index) plus `.fulcrum/journal/<session-id>.md`
+(per-session detail) and `buildpatterns/step-<NN>-*.md`.
 
 ---
 
@@ -30,12 +32,12 @@ wholesale each handoff; read this every resume. Append-only history:
 | File | Role |
 |---|---|
 | `DOMAIN.md` | Domain source of truth |
-| `PLAN.md` | Phases, steps, decomposition, entity owners |
-| `tenant-profile.md` | Every tenant-varying fact, with evidence |
+| `.fulcrum/plan.md` | Phases, steps, decomposition, entity owners |
+| `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence |
 | `specs/step-<NN>-*.md` | Self-sufficient spec per step |
-| `BUILD-LOG.md` | Append-only history — read for "what happened" |
+| `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history — session index, read for "what happened" |
 | `buildpatterns/step-<NN>-*.md` | Per-step reliability log |
-| `RUN-IDS.md` | Durable run-id log |
+| `.fulcrum/RUN-IDS.md` | Durable run-id log |
 | \<proof harness path\> | Proof harness — trust a live run over any prose |
 
 ## Target
@@ -46,14 +48,15 @@ wholesale each handoff; read this every resume. Append-only history:
 | Application type | \<value\> |
 | Not the target | \<any confusably named app on the tenant\> |
 
-Do not re-scan these. They are resolved in `tenant-profile.md`.
+Do not re-scan these. They are resolved in `.fulcrum/tenant-profile.md`.
 
 ## Session start sequence
 
-1. Re-run the **Mentor liveness gate** (`tenant-profile.md`, row 0). On fail, halt.
+1. Re-run the **Mentor liveness gate** (`.fulcrum/tenant-profile.md`, row 0). On fail,
+   halt.
 2. Read PART 2 — BRIEF. It names exactly one next step.
 3. Read that step's spec. Read nothing else.
-4. Record the run id in `RUN-IDS.md` before polling it.
+4. Record the run id in `.fulcrum/RUN-IDS.md` before polling it.
 
 ## Standing decisions — do not re-litigate
 
@@ -113,4 +116,4 @@ table exists to prevent.
 ---
 
 **Nothing in PART 2 survives the next handoff.** Anything that must persist belongs in
-PART 1, `PLAN.md`, or `BUILD-LOG.md`.
+PART 1, `.fulcrum/plan.md`, or `.fulcrum/JOURNAL.md` / `.fulcrum/journal/<session-id>.md`.

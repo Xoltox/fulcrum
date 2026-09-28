@@ -28,7 +28,8 @@ scripted agent loop. Therefore:
   (`deep-reasoning`, `workhorse`, `poller`). Only `MODEL-TIERS.md` maps tiers to
   concrete model names, and it does so for more than one vendor.
 - **MCP tool names are allowed** when referring to ODC MCP operations
-  (`mentor_start`, `mentor_get_run`, `publish_start`, `publish_status`,
+  (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`,
+  `mentor_prompt`, `mentor_get_run`, `mentor_publish`, `publish_status`,
   `env_app`, `app_revisions`, `context_*`). These are the ODC surface itself, not
   a harness feature. Write them bare — no `mcp__outsystems__` prefix, which is
   Claude-Code-specific wiring.
@@ -62,14 +63,14 @@ project by a read-only capability probe during `fulcrum-solution-init`, which wr
 
 Skills must **reference the profile, never hardcode the answer**:
 
-- Wrong: "`db_query` is dead — never use it."
-- Right: "Check `tenant-profile.md` for `db_query`. On tenants where it returns
-  empty results for even a trivial `SELECT 1`, there is no model-layer path to
-  live row data; use a temporary diagnostic REST endpoint instead."
+- Wrong: "Icon names are PascalCase — write `ArrowRight`."
+- Right: "Check `tenant-profile.md` for the icon-font family and its name
+  casing. A wrongly cased icon name renders blank or falls back to a default
+  glyph with no error, so quote names in the convention the probe confirmed."
 
-Facts belonging in the profile include, at minimum: `db_query` liveness; which
-UI blocks exist (`Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`,
-`Wizard`); icon-font family and name casing; available `ModelFeature_*` flags;
+Facts belonging in the profile include, at minimum: which UI blocks exist
+(`Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`);
+icon-font family and name casing; available `ModelFeature_*` flags;
 meridiem/format-token behaviour; whether server actions can be marked public;
 Mentor backend identifier; and the Mentor prompt-length ceiling.
 
@@ -94,6 +95,13 @@ Tag any claim that is not directly observed:
 - `[SINGLE-OBSERVATION]` — seen once; real but not generalised.
 - `[UNVERIFIED]` — inferred or reported but never confirmed. Say so plainly.
 - `[TENANT]` — belongs in `tenant-profile.md`; skill must defer to the probe.
+- `[SCHEMA]` — asserted by the vendor's own MCP tool documentation, not observed
+  live. Stronger than inference: the vendor is describing its own system.
+  Weaker than observation: documentation drifts from behaviour, and a schema
+  states intent, not what a given tenant actually does. Keep it distinct —
+  collapsing it into `[VERIFIED]` launders documentation as field evidence,
+  which is exactly what this rule exists to prevent. Promote to `[VERIFIED]`
+  only on a live observation.
 
 Default to `[VERIFIED]` only when the source corpus shows repeat occurrence.
 Do not launder a single observation into a general rule.
@@ -109,6 +117,11 @@ skills/<skill-name>/
 `SKILL.md` is what an agent reads first and may be all it reads. It must be
 self-sufficient for the common path and must say explicitly which reference file
 to open for which situation. Do not write a 600-line SKILL.md.
+
+**Reviewed exception:** `skills/fulcrum-unattended-guardrails/SKILL.md` runs
+~238 lines. The repo owner reviewed and accepted this as a one-time exception
+specific to that file — do not "fix" it by gutting content, and do not cite it
+as licence to ignore the <200 target elsewhere.
 
 ### Frontmatter — portable subset only
 
@@ -167,6 +180,18 @@ whoever issued them. That cost, not wall clock, is what the cadence optimises.
   Never carry that rate into an undelegated loop.
 - Ignore the server's `pollAfterMs` field.
 
+**`db_query` returns no rows — universal, not tenant-varying.** `[SCHEMA]` It is
+not a model-layer SQL path. It runs only against a test harness stood up by
+`test_setup_start`, requires that call's `test_app_url` + `shared_secret`, and
+accepts only SQL templates declared upfront in its `query_templates`. Its own
+schema states that no template, `SELECT` included, returns rows in v1 — every
+template comes back with rowcount 0. So an empty result is a documented v1
+platform limitation on every tenant, not tenant variance: there is no
+model-layer path to live row data anywhere. Do not probe it, do not carry a
+`db_query` row in `tenant-profile.md`, and do not re-derive this. The instrument
+for live row data is `exec_in_app` against a harness fork; that procedure is
+`skills/fulcrum-verification/`'s, not this file's.
+
 **Model tiering — phase-based, not flat:**
 
 - Project init (ingest sources, derive the solution plan, scaffold the repo):
@@ -224,6 +249,22 @@ a measurement. Charts and aggregate figures are wanted — they are what makes a
 report usable — but every number must be recomputable from the itemised evidence
 beside it.
 
+**`JOURNAL.md` absorbs `BUILD-LOG.md`. One role, one file — split by session.** The
+append-only history of what happened is `.fulcrum/journal/<session-id>.md`, one file
+per working session, carrying a line schema rather than a prose narrative. Lines merge
+as adjacent lines; prose paragraphs conflict and need a human to adjudicate them under
+time pressure. A line schema is also the only form a resuming agent can slice
+mechanically. `.fulcrum/JOURNAL.md` keeps the name and becomes the **session index**,
+one row per session, rich enough that resume and oscillation detection both answer
+from the index alone — a monolithic journal makes every reader pay for the whole
+project history to ask about the last three steps. Do not re-introduce `BUILD-LOG.md`
+under any name, and do not fork a second history file. Schema:
+`skills/fulcrum-project-state/references/file-schemas.md`, headings "JOURNAL.md — the
+session index" and `journal/<session-id>.md`.
+`skills/fulcrum-solution-init/references/repo-scaffold.md` and
+`skills/fulcrum-solution-init/templates/handoff-template.md` still describe
+`BUILD-LOG.md`; both are stale against this decision and are rewired separately.
+
 ## Skill boundaries — stay in your lane
 
 Overlap causes mis-triggering. One topic, one owner:
@@ -236,7 +277,67 @@ Overlap causes mis-triggering. One topic, one owner:
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
 | `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: establishing build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, repair-versus-rebuild, sequencing remediation | How to build or prove any individual fix; trap causes |
-| `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific |
+| `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps as a ceiling; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific; the iteration mechanism itself — selecting, dispatching, polling, recording and advancing a task is `fulcrum-loop-engine`'s |
+| `fulcrum` | The router and entry point: detecting project state from the filesystem, resuming an engagement, mode selection, question-asking discipline in `guided` mode, dispatching to the right skill | Anything it routes to. It performs no Mentor turn, no verification, no planning and no state-file schema of its own |
+| `fulcrum-project-state` | Where durable state lives and what shape it has: the `.fulcrum/` file set and each file's schema, append-only versus rewritten discipline, crash-idempotent write ordering, the runtime lease enforcing one Mentor session per app, the decision record gap analysis consumes, the halt record | What goes in any of those files. It never decides what to build, when to stop, what counts as proof, or how to iterate |
+| `fulcrum-loop-engine` | The iteration mechanism: select task, precondition and staleness check, dispatch, poll, verify, record, advance; the bounded fix-loop; oscillation detection against `JOURNAL.md`; crash-idempotency of a single iteration; per-iteration budget accounting | Stop conditions and halt rules — those are `fulcrum-unattended-guardrails`'. Also not what to build |
+| `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements, and producing the source material — a BRD or equivalent spec — that `fulcrum-solution-init` then ingests | Decomposition, sizing and planning. It stops at the spec; `fulcrum-solution-init` takes it from there |
+
+## Mode and posture
+
+Two settings, **two orthogonal axes**. Never collapse them into one dial. An expert
+user may want `collaborative`; a `guided` user may want `directive`. Every
+combination of the four is legal and must be honoured as written.
+
+**Mode — `guided` | `expert`.** Governs who decides and how much is asked of the user.
+
+| | `guided` | `expert` |
+|---|---|---|
+| Entry | The router runs automatically and interviews the user | The user invokes skills directly |
+| On ambiguity | Block and ask. Offer a small number of options with a recommendation | Proceed under a stated assumption and record it in `DECISIONS.md` |
+| Assumptions | Surfaced to the user as they are made | Recorded, not narrated |
+| Narration | Says what is about to happen and why, in plain language | Terse |
+| Parameters and tiers | Defaults | Overridable per project |
+
+**Posture — `collaborative` | `directive`.** Governs how the harness model talks to
+Mentor.
+
+| | `collaborative` (default) | `directive` |
+|---|---|---|
+| Turn shape | Consult Mentor for the idiomatic ODC approach first, review its proposal against the trap registry in `skills/fulcrum-engine-traps/`, correct only the specific traps, then build | Instruct Mentor exactly what to build |
+
+**`collaborative` is the default at every tier.**
+
+**The failure mechanism.** `directive` posture is a bet that the harness model's ODC
+platform knowledge exceeds Mentor's. That bet loses more often as the harness model
+gets cheaper. A model issuing strict build instructions on weak platform knowledge
+invents non-idiomatic structures Mentor would never have chosen; those pass validation
+and publish clean, then surface later as traps. Mentor is the better source of
+platform idiom. Fulcrum is the better source of trap avoidance and verification.
+`collaborative` posture is what makes that division of labour operational.
+
+**`directive` is an explicit user opt-in and is NEVER auto-selected by tier**, model,
+or budget. Same principle as the non-negotiable "never escalate model tier to break a
+stuck bug" in `AGENTS.md`: posture is a user decision, never a machine one. A cheaper
+tier is a reason to lean harder on `collaborative`, not a licence to switch.
+
+**Both settings are recorded in `.fulcrum/project.md`** — see
+`skills/fulcrum-project-state/SKILL.md`, heading "Mode and posture" — never in the
+installed skill files. Precedent: `MODEL-TIERS.md`, heading "The install interview
+must not edit installed files". Installed content carrying project state makes every
+update fight the user's edits and lets the deployed copy drift from source.
+
+**Mode is NOT a branch inside each skill.** Four of the seven original `SKILL.md`
+files are already at or over the 200-line target and a fifth sits one line under it,
+so a per-skill mode fork is unaffordable and would breach the skill file layout rule
+above. Mode is an **interaction contract owned by the router** (`fulcrum`), not a
+second code path in every skill. A skill states its procedure once; the router decides
+what to ask before dispatching into it.
+
+**Economics.** `collaborative` trades one cheap consult turn for fewer expensive fix
+turns. `[UNVERIFIED]` This is a design prediction, not a measurement — no run has been
+instrumented to compare the two postures' total turn cost. Do not cite it as a
+finding.
 
 ## Tone
 

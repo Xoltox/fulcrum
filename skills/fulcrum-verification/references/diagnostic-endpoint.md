@@ -1,18 +1,21 @@
 # Diagnostic REST endpoint pattern
 
-Rung 4 of the proof ladder (live data ground truth) has no model-layer path
-on some tenants. This is the workaround, and the debt it creates.
+Rung 5 of the proof ladder (live data ground truth) has no model-layer path
+in v1, on any tenant. This is the workaround, and the debt it creates.
 
-## Check the tenant profile first
+## Why there is no model-layer path
 
-Whether a direct data-query path works at all is a **tenant fact**, not a
-platform constant. Defer to `tenant-profile.md` (written once per project by
-the capability probe) before assuming either way. On some tenants, a direct
-query path returns empty results for even a trivial query, which means there
-is no such path — not that the query was written wrong. `[TENANT]`
+`[SCHEMA]` `db_query` is not a model-layer SQL path. It requires a harness stood
+up by `test_setup_start`, accepts only SQL templates declared upfront in that
+harness's `query_templates`, and its own schema states that no template —
+`SELECT` included — returns rows in v1: every template comes back with
+rowcount 0. This is a universal v1 platform limitation, not tenant variance.
+Do not probe it per project and do not carry a `db_query` row in
+`tenant-profile.md`.
 
-When the profile shows no live model-layer path to row data, build a
-temporary diagnostic endpoint instead of retrying the query path.
+Build a temporary diagnostic endpoint instead of relying on `db_query` for
+live row data. The instrument for a real query path is `exec_in_app` against a
+harness fork — that procedure is future work, not written here.
 
 ## The pattern that works
 
