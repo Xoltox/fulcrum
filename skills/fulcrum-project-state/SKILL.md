@@ -1,6 +1,6 @@
 ---
 name: fulcrum-project-state
-description: Defines the `.fulcrum/` project-state directory — the committed, on-disk memory a Fulcrum engagement resumes from. Owns the file set, each file's schema, which files are append-only and which are rewritten, the runtime lease that enforces one Mentor session per app, the crash-idempotent write ordering, the decision record that gap analysis consumes, and the halt record. Use when asked to "set up project state", "where do I record what's been done", "create the task list", "what should I write before running this unattended", "resume the build", "pick up where we left off", "record this decision", "why is the project halted", "is another agent working on this app", or when any Fulcrum skill needs to read or write durable state.
+description: Defines the `.fulcrum/` project-state directory - the committed, on-disk memory a Fulcrum engagement resumes from. Owns the file set, each file's schema, which files are append-only and which are rewritten, the runtime lease that enforces one Mentor session per app, the crash-idempotent write ordering, the decision record that gap analysis consumes, and the halt record. Use when asked to "set up project state", "where do I record what's been done", "create the task list", "what should I write before running this unattended", "resume the build", "pick up where we left off", "record this decision", "why is the project halted", "is another agent working on this app", or when any Fulcrum skill needs to read or write durable state.
 version: "1.0.0"
 requires: filesystem read/write access to the project repository; a git working tree for the project (state is committed); the ability to read a clock for timestamps. No ODC MCP surface is needed to read or write project state itself.
 ---
@@ -19,7 +19,7 @@ Two hard properties:
   as `../../MODEL-TIERS.md`, heading "The install interview must not edit installed
   files": installed content that carries project state makes every update fight the
   user's edits and lets the deployed copy drift from source. `[VERIFIED]`
-- **It is committed to git.** Git *is* the multi-session and multi-person mechanism —
+- **It is committed to git.** Git *is* the multi-session and multi-person mechanism -
   history, merge, blame, review. Do not build a sync protocol, a database, or a
   distributed lock on top of it. The one exception is the lease, below.
 
@@ -51,8 +51,8 @@ never let anything write back.
 ```
 <project>/.fulcrum/
   project.md          solution identity, apps, mode, posture, tier overrides
-  brief.md            derived requirements brief — written by fulcrum-discovery
-  tenant-profile.md   the capability probe result — written by fulcrum-solution-init
+  brief.md            derived requirements brief - written by fulcrum-discovery
+  tenant-profile.md   the capability probe result - written by fulcrum-solution-init
   plan.md             phases and steps - stable, rarely rewritten (micro: plan-micro template)
   TASKS.md            current truth: checkbox table of Mentor-turn-shaped tasks
   JOURNAL.md          session index: one ROW per session, completed in place
@@ -64,7 +64,7 @@ never let anything write back.
   runs/<run-id>.md    optional per-run detail
   checkpoints/<agent-label>.md   per-agent, overwrite-in-place, ephemeral
   lease.<app>.json    runtime lock, one per app - NOT committed
-  HALT.md             present only when halted — its existence is the signal
+  HALT.md             present only when halted - its existence is the signal
 ```
 
 `tenant-profile.md` and `HANDOFF.md` are existing contracts. This skill gives them a
@@ -72,7 +72,7 @@ home and **does not restate their schemas**. See
 `../fulcrum-solution-init/references/repo-scaffold.md` and
 `../fulcrum-solution-init/templates/handoff-template.md`.
 
-## Append-only versus rewritten — and why each file is where it is
+## Append-only versus rewritten - and why each file is where it is
 
 | File | Discipline | Why |
 |---|---|---|
@@ -85,7 +85,7 @@ home and **does not restate their schemas**. See
 | `project.md` | rewritten | Identity and settings, not history. |
 | `brief.md` | written once by `fulcrum-discovery`, rarely rewritten | Derived requirements brief; a dated artifact, not a log. |
 | `plan.md` | rewritten, rarely | Scope changes are deliberate and reviewed as a diff. |
-| `checkpoints/*` | overwrite in place | Existing contract — `../fulcrum-unattended-guardrails/references/checkpoints.md`. Ephemeral working state for one agent; its durable residue is the session-file line and the TASKS row. Not an append log, and nothing may depend on it after that agent ends. |
+| `checkpoints/*` | overwrite in place | Existing contract - `../fulcrum-unattended-guardrails/references/checkpoints.md`. Ephemeral working state for one agent; its durable residue is the session-file line and the TASKS row. Not an append log, and nothing may depend on it after that agent ends. |
 
 **Two profiles.** `full` is the layout above. `micro` - one app, about five or fewer
 steps, no BRD - needs only `project.md`, `plan.md`, `TASKS.md`, `JOURNAL.md` with its
@@ -108,7 +108,7 @@ file".
 Rewriting is safe **only** because the append-only files hold the history. That is
 what lets `TASKS.md` drop closed rows at a phase boundary without losing anything.
 
-## Write ordering — state before the wait, never after the result
+## Write ordering - state before the wait, never after the result
 
 `../../AGENTS.md` requires capturing a run identifier durably before the first wait.
 That generalises to all state here. `[UNVERIFIED]`
@@ -131,8 +131,8 @@ Only afterwards write the outcome, then the verdict.
 
 **What breaks without this order.** A crash between dispatch and result leaves a run
 mutating the app with no record of it. The next session sees no active work, opens a
-second Mentor session on the same app — breaking the one-session-per-app
-non-negotiable `[VERIFIED]` — and can publish from a stale model, which advances the
+second Mentor session on the same app - breaking the one-session-per-app
+non-negotiable `[VERIFIED]` - and can publish from a stale model, which advances the
 revision while silently reverting completed work. `[VERIFIED]`
 
 Corollary: never write `[x]` with an empty verdict. `unproven` is the honest value
@@ -140,7 +140,7 @@ and it is what tells a resuming session the work needs re-proving.
 
 ## The lease, in one paragraph
 
-`lease.json` is the only file here that is **not committed** — a committed lock is
+`lease.json` is the only file here that is **not committed** - a committed lock is
 stale the moment it is pushed. It carries a holder identity, an acquisition
 timestamp, and a TTL. Acquire before opening a Mentor session; a live lease held by
 someone else means wait or halt, never take; an expired lease may be broken, but only
@@ -162,7 +162,7 @@ failure it stopped. `[UNVERIFIED]` Procedure: `references/resume-and-halt.md`.
 ## DECISIONS.md closes an existing hole
 
 `../fulcrum-gap-analysis/SKILL.md` requires looking for a decision record before
-calling a deviation a defect — its **drift** finding class. Nothing else in Fulcrum
+calling a deviation a defect - its **drift** finding class. Nothing else in Fulcrum
 produces such a record, so that check currently always finds nothing and every drift
 reads as a gap. `[UNVERIFIED]` `DECISIONS.md` is that record. Its `Affects` field
 must name concrete model artifacts (entity, screen, action identifiers), because gap
@@ -189,7 +189,7 @@ failure mechanism and the opt-in rule are owned by `../../CONVENTIONS.md`, headi
 | Situation | Open |
 |---|---|
 | Creating `.fulcrum/`, or writing/parsing any file in it | `references/file-schemas.md` |
-| Resuming, or checking whether a task has been attempted before | `JOURNAL.md` index alone — never open a session file for either query |
+| Resuming, or checking whether a task has been attempted before | `JOURNAL.md` index alone - never open a session file for either query |
 | About to open a Mentor session, or a second agent may be active | `references/lease-and-concurrency.md` |
 | Starting cold, resuming after a crash, or `HALT.md` exists | `references/resume-and-halt.md` |
 | Small engagement proposed as micro, or deciding which files are mandatory | `references/micro-profile.md` |

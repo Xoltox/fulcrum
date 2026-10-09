@@ -1,4 +1,4 @@
-# Template — `.fulcrum/journal/<session-id>.md`
+# Template - `.fulcrum/journal/<session-id>.md`
 
 Copy to `<project>/.fulcrum/journal/<session-id>.md`, named for the session id minted at
 session start. **Append-only.** Never edit a line, never delete one, never insert into
@@ -15,19 +15,19 @@ before the first dispatch. Schema: `../references/file-schemas.md`, heading
 
 <!-- fulcrum-schema: journal-session v1 -->
 
-# Session `s-7b22af` — \<solution name\>
+# Session `s-7b22af` - \<solution name\>
 
 One line per event:
 
 ```
-<timestamp UTC> | <session-id> | <task-id or —> | <run-id or —> | <action> | <outcome>
+<timestamp UTC> | <session-id> | <task-id or -> | <run-id or -> | <action> | <outcome>
 ```
 
 The `started` line is written **before** the wait. The outcome line is written after.
 A `started` with no outcome is the signal that work may still be in flight, and it is
 what the index row's `InFlight` column mirrors.
 
-The `session-id` repeats the filename on purpose — a self-describing line survives the
+The `session-id` repeats the filename on purpose - a self-describing line survives the
 file being moved, quoted, handed to a subagent as a fragment, or concatenated by the
 index rotation rule.
 

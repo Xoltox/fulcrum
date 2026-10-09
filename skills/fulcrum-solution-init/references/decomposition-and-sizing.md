@@ -3,7 +3,7 @@
 Read this for steps 4 and 5 of `../SKILL.md`. It covers how to split a solution into
 apps, agents and workflows, and how to size phases and steps against measured cost.
 
-## Part 1 — Decomposition
+## Part 1 - Decomposition
 
 ### Apps
 
@@ -49,7 +49,7 @@ non-determinism to a build that already has plenty.
   entities that look like one, and the divergence surfaces as data that "disappears".
 - **Shared reference data belongs at the lowest level** everything above it can consume.
 - **Confirm the cross-app consumption mechanism against the tenant** before planning
-  around it, and record what you confirmed. `[UNVERIFIED]` — the reference engagement
+  around it, and record what you confirmed. `[UNVERIFIED]` - the reference engagement
   shipped a single-app solution, so multi-app entity sharing was never exercised there.
   Treat any multi-app data plan as unproven until you have confirmed it on the tenant.
 
@@ -71,7 +71,7 @@ ODC step that consumes the system, and that step lists the file as a preconditio
 A system whose contract is unknown at planning time is an unresolved item gating that
 step, not an assumption written into a spec.
 
-## Part 2 — Phase sizing
+## Part 2 - Phase sizing
 
 ### Global-then-local ordering
 
@@ -79,7 +79,7 @@ step, not an assumption written into a spec.
 2. **Then vertical slices**, one at a time: cheapest and most central slice first.
 
 A vertical slice is data + screens + navigation for one coherent user job. Slicing
-horizontally instead — all entities, then all screens, then all bindings — leaves the
+horizontally instead - all entities, then all screens, then all bindings - leaves the
 solution un-demoable for the whole middle of the build and defers every integration risk
 to the end.
 
@@ -117,7 +117,7 @@ Shape that worked:
 | Phase | Content |
 |---|---|
 | 1 | Theme, navigation shell, auth, data model, seed, one dashboard slice |
-| 2–4 | One vertical slice each, cheapest and most central first |
+| 2-4 | One vertical slice each, cheapest and most central first |
 | 5 | Remaining slice plus a cross-phase QA pass (reachability, nav completeness, visual parity) |
 
 Explicitly: **a ~28-screen scope is not a one-shot, and neither is a 12-screen one.**
@@ -129,7 +129,7 @@ skill is for. The router proposes the micro profile for it
 (`../../fulcrum-project-state/references/micro-profile.md`); if that engagement grows
 past its size, it is promoted here with its micro `plan.md` as source material.
 
-## Part 3 — Step sizing
+## Part 3 - Step sizing
 
 ### The right-sizing test
 
@@ -138,11 +138,11 @@ written spec within a cap of one build turn plus two fix turns.**
 
 Every clause carries weight:
 
-- **Fresh agent** — no memory of earlier steps. Anything the step needs must be in its
+- **Fresh agent** - no memory of earlier steps. Anything the step needs must be in its
   spec.
-- **One written spec** — if the agent must read a second file to proceed, the step is
+- **One written spec** - if the agent must read a second file to proceed, the step is
   under-specified or drawn across a boundary.
-- **One build plus two fix turns** — if it habitually needs more, split it. The cap is a
+- **One build plus two fix turns** - if it habitually needs more, split it. The cap is a
   measuring instrument here; as a stop condition it belongs to
   `../../fulcrum-unattended-guardrails/SKILL.md`.
 
@@ -172,7 +172,7 @@ In order of preference:
 
 1. **Split data from presentation.** Schema, then seed, then screens.
 2. **Split by screen.** One screen per step for heavy screens.
-3. **Split within a screen** along the natural turn boundaries — data retrieval, then
+3. **Split within a screen** along the natural turn boundaries - data retrieval, then
    layout skeleton, then real widgets and bindings. If a single screen needs this, it is
    a multi-step screen, and the plan should say so.
 

@@ -1,4 +1,4 @@
-# Template — `.fulcrum/DECISIONS.md`
+# Template - `.fulcrum/DECISIONS.md`
 
 Copy to `<project>/.fulcrum/DECISIONS.md`. **Append-only, ADR-lite.** Newest record
 at the bottom. **No existing line is ever edited, including `Status`.** Approving a
@@ -10,7 +10,7 @@ build or publish traps to engine-traps feedback - never here.
 This file closes a hole. `../../fulcrum-gap-analysis/SKILL.md` classifies a deviation
 as **drift** rather than a **gap** only when it can find a decision record for the
 artifact involved. It joins on the artifact identifier, so `Affects` must name
-concrete entities, screens, actions or blocks — never a prose description of an area
+concrete entities, screens, actions or blocks - never a prose description of an area
 of the app.
 
 Schema: `../references/file-schemas.md`, heading "DECISIONS.md".
@@ -19,17 +19,17 @@ Schema: `../references/file-schemas.md`, heading "DECISIONS.md".
 
 <!-- fulcrum-schema: DECISIONS v2 -->
 
-# DECISIONS — \<solution name\>
+# DECISIONS - \<solution name\>
 
 Append-only. One record per decision.
 
-## D-001 — \<short title\>
+## D-001 - \<short title\>
 
 - **Date:** \<ISO-8601 UTC\>
 - **Decider:** `user` | `agent` | `mentor`
 - **Status:** `proposed` | `accepted` | `rejected` | `reverted`
 - **Supersedes:** `D-0NN` | `-`
-- **Affects:** \<app identifier\> / \<Order, OrderList, GetOrders — concrete identifiers\>
+- **Affects:** \<app identifier\> / \<Order, OrderList, GetOrders - concrete identifiers\>
 
 **Context.** \<What was true that forced a choice. One paragraph.\>
 
@@ -41,7 +41,7 @@ Append-only. One record per decision.
 
 ---
 
-## D-002 — Shipment status is a static entity, not a free-text field
+## D-002 - Shipment status is a static entity, not a free-text field
 
 - **Date:** 2026-09-28T11:40:00Z
 - **Decider:** `mentor`
@@ -56,7 +56,7 @@ ODC shape and proposed a static entity.
 **Decision.** Model shipment status as a static entity with five records, referenced
 from `Shipment`.
 
-**Alternatives rejected.** A text attribute — unvalidated, and unfilterable in an
+**Alternatives rejected.** A text attribute - unvalidated, and unfilterable in an
 aggregate without string comparison.
 
 **Consequences.** Adding a sixth state is a model change and a publish, not data

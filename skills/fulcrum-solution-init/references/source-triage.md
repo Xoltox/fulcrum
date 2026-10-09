@@ -18,13 +18,13 @@ inspection stopped once the picture seemed clear. `[VERIFIED]`
 1. **Scan.** Read width, height, byte size, format and DPI for every file. Any
    image-metadata tool will do; a shell one-liner over the directory is enough.
 2. **Bucket** by dimension and aspect (table below).
-3. **Sample** each bucket — inspect enough files to characterise the bucket, then stop.
+3. **Sample** each bucket - inspect enough files to characterise the bucket, then stop.
    Inspect every file only in the smallest, highest-value bucket.
 4. **Deduplicate** screens into screen/flow groups.
 5. **Write the brief.**
 6. **Write the asset list**, with provenance and rights resolved.
 
-Steps 1–3 parallelise cleanly across subagents by bucket. Give each subagent the bucket's
+Steps 1-3 parallelise cleanly across subagents by bucket. Give each subagent the bucket's
 file list and the characterisation questions; do not ask any of them to plan.
 
 ## Bucket table
@@ -34,9 +34,9 @@ what the numbers mean.
 
 | Bucket | Signature | Usable? | What to do with it |
 |---|---|---|---|
-| Brand assets | Square or circular, large (512–2048 px), alpha channel | Yes, sometimes as-is | Candidate app icon / favicon / logo. Inspect every one. |
-| Full-screen frames | Phone or desktop widths, tall (2–4x width) | No | The screen inventory. Sample, then dedupe. |
-| Icon glyphs | Small (10–120 px), single mark | Almost never | Map to the platform icon font instead — see below. |
+| Brand assets | Square or circular, large (512-2048 px), alpha channel | Yes, sometimes as-is | Candidate app icon / favicon / logo. Inspect every one. |
+| Full-screen frames | Phone or desktop widths, tall (2-4x width) | No | The screen inventory. Sample, then dedupe. |
+| Icon glyphs | Small (10-120 px), single mark | Almost never | Map to the platform icon font instead - see below. |
 | Fragment crops | Odd aspect, mid-size, or very wide | No | Widget snapshots and sample-data tooltips. Reference only. |
 | Blanks | Small, low byte size, uniform | No | Empty exports. Discard, but record the count. |
 
@@ -88,7 +88,7 @@ The brief is the domain source of truth for the whole engagement. It must contai
 
 An open question left open gets re-litigated by every later session. Resolve what you can
 now, on your own authority, and mark it **RESOLVED** with the reasoning in one line. In
-the reference corpus a modelling ambiguity (two payment views — one entity or two?) was
+the reference corpus a modelling ambiguity (two payment views - one entity or two?) was
 resolved to one entity with two views, and the resolution note is what stopped it
 reopening. `[VERIFIED]`
 
@@ -99,7 +99,7 @@ step it gates.
 
 Whoever handed you the source material had a mental model of it. Triage will falsify
 parts of that model. **Write the corrections down as corrections**, next to the claim they
-overturn — not as quiet replacements.
+overturn - not as quiet replacements.
 
 Reference corpus, both `[VERIFIED]`:
 
@@ -112,7 +112,7 @@ The second is the more instructive shape: a **wrong diagnosis produces the wrong
 item**. Any asset need must be justified against what the app actually renders, not
 against what the design looks like it needs.
 
-## Assets are a human handoff — plan for it
+## Assets are a human handoff - plan for it
 
 There is **no asset-upload path over the ODC MCP surface.** `[VERIFIED]` External-library
 upload operations carry code, not resources. So every asset must be uploaded as a proper

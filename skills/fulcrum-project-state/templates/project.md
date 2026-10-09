@@ -1,4 +1,4 @@
-# Template — `.fulcrum/project.md`
+# Template - `.fulcrum/project.md`
 
 Copy to `<project>/.fulcrum/project.md`. Rewritten in place when a setting changes.
 Identity and settings only: no history, no task state, no run outcomes, no halt
@@ -9,10 +9,10 @@ Schema: `../references/file-schemas.md`, heading "project.md".
 
 <!-- fulcrum-schema: project v2 -->
 
-# Project — \<solution name\>
+# Project - \<solution name\>
 
 **Created:** \<ISO-8601 UTC\>
-**State directory:** `.fulcrum/` — committed. `lease.*.json` and `checkpoints/` are not.
+**State directory:** `.fulcrum/` - committed. `lease.*.json` and `checkpoints/` are not.
 
 ## Apps
 
@@ -45,7 +45,7 @@ decision and pins nothing.\>
 | `workhorse` | \<model\> |
 | `poller` | \<model\> |
 
-A project override is rank 1 in `../../../MODEL-TIERS.md`, heading "Resolution — how a
+A project override is rank 1 in `../../../MODEL-TIERS.md`, heading "Resolution - how a
 tier becomes a concrete model", so anything written here wins over the machine-local
 file. Record why, in `DECISIONS.md`.
 

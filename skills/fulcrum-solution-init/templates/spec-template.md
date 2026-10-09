@@ -1,17 +1,17 @@
 # Step spec template
 
-Copy per step to `specs/step-<NN>-<slug>.md`. Replace every `<…>`. Delete no section — an
+Copy per step to `specs/step-<NN>-<slug>.md`. Replace every `<…>`. Delete no section - an
 empty section is itself information, so write "None" rather than removing it.
 
 A good spec reads as an **executable test plan**, not a design brief. Reference corpus:
-specs that worked ran 168–226 lines. `[SINGLE-OBSERVATION]` Well below that usually means
+specs that worked ran 168-226 lines. `[SINGLE-OBSERVATION]` Well below that usually means
 judgment calls were left to the build agent.
 
 The spec must be **self-sufficient**. The build agent reads this file and nothing else.
 
 ---
 
-## Step \<NN\> — \<short title\>
+## Step \<NN\> - \<short title\>
 
 **Phase:** \<phase number and name\>
 **App:** \<exact target app identifier from tenant-profile.md\>
@@ -34,7 +34,7 @@ the ambiguity, then the decision.
 Anything genuinely ambiguous in the source that this step touches goes here. An ambiguity
 left unresolved becomes an improvisation, and an improvisation becomes a fix turn.
 
-- \<Ambiguity\> → **Decided:** \<decision\>. \<one-clause reason\>
+- \<Ambiguity\> -> **Decided:** \<decision\>. \<one-clause reason\>
 - \<…\>
 
 **Do not re-litigate these.** If a resolution turns out to be wrong, halt and report
@@ -42,12 +42,12 @@ rather than substituting a different decision mid-step.
 
 ---
 
-## Invariant pre-check — halt if any fails
+## Invariant pre-check - halt if any fails
 
 Read the current state and confirm each before making any change. **If any check fails,
 stop and report. Do not attempt a fix and do not proceed.**
 
-1. \<Precondition, stated as something observable\> — expected: \<observation\>
+1. \<Precondition, stated as something observable\> - expected: \<observation\>
 2. \<…\>
 
 Rationale: a step that starts from an unexpected state produces damage that is more
@@ -57,18 +57,18 @@ expensive to unwind than the step was to run.
 
 ## Standing rules for this step
 
-\<Restate inline, generated from the single rule source — never hand-edited. The build
+\<Restate inline, generated from the single rule source - never hand-edited. The build
 agent must need no other file. Include at minimum:\>
 
 - Tenant facts that apply here, quoted from `tenant-profile.md` with their values.
 - The fix-turn cap and the halt condition.
 - The proof obligation: what counts as evidence this step landed.
 - Any construct-level prohibition relevant to what this step builds, **each with its
-  failure mode stated** — a bare "do not" does not stop the failure recurring.
+  failure mode stated** - a bare "do not" does not stop the failure recurring.
 
 ---
 
-## Turn \<n\> — \<what this turn produces\>
+## Turn \<n\> - \<what this turn produces\>
 
 One block per turn. Number them. Each element in the turn gets all four parts.
 
@@ -88,7 +88,7 @@ constructs makes the build agent construct them to match the name rather than to
 the need, and the resulting model diverges from the platform's own conventions.\>
 
 **FUNCTIONAL BEHAVIOR**
-\<What responds to what. For a display-only element write "Display only — all values live
+\<What responds to what. For a display-only element write "Display only - all values live
 from entity data, loaded on entry", explicitly. A missing behaviour statement is read as
 "static", and the agent hardcodes text.\>
 
@@ -102,7 +102,7 @@ tree that reads ambiguously.\>
 
 ---
 
-## Turn \<n+1\> — \<…\>
+## Turn \<n+1\> - \<…\>
 
 \<…\>
 
@@ -122,13 +122,13 @@ Explicit. Not aspirations deferred, but things this step must **not** do:
 ## Acceptance checklist
 
 Numbered, individually verifiable assertions. Every item must be checkable by looking at
-something — a rendered screen at a stated viewport, a specific string in the output, a
+something - a rendered screen at a stated viewport, a specific string in the output, a
 count, a response value.
 
 **No item may say "should look right", "renders correctly", or "works as expected".**
 Those are unfalsifiable, so they always pass.
 
-1. \<Assertion\> — verified by: \<screenshot at \<viewport\> showing \<what\> / the value
+1. \<Assertion\> - verified by: \<screenshot at \<viewport\> showing \<what\> / the value
    \<x\> in \<where\> / a count of \<n\> \<of what\>\>
 2. \<…\>
 

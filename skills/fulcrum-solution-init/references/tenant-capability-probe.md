@@ -23,7 +23,7 @@ profile, and nothing else asserts a tenant fact.
    cadence, or a downstream session hits a contradiction, re-run the affected row rather
    than editing it from memory.
 
-## 0. Mentor liveness gate — run before anything else
+## 0. Mentor liveness gate - run before anything else
 
 **Failure mode.** In a tenant-wide outage, every run returned terminal status
 `succeeded`, `attempted_change` false, and a summary stating that no application was
@@ -35,7 +35,7 @@ not a control. `[SINGLE-OBSERVATION]`
 a dead one.
 
 **The gate.** Send a cheap read-only prompt against the real target app asking Mentor to
-name what it can see — screens, entities, or both. Pass only if the returned summary
+name what it can see - screens, entities, or both. Pass only if the returned summary
 **names real content that exists in that app**. Concretely:
 
 - Pass: the summary lists screen or entity names you can independently confirm exist.
@@ -51,26 +51,26 @@ Repeat this gate at the start of **every** session, not only at init. It costs o
 read-only turn. Turn mechanics for the probe turn itself:
 `../../fulcrum-mentor-turns/SKILL.md`.
 
-## 1. Live row data — nothing to probe
+## 1. Live row data - nothing to probe
 
 **Do not probe this. It does not vary by tenant.** There is no model-layer path to live
 row data on any tenant. `[SCHEMA]` `db_query` is not a general SQL path: it runs only
 against a test harness stood up by `test_setup_start`, accepts only SQL templates
 declared upfront in that call, and its own schema states that no template, `SELECT`
-included, returns rows in v1 — every template comes back with rowcount 0. A "trivial
+included, returns rows in v1 - every template comes back with rowcount 0. A "trivial
 constant select" cannot be issued at all without first standing up that harness, so the
 probe that used to sit here could never execute.
 
 The conclusion the old probe reached still holds, and holds universally: **reading real
-rows needs a separate diagnostic instrument, and that cost belongs in the budget** —
+rows needs a separate diagnostic instrument, and that cost belongs in the budget** -
 historically a temporary diagnostic endpoint at roughly two Mentor turns and two
 revisions per seed step.
 
 The instrument for live row data is `exec_in_app` against a harness fork. `[SCHEMA]` The
-procedure is not written here — see `../../fulcrum-verification/SKILL.md`; seed
+procedure is not written here - see `../../fulcrum-verification/SKILL.md`; seed
 consequences in `../../fulcrum-seed-data/SKILL.md`.
 
-## 2. Which UI blocks exist — and their real inputs
+## 2. Which UI blocks exist - and their real inputs
 
 Probe each of: `Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`.
 Add any block a phase-one spec depends on.
@@ -88,7 +88,7 @@ that uses it, then read the resulting model or rendered output.
 |---|---|
 | The block is placed and its inputs appear in the model | Exists. Record the exact input property names and types you saw. |
 | A validation or model error naming the block | Absent, with the exact error text quoted. |
-| Mentor substitutes a different block silently | Absent-in-practice. Record what it substituted — that substitution is what specs will get. |
+| Mentor substitutes a different block silently | Absent-in-practice. Record what it substituted - that substitution is what specs will get. |
 | Mentor says it does not exist but nothing was attempted | **Unresolved.** Attempt the reference before recording anything. |
 
 **Input properties matter as much as existence.** A block that exists with different
@@ -100,7 +100,7 @@ Probe: place one icon and read back what the model holds.
 
 Record: the icon font family in use, the exact casing convention for icon names
 (`ArrowRight` vs `arrow-right` vs `arrow_right`), and one confirmed working example.
-Casing is not cosmetic — a wrongly cased name yields a blank or a fallback glyph with no
+Casing is not cosmetic - a wrongly cased name yields a blank or a fallback glyph with no
 error, so specs must quote names in the confirmed convention.
 
 ## 4. Available `ModelFeature_*` flags
@@ -126,7 +126,7 @@ Probe: attempt to mark a trivial server action public and read whether the prope
 takes.
 
 Record yes/no plus the error text if no. If no, exposing logic outside the app needs a
-REST method instead, which is a step in the plan and a cost in the budget — notably for
+REST method instead, which is a step in the plan and a cost in the budget - notably for
 seeding and for diagnostic row reads.
 
 ## 7. Mentor backend identifier
@@ -140,7 +140,7 @@ compared against a later one, and a regression cannot be attributed.
 ## 8. Mentor prompt-length ceiling
 
 Probe: establish the ceiling the tenant actually enforces, by the cheapest available
-route — a documented or reported limit, or a bounded escalation of prompt size on a
+route - a documented or reported limit, or a bounded escalation of prompt size on a
 throwaway read-only turn.
 
 Record the number and how you obtained it. Spec turn blocks are sized against this, so
@@ -162,10 +162,10 @@ Also record here the answer to the mobile-application-type question from step 2 
 `../SKILL.md`: whether Mentor can add screens to an app of the type you intend to use, as
 observed on this tenant.
 
-## 10. Tool availability — three states, not two
+## 10. Tool availability - three states, not two
 
 **A schema that loads is not a tool that dispatches.** Tool discovery and tool
-dispatch are separate paths — an op whose schema is listed may still fail
+dispatch are separate paths - an op whose schema is listed may still fail
 dispatch with a resolution error. Do not treat "the schema loaded" as
 confirmation the op works. Fallbacks and the halt rule for an op with none:
 `tool-availability-and-fallback.md`.
@@ -176,7 +176,7 @@ Record exactly three states per op, never collapsed into a plain yes/no:
 |---|---|---|
 | **Confirmed callable** | Dispatched, and returned a real result | The op was actually called (read-only op only) and it worked |
 | **Confirmed unavailable** | Dispatched, and failed with a resolution/dispatch error (not a data-not-found or an inconclusive result) | The op was actually called and it failed at the dispatch layer |
-| **Unknown** | Never dispatched | Default state. **Every mutating op is unknown by construction** — a read-only probe must never call a mutating op just to learn whether it dispatches. This is correct and expected; do not silently upgrade it to "available" because nothing else has failed |
+| **Unknown** | Never dispatched | Default state. **Every mutating op is unknown by construction** - a read-only probe must never call a mutating op just to learn whether it dispatches. This is correct and expected; do not silently upgrade it to "available" because nothing else has failed |
 
 **Keep the probe cheap.** Check only the read-only ops the planned engagement
 actually needs, not the whole tool surface. If a session never plans to call
@@ -186,7 +186,7 @@ actually needs, not the whole tool surface. If a session never plans to call
 against the real target app with a trivial, cheap argument and record which of
 the three states resulted, plus the exact error text on a failure. An
 inconclusive result (e.g. a 404 that could equally mean "no data" as "broken
-dispatch") is not confirmed-unavailable — record it as unresolved with the
+dispatch") is not confirmed-unavailable - record it as unresolved with the
 ambiguity stated, never as a broken op.
 
 ## 11. Portfolio, environments and template screen set
@@ -230,5 +230,5 @@ the result, or the row is unresolved.
   it gates.
 - No mutating operation was run and no revision was bumped.
 - Every read-only op the plan depends on has a tool-availability row in one of the three
-  states. Every mutating op the plan depends on is recorded **unknown** — not called, not
+  states. Every mutating op the plan depends on is recorded **unknown** - not called, not
   guessed.

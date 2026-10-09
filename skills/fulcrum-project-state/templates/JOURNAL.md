@@ -1,20 +1,20 @@
-# Template — `.fulcrum/JOURNAL.md` (the session index)
+# Template - `.fulcrum/JOURNAL.md` (the session index)
 
 Copy to `<project>/.fulcrum/JOURNAL.md`. **One row per session, never per action.**
-The per-action lines live in `<project>/.fulcrum/journal/<session-id>.md` — skeleton in
+The per-action lines live in `<project>/.fulcrum/journal/<session-id>.md` - skeleton in
 `journal-session.md` beside this file.
 
 A row is **appended at session start and completed in place**. Edit only your own row.
 Never append a second row to close a session: one row per session is what makes the
 `Tasks` column scannable for oscillation detection.
 
-Schema: `../references/file-schemas.md`, heading "JOURNAL.md — the session index".
+Schema: `../references/file-schemas.md`, heading "JOURNAL.md - the session index".
 
 ---
 
 <!-- fulcrum-schema: JOURNAL v2 -->
 
-# JOURNAL — \<solution name\>
+# JOURNAL - \<solution name\>
 
 Session index. Detail for any row: `journal/<Session>.md`.
 
@@ -28,18 +28,18 @@ Session index. Detail for any row: `journal/<Session>.md`.
 
 ## Reading this file
 
-- **Resume** — read the last row. `State`/`End` say whether it closed; `InFlight` names
+- **Resume** - read the last row. `State`/`End` say whether it closed; `InFlight` names
   tasks that may have mutated the app with no recorded outcome.
-- **Oscillation** — match a task id across the `Tasks` column. Two `:fail` entries for
+- **Oscillation** - match a task id across the `Tasks` column. Two `:fail` entries for
   one task is "stuck twice means stop and report" (`../../../AGENTS.md`) firing
   mechanically. The example above shows exactly that, and the halt that followed.
-- **`State: open`** — live session or crashed session; the file cannot tell. Resolve
+- **`State: open`** - live session or crashed session; the file cannot tell. Resolve
   against the lease, per `../references/file-schemas.md`, heading "Reading a row that
   was never closed". Never guess.
 
 ## Values
 
 `State`: `open` · `clean` · `halted` · `aborted`
-`Tasks`: `<task-id>:<pass|fail|unproven|—>`, comma-separated, written as each task
-reaches a terminal state — **not** at session close, so a crashed attempt still shows.
+`Tasks`: `<task-id>:<pass|fail|unproven|->`, comma-separated, written as each task
+reaches a terminal state - **not** at session close, so a crashed attempt still shows.
 `-` means "not applicable or not yet known". Never leave a cell empty.

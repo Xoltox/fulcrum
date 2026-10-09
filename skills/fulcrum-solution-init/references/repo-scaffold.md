@@ -32,10 +32,10 @@ source exports, use it and record the actual paths in `HANDOFF.md` PART 1, "File
 What is fixed is the `.fulcrum/` file set and that each fact has one home.
 
 `plan.md`, `tenant-profile.md`, `HANDOFF.md` and `RUN-IDS.md` live in `.fulcrum/`, not
-at the project root — full layout and file contracts:
+at the project root - full layout and file contracts:
 `../../fulcrum-project-state/SKILL.md`, `../../fulcrum-project-state/references/file-schemas.md`.
 
-## File roles — one owner per fact
+## File roles - one owner per fact
 
 | File | Owns | Never contains |
 |---|---|---|
@@ -43,7 +43,7 @@ at the project root — full layout and file contracts:
 | `.fulcrum/plan.md` | Scope and ordering: phases, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
 | `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence | Anything not probed |
 | `.fulcrum/HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
-| `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history — session index plus per-session action lines, including withdrawn claims | Rules, plans |
+| `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history - session index plus per-session action lines, including withdrawn claims | Rules, plans |
 | `.fulcrum/RUN-IDS.md` | Run ids and their outcomes, including publish records | Anything else |
 | `.fulcrum/external/<system>.md` | One external system's endpoint, auth scheme, payload contract, error codes, verified log paths | The secret value; anything about the ODC side |
 | `specs/*` | Everything one step's build agent needs | Cross-step context |
@@ -52,15 +52,15 @@ at the project root — full layout and file contracts:
 The right-hand column is the load-bearing one. Every documentation failure below is a
 fact living in more than one file.
 
-## The handoff document — two parts, one replaced
+## The handoff document - two parts, one replaced
 
 `HANDOFF.md` has exactly two parts:
 
-**PART 1 — RULES.** Stable. Accumulates slowly. Standing decisions, the file map,
+**PART 1 - RULES.** Stable. Accumulates slowly. Standing decisions, the file map,
 the target app identity, error handling, what is not to be re-litigated. Changes only
 when a rule changes.
 
-**PART 2 — BRIEF.** Replaced **wholesale** every session. Where the build is now, the
+**PART 2 - BRIEF.** Replaced **wholesale** every session. Where the build is now, the
 one next step, and what that step needs. Never appended to.
 
 **Why the split.** A handoff that accumulates step narrative grows without bound and
@@ -73,7 +73,7 @@ Hard rules:
 
 - The BRIEF names **exactly one** next step. Two next steps means the orchestrator picks.
 - The BRIEF never narrates completed steps beyond what the next step depends on.
-- The RULES section is where a new standing decision lands — once, in one place.
+- The RULES section is where a new standing decision lands - once, in one place.
 - Neither part restates a spec. Specs are self-sufficient by design.
 
 Shape to copy: `../templates/handoff-template.md`.
@@ -97,8 +97,8 @@ The same rule set appeared three times; one copy had silently dropped a prohibit
 agent obeying that copy breaks a rule it was never shown, and the breach looks like
 disobedience rather than a documentation defect.
 
-**Rule.** Never duplicate a rule list. If a spec must restate standing rules inline — and
-it must, so the build agent needs no second file — then generate that block from one
+**Rule.** Never duplicate a rule list. If a spec must restate standing rules inline - and
+it must, so the build agent needs no second file - then generate that block from one
 source, and treat any hand-edit of a spec's rules block as a defect.
 
 ### 3. Every section-anchored cross-reference dangling
@@ -107,7 +107,7 @@ Every `§`-numbered reference in the corpus pointed at nothing, because the targ
 had no numbered headings.
 
 **Rule.** Link by relative path, and quote the target heading verbatim. Never `§`. Never
-a line number — line numbers rot on the first edit.
+a line number - line numbers rot on the first edit.
 
 ### 4. A plausible inference recorded as verified fact
 
@@ -116,9 +116,9 @@ when it was an inference.
 
 **Rule.** Tag evidence strength on every non-obvious claim, per the evidence tags in the
 authoring contract. When a claim is withdrawn, **append a withdrawing line to the
-session file that carries it** (`.fulcrum/journal/<session-id>.md` — see
+session file that carries it** (`.fulcrum/journal/<session-id>.md` - see
 `../../fulcrum-project-state/references/file-schemas.md`, heading
-"journal/<session-id>.md") rather than deleting it — a silently deleted claim gets
+"journal/<session-id>.md") rather than deleting it - a silently deleted claim gets
 re-derived.
 
 ## Durable run-id log
@@ -140,7 +140,7 @@ stub explaining what belongs there:
 
 - What the step actually did, versus what its spec said.
 - Which turn shapes worked and which needed a fix turn.
-- Anything that should become a standing rule — flagged, not promoted; promotion is a
+- Anything that should become a standing rule - flagged, not promoted; promotion is a
   deliberate edit to `HANDOFF.md` PART 1.
 
 ## Scaffold checklist

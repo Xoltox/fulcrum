@@ -9,13 +9,13 @@ requires: ODC MCP server authenticated; Mentor enabled on the tenant; filesystem
 
 Phase zero of an ODC engagement. Everything downstream reads what this phase writes.
 Run once per project, on the **deep-reasoning** tier (see `../../MODEL-TIERS.md`); every
-session after runs **workhorse**. That asymmetry is the point — spend the expensive
+session after runs **workhorse**. That asymmetry is the point - spend the expensive
 thinking once, on decomposition and sizing, so later sessions only execute.
 
 ## When to use
 
-A solution-sized ask — more than a handful of screens, or more than one app, or apps
-plus agents plus workflows — with source material that is not yet a spec, and no repo
+A solution-sized ask - more than a handful of screens, or more than one app, or apps
+plus agents plus workflows - with source material that is not yet a spec, and no repo
 that already has a plan and a tenant profile.
 
 **Not** for one app from one clean source with no decomposition: a single-app bootstrap
@@ -35,13 +35,13 @@ scaffold, the handoff structure. Everything else belongs to a sibling:
 | Proof obligations and visual capture | `../fulcrum-verification/SKILL.md` |
 | Loader idempotence, natural keys, static entity identifiers | `../fulcrum-seed-data/SKILL.md` |
 | Stop conditions, fix-turn caps, delegation depth, model tier policy | `../fulcrum-unattended-guardrails/SKILL.md` |
-| No source material exists at all — nothing written, no designs, no mockups | `../fulcrum-discovery/SKILL.md` |
+| No source material exists at all - nothing written, no designs, no mockups | `../fulcrum-discovery/SKILL.md` |
 
 Cross-reference these; never restate their rules beyond a one-line pointer.
 
 ## Procedure
 
-Run in order. Steps 2 and 3 gate step 4 — never plan before both are settled.
+Run in order. Steps 2 and 3 gate step 4 - never plan before both are settled.
 
 ### 1. Source triage
 
@@ -50,7 +50,7 @@ Source material arrives near-useless more often than not. Do not read it as a sp
 - **Dimension-scan every file first**, before any visual inspection. Bucket by size and
   aspect: brand assets, full-screen frames, icon glyphs, fragment crops, blanks. In the
   reference corpus a first-pass visual triage and a later systematic dimension scan
-  disagreed on the frame count (67 vs 87) — the scan is the reliable census, so run it
+  disagreed on the frame count (67 vs 87) - the scan is the reliable census, so run it
   first and let inspection sample within its buckets. `[VERIFIED]`
 - **Inspect a representative sample per bucket, not every file.** Expect a very low
   signal ratio: 2 of 138 exports were genuinely upload-ready assets; the other 136 were
@@ -66,7 +66,7 @@ Source material arrives near-useless more often than not. Do not read it as a sp
   cleanly, every asset gap is a manual-crop task, not a re-export task, and is work.
   Bucket table, sampling rule, asset-upload handoff: `references/source-triage.md`.
 
-### 2. Target-platform decision — before planning, not during
+### 2. Target-platform decision - before planning, not during
 
 Reversing it means re-creating the app and re-building every screen. Make it a written,
 checked decision with its consequence stated. Decide and record: web vs mobile
@@ -74,7 +74,7 @@ application type; mobile-first vs desktop layout; existing app or fresh shell; w
 
 - Mentor could not add screens to an app created with the **Mobile** application type,
   forcing a Reactive Web app with a phone-width mobile-first layout instead.
-  `[SINGLE-OBSERVATION]` `[TENANT]` — confirm on the current tenant in step 3, don't assume.
+  `[SINGLE-OBSERVATION]` `[TENANT]` - confirm on the current tenant in step 3, don't assume.
 - **App creation is a user choice; neither option is the default.** Ask the user: have
   Mentor create the app (`mentor_start_session` then `mentor_create_asset`), or will they
   create a shell app from the standard template in Studio/Portal for Fulcrum to load
@@ -91,7 +91,7 @@ application type; mobile-first vs desktop layout; existing app or fresh shell; w
 ### 3. Tenant capability probe
 
 One read-only pass that resolves everything tenant-varying and writes `tenant-profile.md`
-into the repo. After this, **no downstream skill hardcodes a tenant fact** — they all read
+into the repo. After this, **no downstream skill hardcodes a tenant fact** - they all read
 the profile. Must resolve, at minimum: which UI blocks exist and
 their real input properties; icon font family and name casing; available `ModelFeature_*`
 flags; date and meridiem format-token behaviour; whether server actions can be marked
@@ -103,10 +103,10 @@ public; the Mentor backend identifier; the Mentor prompt-length ceiling. Two har
   assertion.
 - **Gate on Mentor liveness before any build begins.** In a tenant-wide outage every run
   returned terminal status `succeeded` with `attempted_change` false and a summary saying
-  no application was selected — including against an unrelated app. `[SINGLE-OBSERVATION]`
+  no application was selected - including against an unrelated app. `[SINGLE-OBSERVATION]`
   The gate is therefore: a cheap read-only probe returns a summary **naming real content
   from the actual app**. A read-only prompt correctly returns `attempted_change` false,
-  so that field is not the signal — the named content is.
+  so that field is not the signal - the named content is.
 
 Checklist, probe prompts, evidence format: `references/tenant-capability-probe.md`; fill
 `templates/tenant-profile.md`.
@@ -115,14 +115,14 @@ Checklist, probe prompts, evidence format: `references/tenant-capability-probe.m
 
 Decide and write into the plan:
 
-- **Apps** — one per coherent persona-plus-lifecycle boundary, not one per screen area.
-- **Agents and workflows** — which behaviour is an agent, which a workflow, which just a
+- **Apps** - one per coherent persona-plus-lifecycle boundary, not one per screen area.
+- **Agents and workflows** - which behaviour is an agent, which a workflow, which just a
   server action. Name each and its trigger.
-- **Entity ownership** — exactly one owning app or library per entity. Consumers
+- **Entity ownership** - exactly one owning app or library per entity. Consumers
   reference the owner and never redeclare it; shared reference data belongs at the lowest
   level everything above it can consume. Confirm the consumption mechanism against the
   tenant before planning around it. `[UNVERIFIED]`
-- **Deployable units** — what ships together, and so what must be demoable together.
+- **Deployable units** - what ships together, and so what must be demoable together.
 - **Prefer fewer apps.** Each extra boundary buys isolation and costs a cross-app
   dependency every later step must respect.
 
@@ -146,7 +146,7 @@ Worked sizing tables and slice ordering: `references/decomposition-and-sizing.md
 
 ### 6. Author the specs
 
-One spec file per step, written now — not deferred to the session that builds it. Specs
+One spec file per step, written now - not deferred to the session that builds it. Specs
 are the interface between this expensive phase and every cheap one after it. Anatomy
 that worked: a header stating phase and scope plus what is explicitly **not**
 covered; a resolution section stating judgment calls outright instead of leaving
@@ -157,13 +157,13 @@ entities and attributes only and never aggregates, screen actions or local varia
 invariant pre-check that can halt the run; an explicit non-goals list; and an acceptance
 checklist of numbered, verifiable, screenshot-anchored assertions.
 
-Never "should look right". Good specs read as executable test plans and ran 168–226
+Never "should look right". Good specs read as executable test plans and ran 168-226
 lines. `[SINGLE-OBSERVATION]` Copy `templates/spec-template.md` per step.
 
 ### 7. Scaffold the repo and the handoff
 
 The handoff document is **two parts**: stable **RULES** that accumulate, and a **BRIEF**
-replaced wholesale every session. Never a growing narrative of past steps — that is what
+replaced wholesale every session. Never a growing narrative of past steps - that is what
 the append-only build log is for. Scaffold: the derived brief, the plan, `specs/`, a
 per-step build-pattern log, a durable run-id log, `tenant-profile.md`, and that handoff.
 
@@ -176,14 +176,14 @@ Route each app's first build by the source type available **for that app**:
 
 | Source for that app | Route to |
 |---|---|
-| Structured front-end code — TSX/React/HTML | the design-source bootstrap skill (`outsystems-design-to-app`) — its highest-fidelity input |
-| Visual — Figma URL, screenshots, image mockups | the same design-source bootstrap skill |
-| Text only — derived brief, prose spec | the text-spec bootstrap skill (`outsystems-spec-driven-build`) |
+| Structured front-end code - TSX/React/HTML | the design-source bootstrap skill (`outsystems-design-to-app`) - its highest-fidelity input |
+| Visual - Figma URL, screenshots, image mockups | the same design-source bootstrap skill |
+| Text only - derived brief, prose spec | the text-spec bootstrap skill (`outsystems-spec-driven-build`) |
 | Both | design-source skill for theme, chrome and screens; text-spec skill for entities |
 
 Both are single-app, single-source bootstraps producing draft scaffolds; neither
-decomposes a solution. Give each **one app, one shell, one spec** — shell from step 2,
-spec from step 6 — and never let either re-derive scope. Sessions after the bootstrap
+decomposes a solution. Give each **one app, one shell, one spec** - shell from step 2,
+spec from step 6 - and never let either re-derive scope. Sessions after the bootstrap
 turn use `../fulcrum-mentor-turns/SKILL.md` directly.
 
 ## Exit gate

@@ -12,7 +12,7 @@ The interview is sufficient when **every item below has an answer or an explicit
 `undecided` marker naming what it blocks**. Not when the brief feels complete.
 
 The set is derived from what `../../fulcrum-solution-init/SKILL.md` cannot start
-without — steps 2, 4, 5 and 6. Anything outside it is not this interview's business,
+without - steps 2, 4, 5 and 6. Anything outside it is not this interview's business,
 however interesting.
 
 | # | Item | Blocking? | Gates |
@@ -46,7 +46,7 @@ The mechanism, and why a ceiling rather than "ask until done":
   leaves nothing for the question that actually matters at step 30.
 - **Answer quality decays with question count.** A user asked thirty questions answers
   the last ten carelessly. This inverts the naive intuition: the late answers are the
-  *least* reliable, not the most, so a long interview does not converge on truth — it
+  *least* reliable, not the most, so a long interview does not converge on truth - it
   accumulates `elicited` lines with `held` formatting.
 - **Context spent here is context not spent building.** Discovery runs before any
   Mentor turn exists to show for it.
@@ -61,7 +61,7 @@ non-blocking item, and never extend to "round out" the brief.
 
 Everything still open becomes `undecided`, with who decides and what it blocks. Say so
 to the user plainly, in one line. A brief that declares five open questions is more
-useful than one that quietly invented five answers — the first routes to a human, the
+useful than one that quietly invented five answers - the first routes to a human, the
 second routes to a build turn that produces the wrong app.
 
 ## Deliberately never asked
@@ -94,5 +94,5 @@ Stop before the ceiling on any of these. They all mean further questions return 
 - The user asks when the building starts. Take it literally.
 
 Stopping early is not failure. The remaining items become `undecided`, which is a
-routable state, and the build produces something to react to — which elicits better
+routable state, and the build produces something to react to - which elicits better
 answers than any further question would have.

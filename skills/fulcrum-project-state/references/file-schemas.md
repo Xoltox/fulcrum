@@ -18,7 +18,7 @@ Rules that hold for every file here:
   elsewhere (`tenant-profile.md`, `HANDOFF.md`, `checkpoints/*`) carry
   the marker only if that contract adds one. `RUN-IDS.md` has its own schema and carries one. Changing a field set, a
   field order or a field's meaning requires bumping `<N>` and updating this document in the same change.
-  A reader that finds a version it does not know must stop and report — never guess
+  A reader that finds a version it does not know must stop and report - never guess
   field positions. Without the marker the "never reorder" rule has no legitimate
   mechanism for change, so the first schema change breaks it silently and every later
   parser reads the wrong column. `[UNVERIFIED]`
@@ -71,7 +71,7 @@ is fine, but its durable content moves into those files at wave close.
 
 v2 adds `profile`. A v1 file is read as `profile: full`.
 
-Rewritten. Identity and settings only — no history, no task state.
+Rewritten. Identity and settings only - no history, no task state.
 
 | Field | Values |
 |---|---|
@@ -81,7 +81,7 @@ Rewritten. Identity and settings only — no history, no task state.
 | `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
 | `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
-| `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` → a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution — how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override — an empty section reads as a decision and pins nothing. |
+| `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` -> a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution - how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override - an empty section reads as a decision and pins nothing. |
 
 `project.md` carries no run outcome, gate verdict or halt status: those are in
 `RUN-IDS.md`, `TASKS.md` and `HALT.md`, and a copy here was the line found stale in
@@ -117,7 +117,7 @@ Exactly these columns, in this order:
 |---|---|---|
 | 1 | `Done` | `[ ]` or `[x]`. Terminal state only. |
 | 2 | `ID` | `T-<NNN>`, zero-padded, assigned once, **never reused** even after deletion. A reused ID makes a journal line ambiguous forever, and silently corrupts the oscillation count in the session index. |
-| 3 | `Task` | One imperative line. No newlines, no pipes — escape a literal pipe as `\|`. |
+| 3 | `Task` | One imperative line. No newlines, no pipes - escape a literal pipe as `\|`. |
 | 4 | `App` | App identifier. This is the lease key; a wrong value here books the wrong lock. For `Turn: external` rows, the system stem from `external/<system>.md`. |
 | 5 | `Turn` | `build` \| `fix` \| `inspect` \| `publish` \| `seed` \| `verify` \| `manual` \| `code` \| `infra` \| `external` |
 | 6 | `Verify` | Required proof rungs, comma-separated rung numbers from `../../fulcrum-verification/SKILL.md`, heading "The proof ladder" - e.g. `1,3,6`. `-` is valid for `inspect`, `manual`, `code`, `infra` and `external` rows; for the last three the session-file outcome line names the evidence (test run, build output, listing). |
@@ -153,7 +153,7 @@ task always carries a verdict, and `unproven` is a legal, honest one.
 
 **Task entries are Mentor-turn-shaped, not tickets.** Every row names the app it
 touches, the kind of turn it is, the proof it owes, and the traps that apply. A row
-that cannot fill columns 4–6 is not yet a task; it is a plan item, and it belongs in
+that cannot fill columns 4-6 is not yet a task; it is a plan item, and it belongs in
 `plan.md` until it is decomposed.
 
 **Row lifecycle.** Rows for the current phase stay in the table. At a phase boundary,
@@ -162,11 +162,11 @@ their outcomes are already in `JOURNAL.md` and `RUN-IDS.md`. Without the removal
 file grows without bound and stops being readable in one go, which is the one property
 it exists to have.
 
-## JOURNAL.md — the session index
+## JOURNAL.md - the session index
 
 `<!-- fulcrum-schema: JOURNAL v2 -->`
 
-**`JOURNAL.md` is an index, one row per session — not per action.** The per-action
+**`JOURNAL.md` is an index, one row per session - not per action.** The per-action
 lines live in `journal/<session-id>.md`, one file per session.
 
 **Why split.** A single monolithic journal is unbounded, and every agent that reads it
@@ -185,7 +185,7 @@ Exactly these columns, in this order:
 | 1 | `Session` | `s-<6 hex>`. Also the session file's name: `journal/<session-id>.md`. |
 | 2 | `Start` | Timestamp of the session's first write. |
 | 3 | `End` | Timestamp the session closed, or `-` while open. |
-| 4 | `State` | `open` \| `clean` \| `halted` \| `aborted`. `open` means the row was never closed — the session is live or it crashed. There is no `crashed` value; a crash is indistinguishable from a live session in the file alone, and claiming otherwise invents a fact. |
+| 4 | `State` | `open` \| `clean` \| `halted` \| `aborted`. `open` means the row was never closed - the session is live or it crashed. There is no `crashed` value; a crash is indistinguishable from a live session in the file alone, and claiming otherwise invents a fact. |
 | 5 | `Tasks` | Task ids touched, comma-separated, each with its terminal outcome for **this session**: `T-003:pass,T-004:fail,T-007:unproven`. Written as each task reaches a terminal state, not at close. |
 | 6 | `InFlight` | Task ids with a `started` line and no outcome, comma-separated, or `-`. |
 | 7 | `Lines` | Count of action lines in the session file. Tells a reader what opening it costs. |
@@ -203,7 +203,7 @@ remembering it has been here before. `../../fulcrum-loop-engine/SKILL.md` is the
 consumer. `[UNVERIFIED]`
 
 **The task list is inline, not a count plus a pointer.** Counts cannot answer "has this
-task been attempted before, and how did it go" — that is the oscillation query itself,
+task been attempted before, and how did it go" - that is the oscillation query itself,
 and a pointer forces opening one session file per candidate session, which is exactly
 the cost the split removes. The list is bounded in practice because a session is
 bounded by its context budget; a row naming more than a dozen tasks is a mis-sized
@@ -224,7 +224,7 @@ At session start, in this order:
 
 Then during the session: set `InFlight` at dispatch and clear the id from it at
 outcome; append the id and its verdict to `Tasks` the moment that task reaches a
-terminal state. **Not at close** — a session that crashes mid-task must still leave its
+terminal state. **Not at close** - a session that crashes mid-task must still leave its
 attempt visible, and the crashed attempt is precisely the one oscillation detection
 needs.
 
@@ -240,17 +240,17 @@ difference. Resolve it against the lease, never by guessing:
 | Live lease held by that session id | The session is running now | Wait or halt. Never take. `../../../AGENTS.md`: one Mentor session per app. |
 | No lease, or an expired one | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
 
-### Index growth — the arithmetic
+### Index growth - the arithmetic
 
 One row, roughly 130 bytes. A 47-step build at two to four sessions per step is about
-150 rows, ~20 KB. A year of daily work is 250–500 rows, ~65 KB — a few thousand tokens
+150 rows, ~20 KB. A year of daily work is 250-500 rows, ~65 KB - a few thousand tokens
 to read whole, which is the cost the split was buying down. No rotation is needed
 below that. `[UNVERIFIED]`
 
 **Rotation rule, at 500 rows or a major phase boundary, whichever comes first:** move
 closed rows whose tasks are all terminal into `journal/INDEX-archive-<NN>.md`, leave a
 single pointer line in `JOURNAL.md` naming the archive and the row range it holds, and
-record the rotation in `DECISIONS.md`. Rotation is a deliberate, reviewed change —
+record the rotation in `DECISIONS.md`. Rotation is a deliberate, reviewed change -
 never automatic, and never applied to a row whose `State` is `open` or whose tasks are
 still live, because those are the rows both queries are about.
 
@@ -261,31 +261,31 @@ still live, because those are the rows both queries are about.
 **Append-only, one file per working session.** Never edit or delete a line; correct a
 wrong line by appending a later line that withdraws it, per
 `../../fulcrum-solution-init/references/repo-scaffold.md`, heading "The four
-documentation failures to design against" — a silently deleted claim gets re-derived.
+documentation failures to design against" - a silently deleted claim gets re-derived.
 
 One line per event, pipe-delimited, fixed field order:
 
 ```
-<timestamp> | <session-id> | <task-id or —> | <run-id or —> | <action> | <outcome>
+<timestamp> | <session-id> | <task-id or -> | <run-id or -> | <action> | <outcome>
 ```
 
-- `session-id` — the same `s-<6 hex>` the filename carries. **Redundant on purpose.**
+- `session-id` - the same `s-<6 hex>` the filename carries. **Redundant on purpose.**
   A self-describing line survives the file being moved, quoted into a prompt, handed to
-  a subagent as a fragment, or concatenated — and the rotation rule above concatenates.
+  a subagent as a fragment, or concatenated - and the rotation rule above concatenates.
   Ten characters a line is a cheaper premium than a merged archive nobody can attribute.
-- `action` — a short verb phrase: `dispatch build turn`, `poll`, `publish`,
+- `action` - a short verb phrase: `dispatch build turn`, `poll`, `publish`,
   `acquire lease`, `break expired lease`, `halt`, `resolve halt`, `withdraw`.
 - `outcome` - `started`, `ok`, `failed: <reason>`, `blocked: <reason>`, or a value.
 
 **Three ids, three different things. Do not confuse them.** A `session-id` is the
-orchestrating agent's working session — one cold-start-to-stop span, and one file here.
+orchestrating agent's working session - one cold-start-to-stop span, and one file here.
 A **Mentor session id** is the ODC-side session opened against an app and is not
 written to this file. A **run id** is one Mentor or publish run inside that Mentor
 session, and is field 4 here and in `RUN-IDS.md`. One working session may open several
 Mentor sessions and many runs.
 
 Two lines per unit of work is the norm: one `started` before the wait, one outcome
-after. The `started` line is the one that matters — it is what tells a resuming session
+after. The `started` line is the one that matters - it is what tells a resuming session
 that a turn may be in flight against the app.
 
 Append only at the end of the file. A session file is written by exactly one session,
@@ -295,7 +295,7 @@ file readable and correctly ordered, not a concurrency measure.
 **Crash-idempotency.** Creating the file and appending to it are both safe to repeat: a
 re-created file that already exists is left alone, and a duplicate append is a
 duplicate line, not a corruption. A crashed session therefore leaves a truncated but
-**valid** file, and an index row that says `open` with the in-flight ids still listed —
+**valid** file, and an index row that says `open` with the in-flight ids still listed -
 which is a true description of the world, not a lie that has to be detected.
 
 ## DECISIONS.md
@@ -310,7 +310,7 @@ v2 makes the file strictly append-only: `Status` no longer changes in place, and
 **No existing line is ever edited, including `Status`.**
 
 ```markdown
-## D-007 — <short title>
+## D-007 - <short title>
 
 - **Date:** <timestamp>
 - **Decider:** user | agent | mentor
@@ -404,13 +404,13 @@ Mentor session id) go in the session-file line, not here.
 
 ## HANDOFF.md
 
-**Existing contract** — two parts, RULES stable and BRIEF replaced wholesale. Schema:
+**Existing contract** - two parts, RULES stable and BRIEF replaced wholesale. Schema:
 `../../fulcrum-solution-init/templates/handoff-template.md`. Do not restate or fork it.
 
 Inside `.fulcrum/` it is a **regenerated snapshot**: its BRIEF is derivable from
 `TASKS.md` plus the last rows of `JOURNAL.md`, and it exists so a cold reader gets the
 current position in one read. Where the BRIEF and `TASKS.md` disagree, `TASKS.md`
-wins and the BRIEF is stale — regenerate it rather than reconciling by hand.
+wins and the BRIEF is stale - regenerate it rather than reconciling by hand.
 
 ## plan.md
 
@@ -446,13 +446,13 @@ these H2 sections, in this order: `## Endpoint and auth`, `## Payload contract`,
 
 ## runs/<run-id>.md
 
-Optional, one per run, for detail too large for a session-file line — a full prompt, a
+Optional, one per run, for detail too large for a session-file line - a full prompt, a
 diff, a failure dump. The session-file line and the `RUN-IDS.md` entry are mandatory; this
 file is not. Never make it the only record of a run id.
 
 ## checkpoints/<agent-label>.md
 
-**Existing contract, unchanged** — `../../fulcrum-unattended-guardrails/references/checkpoints.md`.
+**Existing contract, unchanged** - `../../fulcrum-unattended-guardrails/references/checkpoints.md`.
 Overwrite in place, one file per agent, a page not a transcript. `.fulcrum/` supplies
 the path so the orchestrator does not invent one, which that contract requires it to
 supply. These files are ephemeral working state; they may be gitignored, and nothing

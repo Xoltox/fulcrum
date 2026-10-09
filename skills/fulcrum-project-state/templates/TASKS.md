@@ -1,6 +1,6 @@
-# Template — `.fulcrum/TASKS.md`
+# Template - `.fulcrum/TASKS.md`
 
-Copy to `<project>/.fulcrum/TASKS.md`. Rewritten in place — this file is current
+Copy to `<project>/.fulcrum/TASKS.md`. Rewritten in place - this file is current
 truth, not history. Column order is the parse contract: never reorder, never rename,
 never add a column without updating `../references/file-schemas.md`, heading
 "TASKS.md".
@@ -12,9 +12,9 @@ Every row is turn-shaped: a Mentor turn, or one `code`, `infra`, `external` or
 
 <!-- fulcrum-schema: TASKS v2 -->
 
-# TASKS — \<solution name\>
+# TASKS - \<solution name\>
 
-Current phase: \<P2 — name\>. Closed rows are removed at each phase boundary; their
+Current phase: \<P2 - name\>. Closed rows are removed at each phase boundary; their
 history is in `journal/` and `RUN-IDS.md`.
 
 | Done | ID | Task | App | Turn | Verify | Status | Verdict | Traps | Step |
@@ -30,18 +30,18 @@ history is in `journal/` and `RUN-IDS.md`.
 
 ## Column values
 
-- `Done` — `[ ]` or `[x]`. Terminal state only.
-- `ID` — `T-<NNN>`. Assigned once, never reused, even after a row is removed.
-- `App` — the app identifier. This is the lease key.
+- `Done` - `[ ]` or `[x]`. Terminal state only.
+- `ID` - `T-<NNN>`. Assigned once, never reused, even after a row is removed.
+- `App` - the app identifier. This is the lease key.
 - `Turn` - `build` | `fix` | `inspect` | `publish` | `seed` | `verify` (Mentor work) |
   `manual` | `code` | `infra` | `external` (not Mentor work; no lease).
-- `Verify` — proof rungs from `../../fulcrum-verification/SKILL.md`, heading "The proof
+- `Verify` - proof rungs from `../../fulcrum-verification/SKILL.md`, heading "The proof
   ladder". `-` is legal only for `inspect`, `manual`, `code`, `infra` and `external`.
-- `Status` — `todo` | `active` | `blocked` | `done` | `parked`.
+- `Status` - `todo` | `active` | `blocked` | `done` | `parked`.
 - `Verdict` - `-` | `pass` | `fail` | `unproven`. A `done` row always carries one.
 - `Traps` - reference file stems from `../../fulcrum-engine-traps/references/`, or `-`.
   Never incident text.
-- `Step` — the `plan.md` step id.
+- `Step` - the `plan.md` step id.
 
 Escape any literal pipe inside a cell as `\|`. No newlines inside a cell. No free text in
 `Status`, `Verdict` or `Turn`: a cell that needs prose means the prose belongs in the

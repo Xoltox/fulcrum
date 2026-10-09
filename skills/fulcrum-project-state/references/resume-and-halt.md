@@ -5,12 +5,12 @@
 Fixed, and short on purpose. A cold session reads these and nothing else before it
 acts.
 
-1. **`HALT.md`** — if the file exists, stop here. See "The halt record" below.
-2. **`project.md`** — identity, apps, `mode`, `posture`, tier overrides.
+1. **`HALT.md`** - if the file exists, stop here. See "The halt record" below.
+2. **`project.md`** - identity, apps, `mode`, `posture`, tier overrides.
 3. **`HANDOFF.md`** - PART 1 RULES, then PART 2 BRIEF. Absent in the micro profile
    (`micro-profile.md`); read the `plan.md` "Standing rules" section instead.
-4. **`TASKS.md`** — the current truth. Where it disagrees with the BRIEF, it wins.
-5. **The last row of `JOURNAL.md`** — the session index. It alone answers where the
+4. **`TASKS.md`** - the current truth. Where it disagrees with the BRIEF, it wins.
+5. **The last row of `JOURNAL.md`** - the session index. It alone answers where the
    last session stopped and what was in flight. Open `journal/<session-id>.md` only
    when that row is not enough.
 6. **`lease.<app>.json`** for the app about to be touched.
@@ -19,10 +19,10 @@ Do not read `plan.md`, `DECISIONS.md` or `runs/*` on a normal start. Read `plan.
 when a task's `Step` needs resolving, `DECISIONS.md` when about to reverse or
 re-litigate something, and a run file only when diagnosing that run.
 
-## Crash recovery — the four signals of interrupted work
+## Crash recovery - the four signals of interrupted work
 
 A crash leaves recoverable evidence precisely because state is written before the
-wait, never after the result (`../SKILL.md`, heading "Write ordering — state before
+wait, never after the result (`../SKILL.md`, heading "Write ordering - state before
 the wait, never after the result"). Check all four; any one of them means work was in
 flight.
 
@@ -36,7 +36,7 @@ flight.
 Then, and only then:
 
 - **Re-read the live app revision independently** before any mutating turn. A revision
-  recorded anywhere in `.fulcrum/` is a baseline, not a current value — publishing
+  recorded anywhere in `.fulcrum/` is a baseline, not a current value - publishing
   from a stale model advances the revision while silently reverting completed work.
   `[VERIFIED]`
 - **Re-prove anything carrying `Verdict: unproven`.** That value exists to be
@@ -62,13 +62,13 @@ absent, never half-applied.
   visible as a malformed file rather than as plausible wrong content.
 - **Never delete a row or a line to record a change of mind.** Rewrite the row in
   `TASKS.md`, or append a withdrawal line to the current `journal/<session-id>.md`. A silently deleted claim
-  gets re-derived — `../../fulcrum-solution-init/references/repo-scaffold.md`,
+  gets re-derived - `../../fulcrum-solution-init/references/repo-scaffold.md`,
   heading "The four documentation failures to design against". `[VERIFIED]`
 
 ## The halt record
 
 `HALT.md` exists only while the engagement is halted. **Its existence is the signal**
-— there is no status field to misread and no way to be halted without the file, or to
+- there is no status field to misread and no way to be halted without the file, or to
 have the file and not be halted.
 
 **A halt written only in prose is not a halt.** "HALTED" in a journal note, a
@@ -86,7 +86,7 @@ It is written by whatever stopped the run, under the conditions in
 Contents:
 
 ```markdown
-# HALT — <ISO-8601 UTC timestamp>
+# HALT - <ISO-8601 UTC timestamp>
 
 - **Trigger:** <which hard stop or condition fired>
 - **Task:** <T-NNN, or `-`>
@@ -111,12 +111,12 @@ Contents:
 
 A halt is never silently passed. `[UNVERIFIED]` Resuming without resolving it re-runs
 the situation that produced the halt with the same inputs, and the halt's whole
-purpose was that continuing was unsafe — so the second run fails the same way, having
+purpose was that continuing was unsafe - so the second run fails the same way, having
 spent another turn mutating a live application.
 
 The only legal resume:
 
-1. A human decides what changes. Nothing else clears a halt — not a later agent
+1. A human decides what changes. Nothing else clears a halt - not a later agent
    judging the problem solved, not the condition appearing to have gone away, and
    never an automatic retry.
 2. Append a `DECISIONS.md` record: what was decided, by `user`, and what it affects.
@@ -125,7 +125,7 @@ The only legal resume:
    the file still present leaves the engagement stopped for no reason.
 4. Append a `resolve halt` line to the current `journal/<session-id>.md` citing the
    decision id.
-5. Re-establish ground truth before continuing — live app revision, any run in flight,
-   the lease — exactly as for a crash. A halt may be hours or weeks old.
+5. Re-establish ground truth before continuing - live app revision, any run in flight,
+   the lease - exactly as for a crash. A halt may be hours or weeks old.
 
 Never delete `HALT.md` because it is blocking progress. That is the mechanism working.

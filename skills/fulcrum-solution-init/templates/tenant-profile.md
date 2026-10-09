@@ -6,7 +6,7 @@ instead of hardcoding a tenant fact.**
 Probe procedure and the rules for each row:
 `../references/tenant-capability-probe.md`.
 
-Every row carries five fields. A row missing any field is **not resolved** — mark it
+Every row carries five fields. A row missing any field is **not resolved** - mark it
 `UNRESOLVED` and say which planned step it gates. An answer of "Mentor said X" is not an
 answer.
 
@@ -33,13 +33,13 @@ On FAIL: **halt.** Re-gate at the start of every session regardless of this row.
 
 ---
 
-## 1. Live row data — not a tenant fact
+## 1. Live row data - not a tenant fact
 
 No row here. There is no model-layer path to live row data on any tenant, so nothing
 varies and nothing is probed. `[SCHEMA]` Do not re-add a `db_query` row.
 
 Consequence to carry into the plan: row verification needs a separate diagnostic
-instrument — historically a temporary diagnostic endpoint at roughly two Mentor turns and
+instrument - historically a temporary diagnostic endpoint at roughly two Mentor turns and
 two revisions per seed step. Budget accordingly. The instrument for live row data is
 `exec_in_app` against a harness fork `[SCHEMA]`; the procedure lives in
 `fulcrum-verification`, not here.
@@ -148,26 +148,26 @@ An unknown ceiling means every long spec risks truncation, whose failure mode is
 
 | Field | Value |
 |---|---|
-| App identifier (exact) | \<value — never the display name\> |
+| App identifier (exact) | \<value - never the display name\> |
 | Application type | \<value\> |
 | Revision at init | \<value\> |
 | Can Mentor add screens to this application type? | \<observed answer\> |
-| Confusable apps on the tenant — NOT the target | \<list, or None\> |
+| Confusable apps on the tenant - NOT the target | \<list, or None\> |
 | Date | \<date\> |
 
 ---
 
 ## 10. Tool availability
 
-Three states only — never a plain yes/no. Full rules:
+Three states only - never a plain yes/no. Full rules:
 `../references/tool-availability-and-fallback.md` and
-`../references/tenant-capability-probe.md`, heading "Tool availability — three
+`../references/tenant-capability-probe.md`, heading "Tool availability - three
 states, not two". `Unknown` is correct and expected for a mutating op that a
-read-only probe never called — do not upgrade it to "available".
+read-only probe never called - do not upgrade it to "available".
 
 | Op | State (callable / unavailable / unknown) | Evidence (result or exact error text) | Fallback if unavailable | Date |
 |---|---|---|---|---|
-| \<op name\> | \<…\> | \<…\> | \<see tool-availability-and-fallback.md, or "none — halt"\> | \<…\> |
+| \<op name\> | \<…\> | \<…\> | \<see tool-availability-and-fallback.md, or "none - halt"\> | \<…\> |
 
 ---
 

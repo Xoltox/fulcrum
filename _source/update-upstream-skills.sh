@@ -1,13 +1,13 @@
 #!/bin/sh
-# update-upstream-skills.sh — pull the outsystems-mcp-skills clone and sync
+# update-upstream-skills.sh - pull the outsystems-mcp-skills clone and sync
 # its skills/ into the local agent's skills directory.
 #
-# POSIX sh only (no bashisms) — must run under dash/ash/sh, not just bash.
+# POSIX sh only (no bashisms) - must run under dash/ash/sh, not just bash.
 #
 # Originally lived inside the outsystems-mcp-skills clone itself (as
 # update-skills.sh) and located the clone via its own script directory.
 # Moved here because a script that syncs a third-party upstream clone does
-# not belong committed inside that clone's own working tree — it created
+# not belong committed inside that clone's own working tree - it created
 # local commits on `main` that collide with pull requests sent from the same
 # clone. This copy takes the clone's location explicitly instead.
 #
@@ -21,7 +21,7 @@
 #
 # Install target:
 #   This script installs into ~/.claude/skills/ (Claude Code's skills dir),
-#   per upstream README "Path B — manual":
+#   per upstream README "Path B - manual":
 #     git clone https://github.com/denwx/outsystems-mcp-skills.git
 #     cd outsystems-mcp-skills
 #     mkdir -p ~/.claude/skills
@@ -29,7 +29,7 @@
 #
 #   Non-Claude-Code harnesses (e.g. Codex CLI) use a different, separate
 #   install location instead: ~/.agents/skills/. If you are on such a
-#   harness, do NOT run this script as-is — either edit DEST below or run
+#   harness, do NOT run this script as-is - either edit DEST below or run
 #   the equivalent manual `cp -R skills/* ~/.agents/skills/` yourself.
 #
 # Symlink alternative (NOT used here, untested):
@@ -43,7 +43,7 @@
 #
 # Safety:
 #   - Refuses to run (in either mode) if the clone's working tree has
-#     uncommitted local changes — it will not pull or copy over changes
+#     uncommitted local changes - it will not pull or copy over changes
 #     you might want to keep. Commit, stash, or discard them first.
 #   - --dry-run performs the fetch/pull check but makes no changes: it
 #     shows the commit range that WOULD be pulled and does not copy.
