@@ -59,6 +59,18 @@ State which apps and libraries ship together. That set is what "demoable" means 
 phase boundary, and it is what the publish sequence at the end of each phase must cover.
 Publish sequencing itself: `../../fulcrum-mentor-turns/SKILL.md`.
 
+### External systems and integration targets
+
+Name every system outside ODC that the solution calls or is called by, and decide for
+each whether it already exists or is built in this engagement. Building one is out of
+family (`../../../CONVENTIONS.md`, the skill-boundaries table, row "Out of family"):
+the plan carries it as `Turn: external` tasks, not Mentor steps. What the plan must
+do is order the contract first - `.fulcrum/external/<system>.md`, from
+`../../fulcrum-project-state/templates/external-system.md`, exists before the first
+ODC step that consumes the system, and that step lists the file as a precondition.
+A system whose contract is unknown at planning time is an unresolved item gating that
+step, not an assumption written into a spec.
+
 ## Part 2 — Phase sizing
 
 ### Global-then-local ordering
@@ -111,6 +123,11 @@ Shape that worked:
 Explicitly: **a ~28-screen scope is not a one-shot, and neither is a 12-screen one.**
 `[VERIFIED]` If a plan proposes doing a solution-sized scope in one session, that is the
 error, not the ambition.
+
+The opposite end: one app, about five or fewer steps, no BRD, is below what this
+skill is for. The router proposes the micro profile for it
+(`../../fulcrum-project-state/references/micro-profile.md`); if that engagement grows
+past its size, it is promoted here with its micro `plan.md` as source material.
 
 ## Part 3 — Step sizing
 

@@ -9,13 +9,13 @@ a bare percentage is a judgement wearing the costume of a measurement.
   the percentage alone, not even in a chart label or an executive summary.
 - **Reproducibility test.** Two reviewers with the same itemised evidence must land on
   the same number. If they would not, the sub-requirements are not named concretely
-  enough — fix the row, not the number.
+  enough - fix the row, not the number.
 - **Count named sub-requirements, never weight by importance.** Weighting is a judgement
   that cannot be recomputed. Importance belongs in the remediation sequence, where it is
   argued explicitly, not smuggled into a coefficient.
 - **Aggregate by arithmetic, shown.** The app-level figure is the sum of present
   sub-requirements over the sum of assessable sub-requirements, and the report prints
-  both totals. Never estimate an aggregate independently of the rows — an aggregate that
+  both totals. Never estimate an aggregate independently of the rows - an aggregate that
   does not equal its rows is a fabrication, and it is the single easiest thing for a
   reader to catch.
 - **Three categories of row leave the denominator**: unfalsifiable requirements,
@@ -26,15 +26,15 @@ a bare percentage is a judgement wearing the costume of a measurement.
 - **Never report a trend without recomputing both ends.** A prior report's number is not
   a baseline unless its rows were re-derived.
 
-## Diagram 1 — requirement coverage
+## Diagram 1 - requirement coverage
 
-Done vs partial vs absent, with counts labelled — the label carries the number, so the
+Done vs partial vs absent, with counts labelled - the label carries the number, so the
 chart is readable without measuring bars.
 
 ```mermaid
-pie title Requirement coverage — 24 of 41 assessable sub-requirements present
+pie title Requirement coverage - 24 of 41 assessable sub-requirements present
     "Present (24)" : 24
-    "Partial — some sub-requirements absent (9)" : 9
+    "Partial - some sub-requirements absent (9)" : 9
     "Absent (8)" : 8
 ```
 
@@ -55,7 +55,7 @@ pie showTitle
 The counts are the aggregate of the per-area rows, so the chart is recomputable
 from the matrix rather than drawn by eye.
 
-Per-area detail goes in a table beside it, not a second chart — a reader
+Per-area detail goes in a table beside it, not a second chart - a reader
 comparing four areas wants the numbers, and a table cannot fail to render:
 
 | Area | Present | Assessable | Coverage |
@@ -71,7 +71,7 @@ supported by every renderer, and a report whose chart renders as an error block
 is worse than one with a table. If you want a grouped bar chart, confirm the
 renderer handles it before relying on it, and keep the table as the fallback.
 
-## Diagram 2 — actual schema against required schema
+## Diagram 2 - actual schema against required schema
 
 The point is to make **absences visible as absences** rather than described in prose.
 Draw one ER diagram containing both, and mark every element that does not exist.
@@ -83,7 +83,7 @@ erDiagram
         int Id
         int AssigneeId
         int SequenceOrder "present, unused by any logic"
-        date DueDate "MISSING — required by R-3.2"
+        date DueDate "MISSING - required by R-3.2"
     }
     TASKRESULT {
         int Id
@@ -91,22 +91,22 @@ erDiagram
         string Outcome
     }
     APPROVAL {
-        int Id "ENTITY MISSING — required by R-5"
+        int Id "ENTITY MISSING - required by R-5"
     }
 ```
 
 Conventions to keep consistent, because a reader will not guess them:
 
-- `MISSING — required by <ID>` on any absent attribute, and on the first attribute of an
+- `MISSING - required by <ID>` on any absent attribute, and on the first attribute of an
   absent entity, with the entity marked `ENTITY MISSING`.
-- Present-but-unused elements annotated as such — that is the "schema present, logic
+- Present-but-unused elements annotated as such - that is the "schema present, logic
   absent" shape made visible.
 - Every annotation names the requirement identifier, so the diagram and the matrix are
   navigable in both directions.
 - Split into per-area diagrams past roughly a dozen entities; an unreadable diagram is
   not a deliverable.
 
-## Diagram 3 — phased remediation
+## Diagram 3 - phased remediation
 
 The sequence from `repair-vs-rebuild.md`, with dependencies visible, so a team can plan
 against it. This is the diagram a real team used to plan. `[SINGLE-OBSERVATION]`
@@ -114,15 +114,15 @@ against it. This is the diagram a real team used to plan. `[SINGLE-OBSERVATION]`
 ```mermaid
 flowchart TD
     D1["Decision: resolve R-7 unfalsifiable<br/>blocks phase 2"] --> P1
-    P1["Phase 1 — schema repair<br/>Task.DueDate, Approval entity<br/>R-3.2, R-5"] --> P2
-    P1 --> S1["Phase 1a — SECURITY<br/>revoke Assignee from TaskResultEdit<br/>R-9"]
-    P2["Phase 2 — sequencing logic<br/>R-3.1, R-3.3"] --> P3
-    S1 --> P3["Phase 3 — reporting rebuild<br/>R-11, R-12"]
+    P1["Phase 1 - schema repair<br/>Task.DueDate, Approval entity<br/>R-3.2, R-5"] --> P2
+    P1 --> S1["Phase 1a - SECURITY<br/>revoke Assignee from TaskResultEdit<br/>R-9"]
+    P2["Phase 2 - sequencing logic<br/>R-3.1, R-3.3"] --> P3
+    S1 --> P3["Phase 3 - reporting rebuild<br/>R-11, R-12"]
 ```
 
 Rules: every node names the requirement identifiers it closes; security work is drawn as
 its own node and never buried inside a phase; a decision node precedes anything blocked
-by an unfalsifiable requirement; and the graph must be acyclic — a cycle means the
+by an unfalsifiable requirement; and the graph must be acyclic - a cycle means the
 sequencing is not decided yet.
 
 ## When no renderer is available

@@ -25,6 +25,8 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | Decomposing source material into a plan and repo scaffold | `../fulcrum-solution-init/SKILL.md` |
 | Assessing an existing app against its requirements | `../fulcrum-gap-analysis/SKILL.md` |
 | Running the task list once resumed | `../fulcrum-loop-engine/SKILL.md` |
+| A small engagement run on the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
+| **Out of family:** external systems and integration targets (an integration target or external system (another vendor's server, a workflow engine, a third-party API)) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
 | What `mode` and `posture` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
 
 ## The detection ladder
@@ -34,12 +36,29 @@ including every conflicting-signal case: `references/detection-procedure.md`.
 
 | Found | Route |
 |---|---|
+| No `.fulcrum/`, no app, no BRD or source material to triage, and the ask is one app of about five or fewer steps | **Propose the micro profile; the user confirms.** Confirmed: `../fulcrum-project-state/references/micro-profile.md`, then the loop engine. Declined: the next matching row |
 | No `.fulcrum/`, no app, no source material | `../fulcrum-discovery/SKILL.md` |
 | No `.fulcrum/`, no app, source material present (BRD, Figma/Stitch export, mockups, screenshots) | `../fulcrum-solution-init/SKILL.md` |
 | No `.fulcrum/`, an app already exists | `../fulcrum-gap-analysis/SKILL.md` |
 | `.fulcrum/` present, `HALT.md` present | **STOP. Report. Ask a human.** Never auto-resume — see below. |
 | `.fulcrum/` present, an open task per the `JOURNAL.md` index | resume → `../fulcrum-loop-engine/SKILL.md` |
 | `.fulcrum/` present, all tasks closed | Report status. Offer the next phase in `plan.md`, or gap analysis if none remains. |
+
+**Micro is proposed, never picked.** The signals say the engagement looks small; only
+the user knows whether it will stay small. Ask once, with micro recommended and the
+full path named as the alternative. A profile chosen silently is a scope decision the
+user never made.
+
+**App creation is a user choice on every path.** Whichever skill runs before the first
+build - `fulcrum-solution-init` step 2, or the micro profile's first batch - asks
+whether Mentor creates the app or the user makes a shell from the standard template.
+A shell the user has just made for this engagement is not "an app already exists";
+see `references/detection-procedure.md`, heading "A freshly made shell app is not an
+existing app".
+
+**External systems gate their consumers.** When the plan names an external system,
+the step that consumes it does not start until `.fulcrum/external/<system>.md`
+exists. Building that system is out of family; recording its contract is not.
 
 **Detection is cheap by construction.** Resume answers from the last row of
 `.fulcrum/JOURNAL.md` alone — never open a session file to decide where to
@@ -68,7 +87,7 @@ full signal table in `../fulcrum-project-state/references/resume-and-halt.md`,
 heading "Crash recovery — the four signals of interrupted work". This router
 does not diagnose a crash itself:
 
-- `State: closed` in the last row → clean stop. Route by the ladder above as
+- `State: clean` in the last row -> clean stop. Route by the ladder above as
   if starting fresh at that point.
 - `State: open` in the last row → possible crash or a run still executing.
   Hand off to `../fulcrum-loop-engine/SKILL.md` to resume at its phase 4
@@ -135,5 +154,6 @@ the others.
 | Situation | Open |
 |---|---|
 | Any ladder row, or a conflicting-signal case (mismatched tenant, app with no state, `TASKS.md` rows but no plan) | `references/detection-procedure.md` |
+| Proposing or running the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
 | Composing a guided-mode question batch | `references/guided-mode-interaction.md` |
 | Before dispatching, confirming the ops the next phase needs are callable | `references/tool-preflight.md` |

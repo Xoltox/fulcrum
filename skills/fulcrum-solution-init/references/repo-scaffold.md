@@ -18,12 +18,18 @@ reads it cold, every time, with no conversational history. Design it for that re
     HANDOFF.md           two parts: RULES (stable) + BRIEF (replaced each session)
     JOURNAL.md           session index; per-session detail in journal/<session-id>.md
     RUN-IDS.md           durable run-id log
+    external/<system>.md contract per external system consumed (if any)
   specs/
     step-<NN>-<slug>.md one spec per step (step 6)
   buildpatterns/
     step-<NN>-<slug>.md per-step reliability log
   assets/               source artifacts + the asset list from step 1
 ```
+
+**Outside `.fulcrum/`, this layout is a default, not a requirement.** Users organise
+directories differently; where the repo already has a place for domain notes, specs or
+source exports, use it and record the actual paths in `HANDOFF.md` PART 1, "File map".
+What is fixed is the `.fulcrum/` file set and that each fact has one home.
 
 `plan.md`, `tenant-profile.md`, `HANDOFF.md` and `RUN-IDS.md` live in `.fulcrum/`, not
 at the project root — full layout and file contracts:
@@ -38,7 +44,8 @@ at the project root — full layout and file contracts:
 | `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence | Anything not probed |
 | `.fulcrum/HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
 | `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history — session index plus per-session action lines, including withdrawn claims | Rules, plans |
-| `.fulcrum/RUN-IDS.md` | Run ids and their outcomes | Anything else |
+| `.fulcrum/RUN-IDS.md` | Run ids and their outcomes, including publish records | Anything else |
+| `.fulcrum/external/<system>.md` | One external system's endpoint, auth scheme, payload contract, error codes, verified log paths | The secret value; anything about the ODC side |
 | `specs/*` | Everything one step's build agent needs | Cross-step context |
 | `buildpatterns/*` | What was reliable or unreliable for one step | Rules for other steps |
 
@@ -121,8 +128,9 @@ it is started, before it is polled. A run id held only in an agent's context is 
 the context is lost, and an unpolled run's outcome is then unknowable while its effects
 are already in the model.
 
-Minimum per line: timestamp, step number, run id, the operation, and the outcome once
-known. Durability mechanics: `../../fulcrum-mentor-turns/SKILL.md`.
+Line format, including the publish slot (one Publish yields a run id and a separate
+publication key): `../../fulcrum-project-state/references/file-schemas.md`, heading
+"RUN-IDS.md". Durability mechanics: `../../fulcrum-mentor-turns/SKILL.md`.
 
 ## Per-step build-pattern log
 

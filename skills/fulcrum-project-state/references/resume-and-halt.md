@@ -7,7 +7,8 @@ acts.
 
 1. **`HALT.md`** — if the file exists, stop here. See "The halt record" below.
 2. **`project.md`** — identity, apps, `mode`, `posture`, tier overrides.
-3. **`HANDOFF.md`** — PART 1 RULES, then PART 2 BRIEF.
+3. **`HANDOFF.md`** - PART 1 RULES, then PART 2 BRIEF. Absent in the micro profile
+   (`micro-profile.md`); read the `plan.md` "Standing rules" section instead.
 4. **`TASKS.md`** — the current truth. Where it disagrees with the BRIEF, it wins.
 5. **The last row of `JOURNAL.md`** — the session index. It alone answers where the
    last session stopped and what was in flight. Open `journal/<session-id>.md` only
@@ -29,7 +30,7 @@ flight.
 |---|---|---|
 | A `TASKS.md` row with `Status: active` | A turn was dispatched | Find its run in `RUN-IDS.md` by task ID |
 | A `JOURNAL.md` row with `State: open`, or a `started` line in its session file with no matching outcome | The wait was entered and never returned | Same |
-| A `RUN-IDS.md` line with no recorded outcome | A run may still be executing | **Poll that same run to a terminal state. Never start a competing turn on it.** |
+| A `RUN-IDS.md` `started` line with no later line for that run id | A run may still be executing | **Poll that same run to a terminal state. Never start a competing turn on it.** |
 | A lease held by a holder that is not you | Another agent may be live | `lease-and-concurrency.md` |
 
 Then, and only then:
@@ -70,6 +71,14 @@ absent, never half-applied.
 — there is no status field to misread and no way to be halted without the file, or to
 have the file and not be halted.
 
+**A halt written only in prose is not a halt.** "HALTED" in a journal note, a
+`project.md` line or a report to the user leaves no `HALT.md`, so the next session
+resumes past it. Whoever halts writes the file first, then the `halt` journal line,
+then closes its index row as `halted`, then reports. `[VERIFIED]` - two field projects
+halted in prose only. A user-action stop is not a halt: it is a `parked` `TASKS.md` row
+with `Blocked on: the user` (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`,
+heading "User-action stops").
+
 It is written by whatever stopped the run, under the conditions in
 `../../fulcrum-unattended-guardrails/references/halt-conditions.md`. That skill owns
 *when* to halt; this one owns only the record.
@@ -80,9 +89,9 @@ Contents:
 # HALT — <ISO-8601 UTC timestamp>
 
 - **Trigger:** <which hard stop or condition fired>
-- **Task:** <T-NNN, or — >
+- **Task:** <T-NNN, or `-`>
 - **App:** <app identifier>
-- **Last run id:** <run id, or — >
+- **Last run id:** <run id, or `-`>
 - **App revision at halt:** <value, or "not established">
 
 ## What was being attempted

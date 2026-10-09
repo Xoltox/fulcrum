@@ -12,6 +12,9 @@ The router's questions are scoped to **routing and mode** only:
 - Is there source material, or should this start from an interview?
 - Does an app already exist that the user means for this engagement?
 - `guided` or `expert`, on first run only.
+- Micro profile or full path, when detection row 0's signals match - proposed with
+  a recommendation, never picked for the user (`detection-procedure.md`, heading
+  "Proposing the micro profile").
 - Which of two equally-plausible ladder rows applies, when a
   conflicting-signal case in `detection-procedure.md` has no mechanical
   answer.
@@ -49,6 +52,18 @@ choices and, where one exists, a one-clause recommendation.
 >   engagement or an unfamiliar tenant.*
 > - **expert** — you invoke skills directly; I proceed under stated
 >   assumptions and record them rather than asking.
+>
+> Which do you want?
+
+**Example - small ask, micro profile:**
+
+> No `.fulcrum/`, no app and no source material yet, and what you describe is one
+> app of about four steps.
+> - **micro** - a one-page plan we fill in together now, five small state files,
+>   straight to building. *Recommended: one app, about four steps, nothing to
+>   triage.*
+> - **full** - an interview to a written brief, then a planned, specced build.
+>   Better if this is likely to grow past one app or about five steps.
 >
 > Which do you want?
 

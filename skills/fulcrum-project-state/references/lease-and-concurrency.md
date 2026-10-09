@@ -6,7 +6,7 @@
 rule is stated there and the operational detail is in
 `../../fulcrum-unattended-guardrails/SKILL.md`, heading "Concurrency lock — one Mentor
 session per app". What neither provides is a mechanism that survives the agent that
-holds the rule in its own head. `lease.json` is that mechanism.
+holds the rule in its own head. `lease.<app>.json` is that mechanism.
 
 **What breaks without it.** An orchestrator can only refuse to dispatch two agents it
 knows about. A second session started by a different person, a different terminal, or
@@ -20,7 +20,7 @@ model advances the revision while silently reverting completed work. `[VERIFIED]
 Everything else in `.fulcrum/` is committed, because git is the team mechanism. The
 lease is not, because a committed lock is **stale by definition** — it records that
 someone held a lock at push time, which is not a question anyone needs answered.
-`[UNVERIFIED]` Add `lease.json` to the project's `.gitignore`.
+`[UNVERIFIED]` Add `lease.*.json` to the project's `.gitignore`.
 
 ## Shape
 
@@ -38,6 +38,14 @@ someone held a lock at push time, which is not a question anyone needs answered.
 One lease file per app when the solution has several: `lease.<app identifier>.json`.
 The lock is per app, so a single shared file would serialise apps that the platform
 permits to run concurrently.
+
+**App creation is a mutating call too.** Before `mentor_create_asset` there is no app
+identifier yet: key the lease by the intended app name from `plan.md` and
+`project.md`, write the journal `started` line, then create. Once the call returns the
+application key, record it (`RUN-IDS.md` outcome line, then `project.md` at wave
+close) and keep the same lease file until release. In the field the first journal
+line and the lease came after creation, so a crash at that moment would have left an
+app nobody knew existed. `[SINGLE-OBSERVATION]`
 
 - `holder` must be stable across a crash and unique across concurrent agents. A
   hostname plus a session label is enough. An agent-generated random id is acceptable

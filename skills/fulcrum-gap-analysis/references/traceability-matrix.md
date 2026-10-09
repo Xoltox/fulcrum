@@ -15,7 +15,7 @@ the coverage figure is a summary of it and never a substitute.
   identifiers as withdrawn rather than reusing them.
 - **Split every requirement into named sub-requirements** before assessing. A
   requirement that cannot be split into things individually present or absent is a
-  candidate Unfalsifiable requirement — see `finding-classes.md`.
+  candidate Unfalsifiable requirement - see `finding-classes.md`.
 
 ## Row format
 
@@ -24,8 +24,8 @@ the coverage figure is a summary of it and never a substitute.
 | ID | Stable identifier; `(assigned)` if not from the document |
 | Requirement | One line, in the document's own terms |
 | Sub-requirements | Named, each individually assessable |
-| Present — evidence | Concrete artifacts by name: `Task` entity with `AssigneeId`, `SequenceOrder`; screen `TaskDetail`; action `SubmitTask`. Name the operation that showed each |
-| Absent — evidence | What was checked and not found, by the name searched for. "No action anywhere references `SequenceOrder` (`context_actions`, `context_graph`)" |
+| Present - evidence | Concrete artifacts by name: `Task` entity with `AssigneeId`, `SequenceOrder`; screen `TaskDetail`; action `SubmitTask`. Name the operation that showed each |
+| Absent - evidence | What was checked and not found, by the name searched for. "No action anywhere references `SequenceOrder` (`context_actions`, `context_graph`)" |
 | Coverage | `<n> of <m> named sub-requirements present`, then the percentage |
 | Class | One of the five, per sub-requirement where they differ |
 | Provenance note | Which area's provenance applies, and whether the finding is expected there |
@@ -44,8 +44,8 @@ Two rules that carry the weight:
 The most common shape, and the one a naive matrix destroys by averaging. Do not let a
 single row absorb it. Split:
 
-- `R-x.1` the data can be stored → present: `Task.SequenceOrder` exists.
-- `R-x.2` the behaviour is enforced → absent: no action, no screen validation and no
+- `R-x.1` the data can be stored -> present: `Task.SequenceOrder` exists.
+- `R-x.2` the behaviour is enforced -> absent: no action, no screen validation and no
   timer references `SequenceOrder` (`context_actions`, `context_graph`, `context_search`).
 
 Coverage reads "1 of 2 named sub-requirements present (50%)", and the row plainly says
@@ -56,10 +56,10 @@ hidden that entirely.
 
 Three kinds, and each is reported as its own count rather than folded into coverage:
 
-- **Unfalsifiable requirement** — cannot be assessed as written. `finding-classes.md`.
-- **Unresolved by inventory** — the implementation would plausibly be a Resource,
+- **Unfalsifiable requirement** - cannot be assessed as written. `finding-classes.md`.
+- **Unresolved by inventory** - the implementation would plausibly be a Resource,
   Automation or Timer, which the enumeration operations do not list. `inventory.md`.
-- **Drift — undetermined** — differs from the document, and no decision record exists to
+- **Drift - undetermined** - differs from the document, and no decision record exists to
   say whether that was deliberate. `provenance.md`.
 
 A row in any of these states must not appear in a numerator or a denominator. Reporting
@@ -70,7 +70,7 @@ understatement of coverage.
 
 A role inversion, an unauthorised write path, or a screen exposing another role's record
 gets a row in the matrix for traceability **and** its own entry in the report's security
-section. It is excluded from every coverage average — see `coverage-and-diagrams.md`.
+section. It is excluded from every coverage average - see `coverage-and-diagrams.md`.
 Averaging a security finding into a percentage is how it stops being read.
 
 ## Make the matrix re-runnable

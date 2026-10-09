@@ -1,7 +1,7 @@
 # Inventorying what actually exists
 
 The inventory is the report's ground truth. It comes from the platform's own
-context/inventory operations — never from the requirements document, never from a design
+context/inventory operations - never from the requirements document, never from a design
 export, and never from an agent's prose summary of what it saw.
 
 ## Operations, and what each settles
@@ -11,7 +11,7 @@ Bare operation names; map them to your harness's wiring yourself.
 | Need | Operation | Notes |
 |---|---|---|
 | Entities and their attributes | `context_entities` | Attribute-level detail is the point. A requirement usually turns on one attribute, not on the entity existing. |
-| Screens | `context_screens` | Existence only. Reachability is a separate question — see below. |
+| Screens | `context_screens` | Existence only. Reachability is a separate question - see below. |
 | Roles | `context_roles` | The role list, and per-screen assignment, are different findings. |
 | Server actions and functions | `context_actions` | The place where "schema present, logic absent" becomes visible. |
 | Structures | `context_structures` | Usually integration payload shapes. |
@@ -22,7 +22,7 @@ Bare operation names; map them to your harness's wiring yourself.
 | Anything by name across the app | `context_search` | Use it before filing any Gap: a named search is how you avoid filing an absence for something named differently. |
 | App identity and revision timeline | `app_info`, `app_revisions` | Provenance, not inventory. See `provenance.md`. |
 
-## Known blind spots — absence from an inventory is not evidence of absence
+## Known blind spots - absence from an inventory is not evidence of absence
 
 The context enumeration operations **do not list Resources, nor Automations and
 Timers**. `[TENANT]` The exposed operation set varies by server version, so confirm
@@ -32,17 +32,37 @@ against the operation list your server actually exposes and record the answer in
 Consequence, and it is the whole reason this section exists: a requirement satisfied by a
 Timer or an Automation will look absent in an enumeration that cannot see one. Filing
 that as a Gap is a false finding, and a false Gap in a report is worse than a missing
-one — it sends someone to build a thing that already exists.
+one - it sends someone to build a thing that already exists.
 
 So for any requirement whose implementation would plausibly be a Resource, an
 Automation, or a Timer:
 
 - Mark the row **unresolved by inventory**, not absent.
 - Say which operation would have been needed and that it does not exist.
-- Name the out-of-band check that would settle it — portal inspection, or the app's own
-  observable behaviour — and either run it or list it as an open question.
+- Name the out-of-band check that would settle it - portal inspection, or the app's own
+  observable behaviour - and either run it or list it as an open question.
 - Never let an unresolved row into the numerator or the denominator of a coverage figure.
   Report unresolved rows as their own count, exactly as unfalsifiable requirements are.
+
+## What `context_*` can and cannot see
+
+`context_*` returns **published state only**: never the session's working
+model, so an unpublished edit is invisible. Details and the index lag:
+`../../fulcrum-mentor-turns/references/mcp-surface.md#published-state-inspection-context_`.
+
+- Inventory only after publish and after the lag; re-read once before filing
+  an absence.
+- Owned elements only: inherited or referenced entities do not appear.
+  `[SINGLE-OBSERVATION]`
+- Settings and consumed REST structures (and their JSON names) have no
+  published-state view. `[SINGLE-OBSERVATION]` Screen access flags on template
+  screens have disagreed with Mentor; only a render settles them.
+
+Mark every such construct **"not inventoriable via published state"**, never
+"absent". Same handling as the unresolved rows above: own count, outside the
+coverage figure, with the wire-level or render check named
+(`../../fulcrum-verification/references/defect-instrument-matrix.md`, heading
+"Instrument by model state").
 
 ## Two inventory facts that are not on any list
 
@@ -56,7 +76,7 @@ Automation, or a Timer:
 
 ## Do not trust a prose read-back
 
-Mentor's own read-back of the model is not reliable evidence — it has misreported counts
+Mentor's own read-back of the model is not reliable evidence - it has misreported counts
 and claimed a fix worked while the rendered output still showed the defect. `[VERIFIED]`
 Take inventory from the operations directly. For the general rule and the proof ladder,
 see `../../fulcrum-verification/SKILL.md`, heading "The proof ladder"; this skill only

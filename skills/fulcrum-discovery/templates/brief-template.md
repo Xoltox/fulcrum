@@ -73,7 +73,7 @@ Grouped by area. One line per screen, each with its access rule and its mode.
 
 | Screen | Purpose | Roles — read | Roles — write | Mode | Empty state | Confidence |
 |---|---|---|---|---|---|---|
-| `OrderList` | \<…\> | Manager, Agent | — | read-only | \<what shows with no rows\> | held |
+| `OrderList` | \<...\> | Manager, Agent | - | read-only | \<what shows with no rows\> | held |
 | `ShipmentDetail` | \<…\> | Manager | Manager | transactional | \<…\> | elicited |
 
 **Mode** is `read-only` or `transactional`, per screen, always stated. A missing mode is

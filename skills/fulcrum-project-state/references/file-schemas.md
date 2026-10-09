@@ -8,24 +8,68 @@ Rules that hold for every file here:
 - UTC ISO-8601 timestamps, second precision: `2026-09-28T14:03:11Z`. Local time makes
   two sessions' lines interleave wrongly and is unorderable across machines.
 - Identifiers are **app identifiers, never display names**, everywhere.
-- `—` (em dash) means "not applicable or not yet known". Never leave a cell empty;
+- `-` means not applicable (or not yet known). Never leave a cell empty;
   an empty cell is indistinguishable from a truncated write.
 - Never reorder or rename a column **within a schema version**. Position is the parse
   contract.
 - **Every file with a schema of its own carries a version marker on its first content
   line:**
   `<!-- fulcrum-schema: <file-stem> v<N> -->`. Files whose schema is an existing contract
-  elsewhere — `tenant-profile.md`, `HANDOFF.md`, `RUN-IDS.md`, `checkpoints/*` — carry
-  the marker only if that contract adds one. Changing a field set, a field order or a
-  field's meaning requires bumping `<N>` and updating this document in the same change.
+  elsewhere (`tenant-profile.md`, `HANDOFF.md`, `checkpoints/*`) carry
+  the marker only if that contract adds one. `RUN-IDS.md` has its own schema and carries one. Changing a field set, a
+  field order or a field's meaning requires bumping `<N>` and updating this document in the same change.
   A reader that finds a version it does not know must stop and report — never guess
   field positions. Without the marker the "never reorder" rule has no legitimate
   mechanism for change, so the first schema change breaks it silently and every later
   parser reads the wrong column. `[UNVERIFIED]`
 
+## Write ownership - who writes which file
+
+In the two projects that ran builds, `.fulcrum/` went stale within a day: `TASKS.md` still
+showed finished tasks as `todo`, `project.md` still said "halted" after the gate
+passed, `RUN-IDS.md` ended at a `started` line while later work existed.
+`[VERIFIED]` The cause was the same each time - several writers (orchestrator,
+drivers, pollers, the user) and no rule naming who updates the shared files. One
+writer per shared file removes the race and makes staleness one agent's job to fix.
+
+| File | Written by | Others |
+|---|---|---|
+| `project.md`, `plan.md`, `TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*` | **the orchestrator only** | Drivers report outcomes, decisions and facts in their result; the orchestrator records them |
+| `JOURNAL.md` | each session writes **only its own index row** | - |
+| `journal/<session-id>.md` | the session that owns it | - |
+| `RUN-IDS.md` | whoever issued the run (a driver, or the orchestrator acting as one) | Append only |
+| `lease.<app>.json` | the agent opening the Mentor session | - |
+| `HALT.md` | whoever stopped the run | Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
+| `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
+| `checkpoints/<agent-label>.md` | that agent | - |
+
+A **driver** (a delegated agent running turns) writes nothing outside its journal, its
+index row, its `RUN-IDS.md` lines, its lease and, if it stops the run, `HALT.md`. When
+there is no delegation, the orchestrator is its own driver and the table still holds.
+
+**Reconcile at every wave close.** Before starting the next wave or ending the
+session, the orchestrator reads the wave's index rows, their session files where a
+row is not enough, and the new `RUN-IDS.md` lines, then rewrites `TASKS.md` (status,
+verdict), `project.md` (newly created app identifiers) and `HANDOFF.md` PART 2 to
+match, and commits. Check while doing it: every run id has an outcome line or is named
+in some row's `InFlight`; no `TASKS.md` row is `active` without an open session; a
+`halted` row has a `HALT.md` and vice versa. A reconciliation skipped "because nothing
+changed" is how the stale files above were produced.
+
+**No resume point outside `.fulcrum/`.** An orchestrator checkpoint written elsewhere
+(a session-checkpoint file at the repo root, a commit message, a chat summary) becomes
+a competing source of truth - in the field it was updated instead of `.fulcrum/` and
+ended a full revision ahead of it. `[VERIFIED]` Where we are lives in `TASKS.md` plus
+the last `JOURNAL.md` row; the next step and its preconditions in `HANDOFF.md` PART 2
+(full profile); anything waiting on the user in the `TASKS.md` "Blocked and parked
+rows" table with `Blocked on: the user`. An ephemeral `checkpoints/<agent-label>.md`
+is fine, but its durable content moves into those files at wave close.
+
 ## project.md
 
-`<!-- fulcrum-schema: project v1 -->`
+`<!-- fulcrum-schema: project v2 -->`
+
+v2 adds `profile`. A v1 file is read as `profile: full`.
 
 Rewritten. Identity and settings only — no history, no task state.
 
@@ -35,11 +79,14 @@ Rewritten. Identity and settings only — no history, no task state.
 | `created` | Timestamp of scaffold. |
 | `mode` | `guided` \| `expert` |
 | `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
+| `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
 | `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` → a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution — how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override — an empty section reads as a decision and pins nothing. |
 
-`project.md` does **not** restate tenant facts. Those are in `tenant-profile.md`,
-written by `../../fulcrum-solution-init/SKILL.md`. Point at it; never copy a row out
+`project.md` carries no run outcome, gate verdict or halt status: those are in
+`RUN-IDS.md`, `TASKS.md` and `HALT.md`, and a copy here was the line found stale in
+the field. `project.md` does **not** restate tenant facts either. Those are in `tenant-profile.md` (`.fulcrum/` first, else the nearest parent
+directory's), written by `../../fulcrum-solution-init/SKILL.md`. Point at it; never copy a row out
 of it, or the two drift and the copy wins by being read first. `[VERIFIED]`
 
 ## brief.md
@@ -49,11 +96,16 @@ Written once by `../../fulcrum-discovery/SKILL.md`, consumed by
 produced from an interview when no written source material existed. Carries its own
 `<!-- fulcrum-origin: discovery-interview -->` marker rather than a
 `fulcrum-schema` version line. Shape: `../../fulcrum-discovery/templates/brief-template.md`.
-Not restated here.
+Not restated here. `brief.md` is distinct from the root `DOMAIN.md` that
+`../../fulcrum-solution-init/references/repo-scaffold.md` scaffolds: the brief is the
+discovery interview's output, `DOMAIN.md` is the domain source of truth derived from it.
 
 ## TASKS.md
 
-`<!-- fulcrum-schema: TASKS v1 -->`
+`<!-- fulcrum-schema: TASKS v2 -->`
+
+v2 adds the `code`, `infra` and `external` turn types; columns and order are
+unchanged from v1. A v1 file is read as v2 with no other change.
 
 Rewritten. The single answer to "what is open right now". A markdown table, because a
 human reviews it as a diff in a pull request; the column contract is what keeps it
@@ -66,17 +118,37 @@ Exactly these columns, in this order:
 | 1 | `Done` | `[ ]` or `[x]`. Terminal state only. |
 | 2 | `ID` | `T-<NNN>`, zero-padded, assigned once, **never reused** even after deletion. A reused ID makes a journal line ambiguous forever, and silently corrupts the oscillation count in the session index. |
 | 3 | `Task` | One imperative line. No newlines, no pipes — escape a literal pipe as `\|`. |
-| 4 | `App` | App identifier. This is the lease key; a wrong value here books the wrong lock. |
-| 5 | `Turn` | `build` \| `fix` \| `inspect` \| `publish` \| `seed` \| `verify` \| `manual` |
-| 6 | `Verify` | Required proof rungs, comma-separated rung numbers from `../../fulcrum-verification/SKILL.md`, heading "The proof ladder" — e.g. `1,3,6`. `—` is only valid for `Turn: inspect` and `Turn: manual`. |
+| 4 | `App` | App identifier. This is the lease key; a wrong value here books the wrong lock. For `Turn: external` rows, the system stem from `external/<system>.md`. |
+| 5 | `Turn` | `build` \| `fix` \| `inspect` \| `publish` \| `seed` \| `verify` \| `manual` \| `code` \| `infra` \| `external` |
+| 6 | `Verify` | Required proof rungs, comma-separated rung numbers from `../../fulcrum-verification/SKILL.md`, heading "The proof ladder" - e.g. `1,3,6`. `-` is valid for `inspect`, `manual`, `code`, `infra` and `external` rows; for the last three the session-file outcome line names the evidence (test run, build output, listing). |
 | 7 | `Status` | `todo` \| `active` \| `blocked` \| `done` \| `parked` |
-| 8 | `Verdict` | `—` \| `pass` \| `fail` \| `unproven` |
-| 9 | `Traps` | Reference file stems from `../../fulcrum-engine-traps/references/`, comma-separated, or `—`. |
+| 8 | `Verdict` | `-` \| `pass` \| `fail` \| `unproven` |
+| 9 | `Traps` | Reference file stems from `../../fulcrum-engine-traps/references/`, comma-separated, or `-`. |
 | 10 | `Step` | Plan step id from `plan.md`, e.g. `P2.04`. The traceability join. |
+
+**Turn types.** The first six are Mentor work against an ODC app. The rest are not:
+
+| Turn | Means | Lease |
+|---|---|---|
+| `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none |
+| `code` | Repository code the agent writes outside Mentor - an External Logic library's source, a script, a test harness | none |
+| `infra` | Infrastructure or environment work - gateway, connector, CI, local tooling | none |
+| `external` | Building, deploying or changing an external system or integration target (`external/<system>.md`) | none |
+
+Before v2, field projects forced code and infrastructure work into `manual`, which
+told every reader the user had to do it. `[VERIFIED]` Only Mentor turns take a lease;
+the lease is the one-Mentor-session-per-app lock, not a general mutex.
+
+**Columns stay contract values.** `Status`, `Verdict` and `Turn` take only the values
+above - no "done (partial: ...)", no "read-only", no "mentor". `Traps` takes only
+registry stems; an incident description goes in the session file, and a new trap is
+reported as engine-traps feedback (see "DECISIONS.md" below for what does not go
+there either). A cell that needs prose means the task should be split, or the prose
+belongs in the journal.
 
 `Done` and `Status` are not redundant: `Done` is the reviewer's one-glance signal,
 `Status` distinguishes the four not-done states that need different next actions.
-`[UNVERIFIED]` `[x]` with `Status: done` and `Verdict: —` is malformed — a finished
+`[UNVERIFIED]` `[x]` with `Status: done` and `Verdict: -` is malformed - a finished
 task always carries a verdict, and `unproven` is a legal, honest one.
 
 **Task entries are Mentor-turn-shaped, not tickets.** Every row names the app it
@@ -112,12 +184,12 @@ Exactly these columns, in this order:
 |---|---|---|
 | 1 | `Session` | `s-<6 hex>`. Also the session file's name: `journal/<session-id>.md`. |
 | 2 | `Start` | Timestamp of the session's first write. |
-| 3 | `End` | Timestamp the session closed, or `—` while open. |
+| 3 | `End` | Timestamp the session closed, or `-` while open. |
 | 4 | `State` | `open` \| `clean` \| `halted` \| `aborted`. `open` means the row was never closed — the session is live or it crashed. There is no `crashed` value; a crash is indistinguishable from a live session in the file alone, and claiming otherwise invents a fact. |
 | 5 | `Tasks` | Task ids touched, comma-separated, each with its terminal outcome for **this session**: `T-003:pass,T-004:fail,T-007:unproven`. Written as each task reaches a terminal state, not at close. |
-| 6 | `InFlight` | Task ids with a `started` line and no outcome, comma-separated, or `—`. |
+| 6 | `InFlight` | Task ids with a `started` line and no outcome, comma-separated, or `-`. |
 | 7 | `Lines` | Count of action lines in the session file. Tells a reader what opening it costs. |
-| 8 | `Note` | One clause — halt reason, budget exhaustion, operator interrupt — or `—`. |
+| 8 | `Note` | One clause - halt reason, budget exhaustion, operator interrupt - or `-`. |
 
 **Query 1, resume.** Read the last row. `Start`/`End`/`State` give where it stopped and
 whether it was clean; `InFlight` names the tasks that may have mutated the app with no
@@ -148,7 +220,7 @@ At session start, in this order:
 
 1. Mint the session id.
 2. Create `journal/<session-id>.md` with its header line.
-3. Append the index row: `End` `—`, `State` `open`, `Tasks` `—`, `InFlight` `—`.
+3. Append the index row: `End` `-`, `State` `open`, `Tasks` `-`, `InFlight` `-`.
 
 Then during the session: set `InFlight` at dispatch and clear the id from it at
 outcome; append the id and its verdict to `Tasks` the moment that task reaches a
@@ -156,7 +228,7 @@ terminal state. **Not at close** — a session that crashes mid-task must still 
 attempt visible, and the crashed attempt is precisely the one oscillation detection
 needs.
 
-At session end: write `End`, set `State`, set `InFlight` to `—`.
+At session end: write `End`, set `State`, set `InFlight` to `-`.
 
 ### Reading a row that was never closed
 
@@ -203,7 +275,7 @@ One line per event, pipe-delimited, fixed field order:
   Ten characters a line is a cheaper premium than a merged archive nobody can attribute.
 - `action` — a short verb phrase: `dispatch build turn`, `poll`, `publish`,
   `acquire lease`, `break expired lease`, `halt`, `resolve halt`, `withdraw`.
-- `outcome` — `started`, `ok`, `failed: <reason>`, `blocked: <reason>`, or a value.
+- `outcome` - `started`, `ok`, `failed: <reason>`, `blocked: <reason>`, or a value.
 
 **Three ids, three different things. Do not confuse them.** A `session-id` is the
 orchestrating agent's working session — one cold-start-to-stop span, and one file here.
@@ -228,16 +300,22 @@ which is a true description of the world, not a lie that has to be detected.
 
 ## DECISIONS.md
 
-`<!-- fulcrum-schema: DECISIONS v1 -->`
+`<!-- fulcrum-schema: DECISIONS v2 -->`
+
+v2 makes the file strictly append-only: `Status` no longer changes in place, and a
+`Supersedes` field carries the link instead. A v1 file stays readable; its in-place
+`superseded by` lines are honoured as written, and new records use v2.
 
 **Append-only, ADR-lite.** One record per decision, newest appended at the bottom.
+**No existing line is ever edited, including `Status`.**
 
 ```markdown
 ## D-007 — <short title>
 
 - **Date:** <timestamp>
 - **Decider:** user | agent | mentor
-- **Status:** accepted | superseded by D-0NN | reverted
+- **Status:** proposed | accepted | rejected | reverted
+- **Supersedes:** D-0NN | -
 - **Affects:** <app identifier> / <entity, screen, action or block identifiers>
 
 **Context.** <What was true that forced a choice.>
@@ -254,23 +332,75 @@ which is a true description of the world, not a lie that has to be detected.
   the artifact in question. It joins on the artifact identifier, not on prose, so a
   record that says "the ordering screens" instead of naming them will not be found and
   the deviation will be reported as a defect. `[UNVERIFIED]`
-- **Never edit an accepted record.** Supersede it with a new one and set the old
-  record's `Status` to `superseded by D-0NN` — that status line is the only edit ever
-  permitted. Editing the body rewrites the dated evidence that explains why the app
-  looks the way it does at a given revision.
+- **A status change is a new record.** Approval of a `proposed` decision, a reversal,
+  or a replacement is appended as a new record whose `Supersedes` names the old one.
+  A record is current unless a later record supersedes it; readers find that by
+  scanning `Supersedes`, never by trusting an old record's `Status`. In the field a
+  `Status` edited in place ("accepted (user approved ... record outcome in ...)")
+  erased when approval happened and left the outcome unrecorded. `[SINGLE-OBSERVATION]`
+  Editing the body rewrites the dated evidence that explains why the app looks the
+  way it does at a given revision.
+- **Not everything with a reason is a decision.** A platform or tenant fact (a runtime
+  version cut-off, a missing upload path, a tool that behaves differently) goes to
+  `tenant-profile.md`; a construct that fails to build or publish goes to the
+  engine-traps registry as feedback (`../../fulcrum-engine-traps/SKILL.md`). Both
+  were found stored as decision rationale, where no later reader looks for them.
+  `[VERIFIED]` A decision may cite either; it does not hold it.
+- **Adopt, do not re-transcribe.** If the engagement already has a decision log from
+  before Fulcrum, link it from `DECISIONS.md` and append only new records here.
+  Copying it creates two numberings of one history.
+- **Before artifacts exist**, `Affects` names the intended identifier from
+  `plan.md` or the brief, marked `(planned)`. A later record may supersede it with
+  the real identifier.
 - `Decider: mentor` means Mentor chose the approach and the agent accepted it. Record
   it. Under `posture: collaborative` this is the common case, and an unrecorded
   Mentor choice is exactly the drift gap analysis cannot explain later.
 
 ## RUN-IDS.md
 
-**Append-only. Existing contract** — schema and rationale in
-`../../fulcrum-solution-init/references/repo-scaffold.md`, heading "Durable run-id
-log", and mechanics in `../../fulcrum-mentor-turns/SKILL.md`. Do not restate it here.
+`<!-- fulcrum-schema: RUN-IDS v1 -->`
 
-`.fulcrum/` adds one thing to the stated minimum: **include the task ID** on each
-line. It is the join key from a run back to `TASKS.md`, and without it a resuming
-session that finds an unpolled run cannot tell which row it belongs to.
+**Append-only.** Why it exists: `../../fulcrum-solution-init/references/repo-scaffold.md`,
+heading "Durable run-id log". Polling mechanics: `../../fulcrum-mentor-turns/SKILL.md`.
+This heading owns the line format.
+
+One line per event, pipe-delimited, fixed field order:
+
+```
+<timestamp> | <session-id> | <task-id> | <app> | <op> | <run-id> | <publication-key> | <revision> | <outcome>
+```
+
+- `task-id` - the join key back to `TASKS.md`. Without it a resuming session that
+  finds an unpolled run cannot tell which row it belongs to.
+- `op` - `create-asset` | `prompt` | `publish` | `extlib` | `deploy` | another tool
+  name for any other long-running start.
+- `run-id` - the id the start call returned. For `create-asset`, the returned
+  application key goes in `outcome` once known.
+- `publication-key`, `revision` - `-` except on `publish` lines.
+- `outcome` - `started` first; later lines carry `accepted`, a terminal value, or
+  `failed: <code>`.
+
+**Two or more lines per run, never one edited line.** Append `started` the instant the
+id is issued; append the outcome as a later line repeating the run id. A run with a
+`started` line and no later line is the crash-recovery signal.
+
+**Publish yields two ids, so it gets its own slot.** The Publish prompt's `runId` is
+not the publication key; the key arrives only in the run's `publishAccepted` event,
+and `publish_status` is polled with the key (facts and dates:
+`../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Publishing"). Record
+a publish as:
+
+```
+2026-10-08T11:02:10Z | s-4c1e9a | T-006 | claims_web | publish | 3ec0aa82 | - | - | started
+2026-10-08T11:02:41Z | s-4c1e9a | T-006 | claims_web | publish | 3ec0aa82 | 4252ee9c | 5 | accepted
+2026-10-08T11:03:05Z | s-4c1e9a | T-006 | claims_web | publish | 3ec0aa82 | 4252ee9c | 5 | success
+```
+
+The terminal `outcome` uses the `publish_status` outcome vocabulary from the same
+heading. Before this slot existed, projects mixed run ids, publication keys,
+revisions, deployment and build keys and Mentor session ids on free-text lines and
+the publish outcome was lost. `[VERIFIED]` Other keys (`deploymentKey`, `buildKey`,
+Mentor session id) go in the session-file line, not here.
 
 ## HANDOFF.md
 
@@ -287,6 +417,32 @@ wins and the BRIEF is stale — regenerate it rather than reconciling by hand.
 Rewritten, rarely. Phases and steps, with a stable step id (`P<phase>.<NN>`) per step.
 Sizing and decomposition rules belong to `../../fulcrum-solution-init/SKILL.md`; this
 file only requires that every step id referenced by a `TASKS.md` row exists here.
+
+Micro profile: `plan.md` is filled from `../templates/plan-micro.md` by the
+orchestrator, and carries its own `<!-- fulcrum-schema: plan-micro v1 -->` marker.
+See `micro-profile.md`.
+
+Where the user keeps other project files (specs, domain notes, source exports) is the
+user's choice. `plan.md` or `HANDOFF.md` PART 1 records the actual paths; Fulcrum does
+not impose a folder layout outside `.fulcrum/`.
+
+## external/<system>.md
+
+`<!-- fulcrum-schema: external-system v1 -->`
+
+Rewritten when the contract changes. One file per external system or integration
+target the solution consumes; template `../templates/external-system.md`. Exactly
+these H2 sections, in this order: `## Endpoint and auth`, `## Payload contract`,
+`## Error codes`, `## Log locations`.
+
+- **Gate:** the file exists, with every section filled or marked unresolved, before
+  the first ODC step that consumes the system starts. A step whose system has no file
+  is `blocked`.
+- Auth names the scheme and where the secret lives (normally a secret Setting the user
+  sets in the Portal) - never the secret value.
+- Each log path is verified once with a directory listing and recorded with the date.
+  Briefs and diagnosis prompts copy paths from here, never from memory: a wrong path
+  in a brief made a diagnosis agent report a working system as untested. `[SINGLE-OBSERVATION]`
 
 ## runs/<run-id>.md
 
@@ -305,8 +461,11 @@ session-file line and the TASKS row.
 
 ## HALT.md
 
-Present only when halted. See `resume-and-halt.md`.
+Present only when halted, and **always a file**. A halt written only in prose - a
+journal note, a `project.md` line, a chat report - is not a halt: the next session
+reads no `HALT.md` and resumes. In the field, two projects "halted" in prose and
+neither wrote the file. `[VERIFIED]` Contents and clearing: `resume-and-halt.md`.
 
-## lease.json
+## lease.<app>.json
 
-Not committed. See `lease-and-concurrency.md`.
+Not committed. One per app. See `lease-and-concurrency.md`.

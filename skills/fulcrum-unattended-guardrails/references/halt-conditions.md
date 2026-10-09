@@ -4,7 +4,7 @@
 
 **Per step: 1 build turn + at most 2 fix turns.** [VERIFIED]
 
-Mentor is not a batch processor — one objective per turn (see
+Mentor is not a batch processor - one objective per turn (see
 `../../fulcrum-mentor-turns/SKILL.md`). Past three turns on one step, the pattern
 observed is not convergence: it is Mentor guessing, and each guess mutates the
 model. The cap exists because the cost of an extra turn is not a wasted turn, it
@@ -15,20 +15,19 @@ report. Do not carry the overrun silently into the next step.
 
 ## The escalation ceiling
 
-This file owns the **ceiling and the terminal condition**. Running the attempts
-— issuing the turns, re-verifying, recording each one — is the loop's:
+This file owns the **ceiling and the terminal condition**. Running the attempts - issuing the turns, re-verifying, recording each one - is the loop's:
 `../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`, heading
 "The fix-loop". Do not iterate from this file.
 
 Three rules bound every escalation, in force whoever is running it:
 
 - **A diagnostic step is mandatory before every fix attempt after the first
-  failure.** Not a fix — an observation.
+  failure.** Not a fix - an observation.
 - **At most two fix attempts** after the build turn. That is the turn cap above.
-- **Still failing after the second → stuck twice → halt and report to the
+- **Still failing after the second -> stuck twice -> halt and report to the
   user.** Detected mechanically, by scanning the session index rather than by an
   agent remembering: `../../fulcrum-loop-engine/SKILL.md`, heading "Oscillation
-  detection — mechanical, not remembered". **The loop detects; this file
+  detection - mechanical, not remembered". **The loop detects; this file
   decides.**
 
 ### The diagnostic step is not optional
@@ -62,7 +61,9 @@ Tier policy is phase-based and is set at dispatch time, not adjusted reactively:
 
 ## Hard stops
 
-Write the checkpoint, then stop and report. Do not work around any of these.
+A halt writes `.fulcrum/HALT.md` first (the file before the journal line, per
+`../../fulcrum-project-state/references/resume-and-halt.md`), then stops and
+reports. Do not work around any of these.
 
 | Trigger | Detail |
 |---|---|
@@ -73,7 +74,7 @@ Write the checkpoint, then stop and report. Do not work around any of these.
 | A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
 | **Mentor capacity stop** | An asset load still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
-| The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause — if so, fix it and disclose prominently"* |
+| The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause - if so, fix it and disclose prominently"* |
 | Two candidate actions would both touch Mentor concurrently | Serialise, or stop and ask |
 | A step depends on an op **confirmed unavailable** with **no fallback** recorded in `tenant-profile.md` | See "Halt on an unavailable op with no fallback" below |
 | The plan for the current step does not exist in writing | Deriving a plan mid-unattended-run is the highest-risk act available |
@@ -82,8 +83,8 @@ Write the checkpoint, then stop and report. Do not work around any of these.
 ## User-action stops
 
 A user-action stop differs from a halt: nothing has gone wrong, the next step is
-simply not the agent's to take. Write the checkpoint, mark the step `PARKED`,
-and report one concrete ask. Do not retry, and do not look for a way around it.
+simply not the agent's to take. Write the checkpoint, set the `TASKS.md` row to `parked` (Blocked on: the user;
+`PARKED` is the report word), and report one concrete ask. Do not retry, and do not look for a way around it.
 
 - **The user sets a secret in the Portal.** A secret value never goes in a
   Mentor prompt, a brief, a journal or a report. The agent names the secret
@@ -115,7 +116,7 @@ against the model, and then broke the running app.
 
 **The rule.** Take an `app_health` reading bracketing the step. If, across that
 step, `errors` or `errorPercent` steps up, or `lastErrorOccurred` falls inside
-the after window, **halt and report.** `[SCHEMA]` — those fields and their
+the after window, **halt and report.** `[SCHEMA]` - those fields and their
 meanings are asserted by the ODC MCP tool schema, not observed in a Fulcrum run.
 
 - The before/after window comparison is **instrument selection and belongs to
@@ -136,13 +137,13 @@ meanings are asserted by the ODC MCP tool schema, not observed in a Fulcrum run.
 
 **The rule.** When a step depends on an op recorded **confirmed unavailable**
 in `tenant-profile.md` (`../../fulcrum-solution-init/references/tenant-capability-probe.md`,
-heading "Tool availability — three states, not two") and no fallback is
+heading "Tool availability - three states, not two") and no fallback is
 recorded for it (`../../fulcrum-solution-init/references/tool-availability-and-fallback.md`),
 **halt and report. Do not improvise a workaround.**
 
 **The mechanism.** An unattended agent that works around a missing capability
 invents an unreviewed approach on the spot and records it nowhere durable. The
-deviation does not surface at the moment it happens — it surfaces later as
+deviation does not surface at the moment it happens - it surfaces later as
 unexplainable drift: a screen built a different way than the plan describes, a
 data path that does not match the spec, with no decision record explaining
 why. A halt costs one interruption. A silent improvisation costs a future
@@ -150,10 +151,10 @@ session trying to reconcile behaviour against a plan that never mentioned it.
 
 This is distinct from the ordinary fix-loop: a fix turn retries the *same* op
 after gathering evidence. This halt fires when the op itself has no working
-path at all — there is nothing to retry.
+path at all - there is nothing to retry.
 
 Do not confuse **unavailable** with **unknown**. An op that is merely unknown
-(never dispatched — the default and correct state for every mutating op) is
+(never dispatched - the default and correct state for every mutating op) is
 not a halt condition by itself; dispatch it as the plan calls for and record
 the outcome. This rule fires only once dispatch has actually failed with a
 resolution error and no fallback exists.
@@ -166,7 +167,7 @@ session, because it is the app's default state immediately after every publish.
 
 **The mechanism.** `appScore` is an Apdex-style **latency** score computed from
 response times. It ignores errors entirely. An app with no traffic has no
-response times, and no response times **scores 100** `[SCHEMA]` — identical to a
+response times, and no response times **scores 100** `[SCHEMA]` - identical to a
 fast, correct, heavily-used app. So a freshly published app nobody has touched
 reports perfect health from zero evidence, and an agent with nobody watching
 reports it onward as a pass.
@@ -182,7 +183,7 @@ The guardrail:
 - A metric absent from the row is an **absent reading, not a zero** `[SCHEMA]`.
   Report it as unavailable. Reading a missing `errors` as `errors: 0` converts a
   blind spot into a clean bill of health.
-- Never synthesise availability or uptime — the platform exposes neither
+- Never synthesise availability or uptime - the platform exposes neither
   `[SCHEMA]`, and every candidate proxy lets a zero-traffic app report as up.
 
 Full trap detail, including the paging and sampling cases:
@@ -198,7 +199,7 @@ Full trap detail, including the paging and sampling cases:
 An unattended session's correct output can be a halt report. The user chose
 unattended to avoid supervising *progress*, not to authorise damage.
 
-## The revert failure mode — why halting early is cheap
+## The revert failure mode - why halting early is cheap
 
 [VERIFIED] An agent resumed a **stale Mentor session** and published from it.
 The publish silently reverted the live application past six completed steps of
@@ -223,7 +224,7 @@ The generalisable facts:
 
 The three defences, all of which this skill mandates:
 
-- A **staleness guard before every mutating turn** — verify the session's view
+- A **staleness guard before every mutating turn** - verify the session's view
   of current state against an independent read (published-state `context_*`
   after the index lag, and the live revision via `app_revisions`), never
   against the session's own read-back; before any "Publish" turn, re-read the
@@ -238,8 +239,8 @@ The three defences, all of which this skill mandates:
 
 The halt report states, in order:
 
-1. **Status** — `PARTIAL` or `PARKED`. Never a bare "failed".
-2. **The last verified-good state** — the revision, with the evidence that
+1. **Status** - `PARTIAL` or `PARKED`. Never a bare "failed".
+2. **The last verified-good state** - the revision, with the evidence that
    verified it.
 3. **What was attempted**, including each diagnostic and what it showed.
 4. **What could not be verified**, named explicitly.

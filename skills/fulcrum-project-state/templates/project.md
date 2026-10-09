@@ -1,12 +1,13 @@
 # Template — `.fulcrum/project.md`
 
 Copy to `<project>/.fulcrum/project.md`. Rewritten in place when a setting changes.
-Identity and settings only: no history, no task state, no tenant facts.
+Identity and settings only: no history, no task state, no run outcomes, no halt
+status, no tenant facts. Only the orchestrator rewrites it.
 Schema: `../references/file-schemas.md`, heading "project.md".
 
 ---
 
-<!-- fulcrum-schema: project v1 -->
+<!-- fulcrum-schema: project v2 -->
 
 # Project — \<solution name\>
 
@@ -28,6 +29,7 @@ Do not re-derive these. Confusably named apps on the tenant are listed in
 |---|---|
 | `mode` | `guided` \| `expert` |
 | `posture` | `collaborative` \| `directive` |
+| `profile` | `full` \| `micro` - confirmed by the user; `../references/micro-profile.md` |
 
 `collaborative` is the default. Definitions, the orthogonality rule, the failure
 mechanism and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture".
@@ -49,8 +51,9 @@ file. Record why, in `DECISIONS.md`.
 
 ## Tenant facts
 
-Every tenant-varying fact is in `.fulcrum/tenant-profile.md`, written by
-`../../fulcrum-solution-init/SKILL.md`. Read it there. Never copy a row out of it —
+Every tenant-varying fact is in `tenant-profile.md` - `.fulcrum/` first, else the
+nearest parent directory's (lookup rule: `../../fulcrum-solution-init/templates/tenant-profile.md`,
+section 11). Read it there. Never copy a row out of it -
 the copy and the original drift, and the copy wins by being read first.
 
 ## Scope of this directory

@@ -5,26 +5,28 @@ Five classes. Every finding gets exactly one. Only **Gap** is a defect by defaul
 Four classes come from `../../../CONVENTIONS.md`, heading "Gap analysis never assumes how
 the app got there". **Unfalsifiable requirement** is this skill's addition.
 
-## Decision order — run it top to bottom, stop at the first yes
+## Decision order - run it top to bottom, stop at the first yes
 
 Running it in this order is what stops everything becoming a Gap. A pass that checks
 "is it absent?" first will file drift, staleness and vagueness all as gaps.
 
 1. **Is the requirement assessable as written?** If no testable behaviour can be derived
-   from it — deferred specifics, "as appropriate", "to be detailed further with IT",
-   quantities left unstated — it is an **Unfalsifiable requirement**. Stop. Do not look
+   from it - deferred specifics, "as appropriate", "to be detailed further with IT",
+   quantities left unstated - it is an **Unfalsifiable requirement**. Stop. Do not look
    at the app for it at all; looking invites inventing a gap.
 2. **Does the requirements document still describe intended behaviour here?** If the
    document is contradicted by a later decision record, a newer document revision, or
    an explicit stakeholder statement, it is a **Stale requirement**. Stop. The document
    is what needs changing.
-3. **Does the app do something in this area at all?** If nothing exists — no entity, no
-   attribute, no screen, no action, no role assignment — it is a **Gap**.
+3. **Does the app do something in this area at all?** If nothing exists - no entity, no
+   attribute, no screen, no action, no role assignment - it is a **Gap**.
 4. **It exists but differs.** It is **Drift**. Before calling any Drift a defect, sweep
-   `.fulcrum/DECISIONS.md` for a decision record (see `provenance.md`) — including a
-   `Decider: mentor` record from a Mentor turn accepted under `posture: collaborative`,
+   `.fulcrum/DECISIONS.md` for a decision record (see `provenance.md`) that is
+   current: no later record supersedes it (`Supersedes` field, DECISIONS v2), and
+   a `proposed`, `rejected` or `reverted` record does not make a drift deliberate.
+   Includes a `Decider: mentor` record from a Mentor turn accepted under `posture: collaborative`,
    or a `Decider: user`/`agent` record from a `fulcrum-discovery` interview. Found one
-   → Drift, deliberate, not a defect. None found → **Drift — undetermined**, and say
+   -> Drift, deliberate, not a defect. None found -> **Drift - undetermined**, and say
    that the absence of a record is not evidence of a mistake.
 5. **Separately, sweep the inventory for artifacts no requirement claims.** Each is an
    **Undocumented addition**. Judge each as valuable, neutral, or scope creep, with a
@@ -47,10 +49,10 @@ reasonably disagree on whether it is satisfied, and no evidence in the project s
 
 Common shapes:
 
-- Deferred specifics — wording equivalent to "to be detailed further with IT".
+- Deferred specifics - wording equivalent to "to be detailed further with IT".
   `[SINGLE-OBSERVATION]` This exact deferral appeared in a real BRD.
-- Unquantified qualities — "fast", "user-friendly", "scalable", with no threshold.
-- A named actor with no named behaviour — "the manager will oversee approvals" without
+- Unquantified qualities - "fast", "user-friendly", "scalable", with no threshold.
+- A named actor with no named behaviour - "the manager will oversee approvals" without
   saying what the manager can see or do.
 - Compound requirements whose clauses conflict, so satisfying one breaks the other.
 
@@ -61,17 +63,16 @@ Handling:
   that silently drops them overstates coverage; one that counts them as gaps understates
   it. Both are wrong; naming them is the only correct move.
 - The remediation for it is a **decision**, not a build step, and it usually blocks
-  build steps. Say what it blocks — that is what makes it actionable.
+  build steps. Say what it blocks - that is what makes it actionable.
 
 ## Anti-patterns
 
 - **Everything is a Gap.** The default failure. If a report on a mature app has no
-  Stale requirements and no Undocumented additions, the classification pass did not run
-  — those classes are the normal output of time passing.
+  Stale requirements and no Undocumented additions, the classification pass did not run - those classes are the normal output of time passing.
 - **Drift laundered into Gap** because a decision record was not looked for. The sweep
   is mandatory, and its result is reported even when it found nothing.
 - **Partial credit as a class.** "Partially met" is not a class. Split the requirement
-  into named sub-requirements and classify each — that is exactly what makes the
+  into named sub-requirements and classify each - that is exactly what makes the
   coverage figure recomputable (see `coverage-and-diagrams.md`).
 - **Schema presence read as capability.** An attribute existing is not the requirement
   being met when the requirement is a behaviour. File the behaviour as its own

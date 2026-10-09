@@ -7,11 +7,10 @@ is in play. All `[VERIFIED]` unless marked otherwise.
 
 Assert invariants, never a hardcoded fixed value, for anything that is
 time-dependent or scales with live data volume. A hardcoded expected count
-drifts as the wall clock moves or as more data is seeded — the drift then
+drifts as the wall clock moves or as more data is seeded - the drift then
 looks exactly like a regression when it is not. Prefer a derived expected
 count (read it from somewhere else in the live system) over a hardcoded one,
-always. This includes date-relative labels (e.g. a "today/earlier" split) —
-express them as a derivation the checker can recompute from the current
+always. This includes date-relative labels (e.g. a "today/earlier" split) - express them as a derivation the checker can recompute from the current
 timestamp, not as a literal baked into a fixture.
 
 ## Hand-classify before comparing
@@ -19,7 +18,7 @@ timestamp, not as a literal baked into a fixture.
 Classify expected results independently, by hand, before comparing against
 rendered output. Do not accept the building agent's or Mentor's own
 classification of what the correct result should be as the ground truth you
-check against — that collapses the check into asking the system whether it
+check against - that collapses the check into asking the system whether it
 agrees with itself. Cross-check the independent classification against
 rendered output afterward.
 
@@ -32,7 +31,7 @@ formula was applied inconsistently.
 ## Programmatic comparison
 
 Compare digests, diffs, and any structured output programmatically. Never
-compare by eye — eye comparison misses single-character deltas reliably and
+compare by eye - eye comparison misses single-character deltas reliably and
 does not scale past a handful of rows.
 
 ## Fixture correction, not fixture weakening
@@ -40,7 +39,7 @@ does not scale past a handful of rows.
 When new, legitimately correct data changes what an expected-values fixture
 should say, tighten the fixture to the new correct values and label the
 change explicitly as a fixture correction. Never weaken or delete an
-assertion just to make a gate pass — that erases the check's future value
+assertion just to make a gate pass - that erases the check's future value
 along with today's inconvenience. If a fixture and live output disagree, the
 fixture is not automatically right: cross-read another independently-verified
 source before deciding which side is stale (see `defect-instrument-matrix.md`
@@ -49,7 +48,7 @@ conclusion 4).
 ## Subagent proof discipline
 
 A subagent's report of success is not, on its own, proof. Require every
-verification agent — including yourself, when reporting up — to state
+verification agent - including yourself, when reporting up - to state
 explicitly what it could **not** verify, not just what passed. A report that
 only lists passes is incomplete by construction; the gaps are exactly where
 the next defect hides.
@@ -68,3 +67,23 @@ verification run. Never silently absorb either:
 Carry a running list of known pre-existing failures forward between runs so
 each new run can classify against it, rather than re-deriving the
 distinction from memory each time.
+
+## External log paths come from the contract file
+
+A brief that sends an agent to read an external system's logs must copy the
+log paths from the project's `.fulcrum/external/<system>.md` (section
+`## Log locations`), never from memory. `[SINGLE-OBSERVATION]` A path
+recalled from memory pointed at nothing, and the diagnosis concluded the
+system was untested.
+
+A diagnosis that finds no log at a path reports **"path not verified"**, never
+"system untested". Absence at an unverified path says nothing about the system.
+Verify a path once with a directory listing, record it with the date in the
+contract file, and only then treat a missing log as meaningful.
+
+## Gates that read published state
+
+A gate that reads `context_*` must wait out the index lag, re-read, and only
+then decide; a FAIL inside the lag window is not a FAIL. When Mentor read-back
+contradicts an independent instrument, trust the instrument and journal the
+contradiction. See `../SKILL.md`, heading "Pick the instrument by model state".

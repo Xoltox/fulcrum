@@ -53,6 +53,13 @@ enumerate; see SKILL.md, "What the platform's context tools do not show
 you"). Because every per-entity guard makes a repeat run a no-op, firing on
 every publish is safe.
 
+Trigger the seed from a timer scheduled When-Published, not from a screen or
+app OnInitialize action. `[UNVERIFIED]` Vendor skill
+`outsystems-design-to-app` (`references/gotchas/tablerecords-seeding.md`,
+`references/design-capture.md`) prescribes the When-Published timer and calls
+the OnInitialize list path a distant fallback (in-memory, not persisted);
+not tested here. Verify after publish that the timer ran (runtime logs).
+
 Give it a generous timeout — a chain of several entity loaders each doing
 lookups and row-by-row assigns can run long on a first, empty-database
 load.

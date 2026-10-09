@@ -1,9 +1,11 @@
 # Template — `.fulcrum/DECISIONS.md`
 
 Copy to `<project>/.fulcrum/DECISIONS.md`. **Append-only, ADR-lite.** Newest record
-at the bottom. Never edit an accepted record — supersede it. The only edit ever
-permitted to an existing record is setting its `Status` to `superseded by D-0NN` or
-`reverted`.
+at the bottom. **No existing line is ever edited, including `Status`.** Approving a
+`proposed` record, reverting one, or replacing one is a new record whose `Supersedes`
+names the old id; a record is current unless a later one supersedes it. Only the
+orchestrator appends here. Platform and tenant facts go to `tenant-profile.md`, and
+build or publish traps to engine-traps feedback - never here.
 
 This file closes a hole. `../../fulcrum-gap-analysis/SKILL.md` classifies a deviation
 as **drift** rather than a **gap** only when it can find a decision record for the
@@ -15,7 +17,7 @@ Schema: `../references/file-schemas.md`, heading "DECISIONS.md".
 
 ---
 
-<!-- fulcrum-schema: DECISIONS v1 -->
+<!-- fulcrum-schema: DECISIONS v2 -->
 
 # DECISIONS — \<solution name\>
 
@@ -25,7 +27,8 @@ Append-only. One record per decision.
 
 - **Date:** \<ISO-8601 UTC\>
 - **Decider:** `user` | `agent` | `mentor`
-- **Status:** `accepted`
+- **Status:** `proposed` | `accepted` | `rejected` | `reverted`
+- **Supersedes:** `D-0NN` | `-`
 - **Affects:** \<app identifier\> / \<Order, OrderList, GetOrders — concrete identifiers\>
 
 **Context.** \<What was true that forced a choice. One paragraph.\>
@@ -43,6 +46,7 @@ Append-only. One record per decision.
 - **Date:** 2026-09-28T11:40:00Z
 - **Decider:** `mentor`
 - **Status:** `accepted`
+- **Supersedes:** `-`
 - **Affects:** ordering_app / Shipment, ShipmentStatus, ShipmentDetail
 
 **Context.** The requirements name five shipment states in prose and do not say how

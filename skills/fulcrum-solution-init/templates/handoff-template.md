@@ -38,6 +38,7 @@ wholesale each handoff; read this every resume. Append-only history:
 | `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history — session index, read for "what happened" |
 | `buildpatterns/step-<NN>-*.md` | Per-step reliability log |
 | `.fulcrum/RUN-IDS.md` | Durable run-id log |
+| `.fulcrum/external/<system>.md` | Contract per external system - copy endpoints and log paths from here |
 | \<proof harness path\> | Proof harness — trust a live run over any prose |
 
 ## Target
@@ -104,6 +105,15 @@ table exists to prevent.
 
 - \<Precondition, e.g. a confirmed manual asset upload, a seeded table, a resolved
   question. Empty is fine — write "Nothing".\>
+
+## Waiting on the user
+
+- \<task id only, e.g. T-006 - the ask itself lives in the `.fulcrum/TASKS.md`
+  "Blocked and parked rows" table. Write "Nothing" if empty.\>
+
+This BRIEF is the orchestrator's resume point. Do not keep a second one (a checkpoint
+file at the repo root, a long commit message): it gets updated instead of this file and
+the two diverge. Regenerate this part at every wave close.
 
 ## Known-open items that do NOT block this step
 

@@ -10,7 +10,7 @@ cannot measure its own token usage, so nothing below depends on it doing so.
 - Session-level introspection commands, where a harness has them, belong to the
   main session. A dispatched subagent cannot invoke them.
 - The orchestrator learns an agent's token count only from the completion
-  notification — i.e. after the agent has finished. Too late to act on.
+  notification - i.e. after the agent has finished. Too late to act on.
 
 Corollaries, both absolute:
 
@@ -19,7 +19,7 @@ Corollaries, both absolute:
 - Never ask an agent to report its own token usage. It will produce a number
   that then gets trusted.
 
-What an agent *can* count reliably is **its own tool calls** — that is a count
+What an agent *can* count reliably is **its own tool calls** - that is a count
 of its own actions, not an introspection of hidden state. So budgets are
 expressed in tool calls.
 
@@ -56,19 +56,19 @@ Nine measured subagents, one session, real completion-notification counts.
 Three readings:
 
 1. **Tool-call count is useless as a universal proxy and reliable within a
-   class.** Tokens per call spans 1.0k–8.8k, a ~9x range. One global "max 60
+   class.** Tokens per call spans 1.0k-8.8k, a ~9x range. One global "max 60
    calls" rule would strangle a polling agent and let a document agent blow
-   through its window. But the three poll-heavy agents cluster at 1.0–2.1k/call,
+   through its window. But the three poll-heavy agents cluster at 1.0-2.1k/call,
    which is tight enough to budget against.
 2. **Reads, not calls, dominate.** The pattern inverts intuition: the cheapest
-   agents per call made the most calls (polling — many small results), the most
+   agents per call made the most calls (polling - many small results), the most
    expensive made the fewest (reading large documents). 8 calls cost 70k; 157
    calls cost 162k. In the same session the orchestrator alone burned 141k on
    file reads.
 3. **Therefore the first-order lever is controlling what gets READ.** Trimming
    call counts is second-order.
 
-Limits — do not overclaim. Highest observed agent was 166k; nothing in the
+Limits - do not overclaim. Highest observed agent was 166k; nothing in the
 sample hit a wall, so every budget below is an extrapolation from an observed
 rate, not an observed failure point. n=9, one workflow, one tool mix. Class
 boundaries beyond "poll-heavy" vs "document-heavy" are untested.
@@ -101,8 +101,8 @@ Recalibrate per workflow. Only the poll-heavy row rests on a cluster.
 
 | Class | Example work | Est. tokens/call | Budget (180k) | Checkpoint | Hand back |
 |---|---|---|---|---|---|
-| Poll-heavy | Mentor run polling, publish supervision | 1.0–2.1k (use 1.5k) | 120 | 75 | 100 |
-| Mixed action | seed-data repair, triage, small edits | 2–3k (use 2.5k) | 72 | 45 | 60 |
+| Poll-heavy | Mentor run polling, publish supervision | 1.0-2.1k (use 1.5k) | 120 | 75 | 100 |
+| Mixed action | seed-data repair, triage, small edits | 2-3k (use 2.5k) | 72 | 45 | 60 |
 | Visual / binary | screenshot capture, visual comparison | ~3.5k | 51 | 33 | 43 |
 | Document-heavy | search + doc edit, spec authoring | ~6k | 30 | 20 | 25 |
 | Large-doc restructure | reading and rewriting big files | ~8.8k | 20 | 13 | 17 |
@@ -115,7 +115,7 @@ agent"), so the budget and the later recalibration line up.
 1. Label every agent's class in its brief.
 2. On each completion notification, record `class, tokens, tool_calls`.
 3. After ~3 agents in a class, set that class's rate to the **75th percentile**
-   of observed tokens/call — not the mean. Budgets must hold for the expensive
+   of observed tokens/call - not the mean. Budgets must hold for the expensive
    tail. With fewer than 3 observations use the max and mark the row provisional.
 4. Re-derive the table. Repeat.
 5. Re-derive after any change to the tool mix, a tool's response size, or prompt
@@ -128,7 +128,7 @@ agent"), so the budget and the later recalibration line up.
 Ranked by leverage, given that reads dominate:
 
 1. **Never have an agent read a file the orchestrator already summarised into
-   its brief — and never do both.** Do not inline a summary *and* say "read the
+   its brief - and never do both.** Do not inline a summary *and* say "read the
    source for detail". Pick one. Doing both makes the agent pay twice for the
    same content, and leaves it unsure which version is authoritative.
 2. **Ask for the narrow form.** The summary form, the `details=false` form, the
@@ -140,7 +140,7 @@ Ranked by leverage, given that reads dominate:
 5. **Prefer many small agents over one large one.** Two 80k agents beat one
    160k agent: each has clean context, and a failure loses half as much.
 6. **Return conclusions, not transcripts.** The orchestrator pays for the
-   agent's final message. "Fixed X at `path:line`, root cause Y, Z still open" —
+   agent's final message. "Fixed X at `path:line`, root cause Y, Z still open" - 
    not a replay of the investigation.
 7. **Push writes down, pull reads up.** Let the subagent write files and return
    paths. The orchestrator reads only what it must.
@@ -155,7 +155,7 @@ Ranked by leverage, given that reads dominate:
 | "Read everything, then decide" | Unbounded read volume before any narrowing. Search first, read the hits. |
 | Inlining a summary *and* pointing at the source | Pays twice for one content. |
 | Asking an agent for its token usage | Produces a fabricated number that gets trusted. |
-| Handoff written only at the end | The case where it is needed most — sudden death — is the case where it never gets written. |
+| Handoff written only at the end | The case where it is needed most - sudden death - is the case where it never gets written. |
 | Holding a run id or session id only in context | The handle dies with the agent; in-flight work becomes unrecoverable. |
 | One giant agent "because it has all the context" | Highest-variance, highest-loss design. Split it. |
 
@@ -164,8 +164,8 @@ Ranked by leverage, given that reads dominate:
 1. Define classes from the **tool mix**, not the task name. The useful axis is
    result size: many-small-results (poll-like) vs few-large-results
    (document-like).
-2. Run 3–5 agents with generous budgets. Require each to state its **final
-   tool-call count** in its report — it can count that.
+2. Run 3-5 agents with generous budgets. Require each to state its **final
+   tool-call count** in its report - it can count that.
 3. Compute tokens/call per agent from the completion notifications; group by
    class.
 4. Set each class rate to the 75th percentile of its observations.

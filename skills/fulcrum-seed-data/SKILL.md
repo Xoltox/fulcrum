@@ -24,9 +24,9 @@ requires: >
 This skill owns **getting rows into the database safely and repeatably**. It
 does not own screen construction (see `../fulcrum-engine-traps/SKILL.md`), turn
 sizing (see `../fulcrum-mentor-turns/SKILL.md`), or the verification instruments
-themselves (see `../fulcrum-verification/SKILL.md` — this skill states the
+themselves (see `../fulcrum-verification/SKILL.md` - this skill states the
 four-step seed-proof obligation, that sibling owns the tools that discharge
-it). Seed before building any screen that reads the data — an empty table
+it). Seed before building any screen that reads the data - an empty table
 hides its own screen bugs.
 
 Budget seed work at **three or more turns minimum**, as its own phase, not a
@@ -42,20 +42,20 @@ from a published-time trigger:
 1. Each `LoadSampleDataFor<Entity>` action carries **its own guard**,
    checking an entity or field specific to that loader. Never bolt a later
    loader's guard onto an earlier one's, and never let a later loader
-   silently no-op just because an earlier one already ran — each loader must
+   silently no-op just because an earlier one already ran - each loader must
    independently answer "have I already run" for its own data. `[VERIFIED]`
 2. An orchestrator (`LoadSampleData`) chains every per-entity loader in
    FK-safe parent-before-child order.
 3. Wire the orchestrator to a published-time trigger so seeding happens
    automatically on every publish; the per-loader guards make repeat firing
-   harmless. See "What context tools don't show you" below — this trigger
+   harmless. See "What context tools don't show you" below - this trigger
    is invisible to model inspection, which is expected, not evidence it is
    missing.
 4. Assign every output count (rows created, skipped flag) via an explicit
-   `Assign` node from a real running total before the action ends — never a
+   `Assign` node from a real running total before the action ends - never a
    literal. A literal `RowsCreated = 0` in the output path is indistinguishable
    from a genuine zero once read back over REST (REST silently omits falsey
-   values — see `../fulcrum-engine-traps/SKILL.md`).
+   values - see `../fulcrum-engine-traps/SKILL.md`).
 
 Worked structure and JSON-resource layout: `references/loader-pattern.md`.
 
@@ -64,11 +64,11 @@ Worked structure and JSON-resource layout: `references/loader-pattern.md`.
 On the reference build, a create-or-update action's `Source` was left as an
 empty inline record literal on **all seven loaders**. It published with
 **zero validation errors** and silently blanked every field and every
-foreign key across 34 rows. Nothing at the model layer caught it — not
+foreign key across 34 rows. Nothing at the model layer caught it - not
 validation, not publish, not a clean revision. `[VERIFIED]`
 
 **Standing rule:** declare an explicit record variable, populate every
-field — including every foreign key — with an `Assign` node, and only then
+field - including every foreign key - with an `Assign` node, and only then
 feed that variable into the create-or-update's `Source`. Never rely on an
 inline or implied record source. Before trusting any loader, read `.Source`
 back verbatim and confirm it names a populated local record variable, not a
@@ -80,8 +80,7 @@ unproven until rows have been read back, regardless of validation status.
 ## Guard conditions and null semantics
 
 A guard comparing a text attribute to an empty string (`Attribute = ""`)
-never matches when the platform's stored default is `null`, not empty text
-— and swapping in a null-identifier comparison is a different type and
+never matches when the platform's stored default is `null`, not empty text - and swapping in a null-identifier comparison is a different type and
 silently never matches either. `[SINGLE-OBSERVATION]`
 
 **Robust form:** test `Length(Attribute) = 0`, folding null and empty into
@@ -89,14 +88,14 @@ one true condition.
 
 Generalize this: any guard that can silently never match produces a loader
 that either **silently re-runs** (duplicating rows) or **silently never
-runs** (screens stay empty) — and neither failure shows up in validation or
+runs** (screens stay empty) - and neither failure shows up in validation or
 publish. Every guard in a loader chain deserves this scrutiny, not just the
 orchestrator's top-level check.
 
 ## Natural keys
 
 Express every foreign key and every lookup in seed source data as a
-**natural key** — a code, a name, a label — never a positional index or a
+**natural key** - a code, a name, a label - never a positional index or a
 generated/numeric Id. Resolve it to a real Id by lookup at load time. A
 generated or positional identifier breaks the moment the seed is re-run or
 reset, because the platform does not guarantee the same identifier next
@@ -105,7 +104,7 @@ time: a re-run must **update** a row it recognizes, never duplicate it.
 
 ## Relative timestamps
 
-Never hardcode a calendar date in seed data — it drifts, and a gate built
+Never hardcode a calendar date in seed data - it drifts, and a gate built
 against it breaks as the wall clock moves past the date. `[VERIFIED]`
 
 **Working pattern:** store a day offset (integer, e.g. `-3`, `0`, `+7`) plus
@@ -121,10 +120,10 @@ same reason.
   platform versions; creating one without an explicit Id passes validation
   and then **fails at deploy**. Always assign explicit sequential
   identifiers at record-creation time. Whether the underlying flag is
-  present, and its exact error code, is a `[TENANT]` fact — defer to
+  present, and its exact error code, is a `[TENANT]` fact - defer to
   `tenant-profile.md` rather than asserting one here.
 - Reference a static record by its **identifier**, never by label text and
-  never by positional index — label and identifier text can differ,
+  never by positional index - label and identifier text can differ,
   including in whitespace, so matching on the label picks the wrong row
   without warning.
 - Watch for duplicate static records on re-run; they are not covered by the
@@ -133,8 +132,8 @@ same reason.
 ## Exposing the loader
 
 A server action cannot be marked public directly on current platform
-versions (`[TENANT]` — confirm in `tenant-profile.md`); expose the loader
-(and any reset action) through a REST method instead — load-bearing, not
+versions (`[TENANT]` - confirm in `tenant-profile.md`); expose the loader
+(and any reset action) through a REST method instead - load-bearing, not
 tidiness, since an on-demand HTTP call may be the only way to trigger the
 loader outside the publish-time trigger. Response structures can be shared
 across REST methods; check that before editing either method, so a
@@ -142,8 +141,8 @@ shared-structure edit doesn't silently change both.
 
 ## Aggregate limits
 
-Any aggregate expected to return **all** rows — action aggregate or screen
-aggregate alike — needs an explicit high maximum-records value. The
+Any aggregate expected to return **all** rows - action aggregate or screen
+aggregate alike - needs an explicit high maximum-records value. The
 platform default silently truncates, and a truncated aggregate inside a
 loader or a verification action produces a plausible-looking wrong count
 with no error.
@@ -152,18 +151,18 @@ with no error.
 
 Four-step proof; discharge each step with the instruments in
 `../fulcrum-verification/SKILL.md` (diagnostic REST endpoint pattern when there
-is no direct query path — `[TENANT]`, check `tenant-profile.md`):
+is no direct query path - `[TENANT]`, check `tenant-profile.md`):
 
-1. Load on an empty/reset database → confirm real, non-zero row counts.
-2. Load again → confirm it was skipped (zero rows written this time).
-3. Reset, then load → confirm the counts come back, proving the seed is
+1. Load on an empty/reset database -> confirm real, non-zero row counts.
+2. Load again -> confirm it was skipped (zero rows written this time).
+3. Reset, then load -> confirm the counts come back, proving the seed is
    re-loadable, not a one-shot.
 4. Spot-check foreign keys on a handful of leaf rows resolve to the
    *intended* parent, not null and not row one (a wrong join or sort-order
    bug silently picks row one when a lookup is written wrong).
 
 Verify arithmetic invariants across **all** rows, not a sample. Hand-derive
-expected counts independently before comparing — never accept the agent's
+expected counts independently before comparing - never accept the agent's
 own classification of "looks right." This pass alone can consume a whole
 turn's budget; plan for it inside the three-turn minimum, not on top of it.
 
@@ -183,7 +182,7 @@ and report exhaustion (an empty candidate pool) rather than silently
 passing on an empty result.
 
 If a reset action does get built, do not trust Mentor's report that the
-delete succeeded — verify against the live schema or a live-data read-back,
+delete succeeded - verify against the live schema or a live-data read-back,
 per `../fulcrum-verification/SKILL.md`.
 
 ## What the platform's context tools do not show you
@@ -192,10 +191,10 @@ Context/model-inspection tools do not enumerate an app's Resources tree, and
 do not enumerate its Automations tree (Agents, Events, **Timers**). A
 loader wired to a published-time trigger is invisible to that kind of
 inspection. Do not conclude the trigger is missing from an inspection result
-alone — confirm via the design surface directly before reporting it absent.
+alone - confirm via the design surface directly before reporting it absent.
 `[SINGLE-OBSERVATION]`
 
 ## Where the depth lives
 
-`references/loader-pattern.md` — worked loader/orchestrator structure,
+`references/loader-pattern.md` - worked loader/orchestrator structure,
 JSON-resource-per-entity layout, and reset-action ordering.

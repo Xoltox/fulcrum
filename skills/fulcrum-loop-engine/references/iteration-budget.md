@@ -25,7 +25,7 @@ inside their own windows.
 
 ## The orchestrator's per-iteration cost
 
-Count calls, never tokens — a subagent cannot measure its own token usage and
+Count calls, never tokens - a subagent cannot measure its own token usage and
 the orchestrator learns the number only after the fact
 (`../../fulcrum-unattended-guardrails/SKILL.md`, heading "Budgets are tool-call
 counts, never token counts").
@@ -36,22 +36,22 @@ A `collaborative` iteration costs the orchestrator roughly:
 |---|---|
 | 1 Select | 1 read (`TASKS.md`) |
 | 2 Precondition | 1 halt check, 1 journal scan, 1 lease write, 1 dispatch for the invariant turn, 1 report read |
-| 3 Dispatch | 2–3 state writes, 1–2 dispatches (consult, build), 1–2 report reads |
-| 4 Poll | 0 — delegated. It is 0 **only** if delegated |
+| 3 Dispatch | 2-3 state writes, 1-2 dispatches (consult, build), 1-2 report reads |
+| 4 Poll | 0 - delegated. It is 0 **only** if delegated |
 | 5 Verify | 1 dispatch per rung group, 1 report read each |
-| 6 Record | 3–4 writes |
-| 7 Advance | 1 lease delete, 0–1 re-scan |
+| 6 Record | 3-4 writes |
+| 7 Advance | 1 lease delete, 0-1 re-scan |
 
-Call it **15–20 orchestrator calls for a clean `collaborative` iteration**, plus
+Call it **15-20 orchestrator calls for a clean `collaborative` iteration**, plus
 about 4 per fix-loop attempt. A `directive` iteration saves the consult dispatch
-and its report read — 2 calls, not a different order of magnitude.
+and its report read - 2 calls, not a different order of magnitude.
 
 Do not treat those figures as measured. Derive your own from the recalibration
 loop in `budgeting.md` after three iterations and replace them.
 
 **Phase 4 is the line item that decides everything.** Polling in the
 orchestrator's own context turns the cheapest phase into the most expensive one,
-and the growth is cumulative and unrecoverable — nothing later gives the window
+and the growth is cumulative and unrecoverable - nothing later gives the window
 back. If the harness offers no delegation, the iteration cost is dominated by
 polls and the 90 s floor applies to every one of them
 (`../../fulcrum-mentor-turns/SKILL.md`, heading "Polling").
@@ -64,7 +64,7 @@ at a phase boundary, never mid-iteration.**
 Mechanism: an iteration abandoned between phase 3 and phase 6 leaves a run
 mutating the app with a `started` line and no outcome. Recovering that costs a
 poll of an unknown run, a re-read of the live revision, and a re-proof of
-whatever the run may have changed — strictly more than the iteration would have
+whatever the run may have changed - strictly more than the iteration would have
 cost to finish. Stopping one iteration early is cheap; stopping halfway through
 one is the most expensive stop available.
 
@@ -96,7 +96,7 @@ the second.
   iteration turns the cheapest class into the most expensive.
 - **An iteration that overran by 3x is usually a mis-sized task, not an
   under-budgeted one.** Check whether the row was really Mentor-turn-shaped
-  before raising the rate — a row carrying more than one shape of change is a
+  before raising the rate - a row carrying more than one shape of change is a
   decomposition failure, and the fix is in `plan.md`, not in the budget.
 
 ## What to record

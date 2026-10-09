@@ -18,9 +18,10 @@ A solution-sized ask — more than a handful of screens, or more than one app, o
 plus agents plus workflows — with source material that is not yet a spec, and no repo
 that already has a plan and a tenant profile.
 
-**Not** for one app from one clean source with no decomposition and no unattended
-sessions: route straight to a single-app bootstrap (see **Routing**). **Not** for a repo
-this skill already scaffolded: edit the plan instead of re-running.
+**Not** for one app from one clean source with no decomposition: a single-app bootstrap
+(see **Routing**), or with no BRD and about five or fewer steps, the router's micro
+profile (`../fulcrum-project-state/references/micro-profile.md`), which asks the step-2
+app-creation question itself. **Not** for a repo this skill scaffolded: edit the plan.
 
 ## Does not own
 

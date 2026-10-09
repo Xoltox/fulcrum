@@ -14,7 +14,7 @@ dead end, while validation and publish are clean. One build hit the
 non-public-Login dead end; a later probe confirmed a Mentor-created web app
 ships template screens (Login, RecoverPasswordRequest, RecoverPasswordReset,
 InvalidPermissions, UserProfile, ChangePassword in the Common flow) with no
-explicitly configured default screen `[VERIFIED]` (one probe, live read). The
+explicitly configured default screen `[VERIFIED]` (field report and live probe). The
 template can change, so read it, do not assume. No default screen was
 explicitly configured in the probe, so the **default screen** must be set
 deliberately. Mentor's read-back is not proof of access: it has claimed

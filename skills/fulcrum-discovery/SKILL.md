@@ -21,6 +21,10 @@ Owned here: the interview, the sufficiency judgement, and the brief. Nothing els
 | Assessing an app that already exists against requirements | `../fulcrum-gap-analysis/SKILL.md` |
 | Anything Mentor, publish, or verification | the respective sibling skill |
 
+**Not the app-creation question.** Whether Mentor creates the app or the user makes a
+shell is asked by `../fulcrum-solution-init/SKILL.md` step 2, or by the micro profile;
+never here, so the user is asked once.
+
 **Stop at the brief.** Do not name phases, do not size steps, do not propose an app
 split. Deciding the shape of the build during the interview freezes a decomposition
 before the tenant probe has run, and `fulcrum-solution-init` will then either re-do it
@@ -180,3 +184,4 @@ Do not hand off until all hold:
 | An answer is vague, aspirational, or defers specifics | `references/observable-requirements.md` |
 | Writing the output | `templates/brief-template.md` |
 | The brief is done | `../fulcrum-solution-init/SKILL.md` |
+| The user confirmed the micro profile and only a few acceptance lines are vague | Fill those holes only (expert-style); the output is lines in the micro `plan.md`, not a brief - `../fulcrum-project-state/references/micro-profile.md` |

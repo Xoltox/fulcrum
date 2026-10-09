@@ -53,21 +53,22 @@ never let anything write back.
   project.md          solution identity, apps, mode, posture, tier overrides
   brief.md            derived requirements brief — written by fulcrum-discovery
   tenant-profile.md   the capability probe result — written by fulcrum-solution-init
-  plan.md             phases and steps — stable, rarely rewritten
+  plan.md             phases and steps - stable, rarely rewritten (micro: plan-micro template)
   TASKS.md            current truth: checkbox table of Mentor-turn-shaped tasks
   JOURNAL.md          session index: one ROW per session, completed in place
   journal/<session-id>.md  APPEND-ONLY: one file per session, one line per action
   DECISIONS.md        APPEND-ONLY: ADR-lite records
-  RUN-IDS.md          APPEND-ONLY: durable run ids
+  RUN-IDS.md          APPEND-ONLY: durable run ids, with a publish slot
+  external/<system>.md  contract per external system the solution consumes
   HANDOFF.md          two-part RULES/BRIEF snapshot, regenerated
   runs/<run-id>.md    optional per-run detail
   checkpoints/<agent-label>.md   per-agent, overwrite-in-place, ephemeral
-  lease.json          runtime lock — NOT committed
+  lease.<app>.json    runtime lock, one per app - NOT committed
   HALT.md             present only when halted — its existence is the signal
 ```
 
-`tenant-profile.md`, `HANDOFF.md` and `RUN-IDS.md` are existing contracts. This skill
-gives them a home and **does not restate their schemas**. See
+`tenant-profile.md` and `HANDOFF.md` are existing contracts. This skill gives them a
+home and **does not restate their schemas**. See
 `../fulcrum-solution-init/references/repo-scaffold.md` and
 `../fulcrum-solution-init/templates/handoff-template.md`.
 
@@ -86,6 +87,24 @@ gives them a home and **does not restate their schemas**. See
 | `plan.md` | rewritten, rarely | Scope changes are deliberate and reviewed as a diff. |
 | `checkpoints/*` | overwrite in place | Existing contract — `../fulcrum-unattended-guardrails/references/checkpoints.md`. Ephemeral working state for one agent; its durable residue is the session-file line and the TASKS row. Not an append log, and nothing may depend on it after that agent ends. |
 
+**Two profiles.** `full` is the layout above. `micro` - one app, about five or fewer
+steps, no BRD - needs only `project.md`, `plan.md`, `TASKS.md`, `JOURNAL.md` with its
+session files, and `RUN-IDS.md`, plus `DECISIONS.md`, `external/*` and `HALT.md` when
+their trigger occurs. The router proposes it and the user confirms; `profile` in
+`project.md` records which. Full rules: `references/micro-profile.md`.
+
+## Who writes what
+
+One writer per shared file. The orchestrator alone writes `project.md`, `plan.md`,
+`TASKS.md`, `DECISIONS.md`, `HANDOFF.md` and `external/*`. A driver writes only its own
+session file, its own `JOURNAL.md` row, its `RUN-IDS.md` lines, its lease and, if it
+stops the run, `HALT.md`. At every wave close the orchestrator reconciles `TASKS.md`
+and `project.md` against the journal and run ids, then commits. In every field project
+inspected, `.fulcrum/` was stale within a day because nobody owned that step.
+`[VERIFIED]` No resume point lives outside `.fulcrum/`. Table and reconciliation
+checklist: `references/file-schemas.md`, heading "Write ownership - who writes which
+file".
+
 Rewriting is safe **only** because the append-only files hold the history. That is
 what lets `TASKS.md` drop closed rows at a phase boundary without losing anything.
 
@@ -94,12 +113,19 @@ what lets `TASKS.md` drop closed rows at a phase boundary without losing anythin
 `../../AGENTS.md` requires capturing a run identifier durably before the first wait.
 That generalises to all state here. `[UNVERIFIED]`
 
-Before dispatching or waiting on anything:
+Before the first mutating call - **including app creation** - and before any wait:
 
-1. Allocate the task ID and write its `TASKS.md` row with status `active`.
-2. Create `journal/<session-id>.md`, append its `started` line, and append the
-   session's `JOURNAL.md` index row with `State: open`.
-3. Append the `RUN-IDS.md` line the instant the run id is issued.
+1. At session start: create `journal/<session-id>.md` and append the session's
+   `JOURNAL.md` index row with `State: open`.
+2. For Mentor work, acquire the lease (`references/lease-and-concurrency.md`; before
+   creation it is keyed by the intended app name).
+3. Write the task's `TASKS.md` row with status `active`, then append its `started`
+   line to the session file and its id to the row's `InFlight`.
+4. Dispatch. Append the `RUN-IDS.md` line the instant the run id is issued.
+
+In the field, the first journal line was written after the app had been created and
+the lease existed only as prose; a crash then would have left an app no record
+mentions. `[SINGLE-OBSERVATION]`
 
 Only afterwards write the outcome, then the verdict.
 
@@ -125,7 +151,9 @@ lease cannot protect against: `references/lease-and-concurrency.md`.
 
 ## HALT.md is never silently passed
 
-If `HALT.md` exists, the engagement is halted. Stop. Do not open a Mentor session, do
+If `HALT.md` exists, the engagement is halted. Stop. A halt is always the file: one
+written only in prose (journal, `project.md`, a report) is not a halt, and the next
+session resumes past it. Do not open a Mentor session, do
 not publish, do not start the next task. Clearing it requires a human resolution
 recorded in `DECISIONS.md` and the file deleted in that same change. Resuming past a
 halt without that record defeats the guardrail that produced it and re-runs the
@@ -138,8 +166,10 @@ calling a deviation a defect — its **drift** finding class. Nothing else in Fu
 produces such a record, so that check currently always finds nothing and every drift
 reads as a gap. `[UNVERIFIED]` `DECISIONS.md` is that record. Its `Affects` field
 must name concrete model artifacts (entity, screen, action identifiers), because gap
-analysis joins from an artifact to a decision, not from prose. Shape:
-`references/file-schemas.md`, heading "DECISIONS.md".
+analysis joins from an artifact to a decision, not from prose. It is strictly
+append-only: a status change is a new record that supersedes the old one, never an
+edit. Platform facts go to `tenant-profile.md` and traps to engine-traps feedback, not
+here. Shape: `references/file-schemas.md`, heading "DECISIONS.md".
 
 ## Mode and posture
 
@@ -162,4 +192,5 @@ failure mechanism and the opt-in rule are owned by `../../CONVENTIONS.md`, headi
 | Resuming, or checking whether a task has been attempted before | `JOURNAL.md` index alone — never open a session file for either query |
 | About to open a Mentor session, or a second agent may be active | `references/lease-and-concurrency.md` |
 | Starting cold, resuming after a crash, or `HALT.md` exists | `references/resume-and-halt.md` |
+| Small engagement proposed as micro, or deciding which files are mandatory | `references/micro-profile.md` |
 | Need a file skeleton to write | `templates/` |
