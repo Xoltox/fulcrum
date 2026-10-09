@@ -74,8 +74,15 @@ application type; mobile-first vs desktop layout; existing app or fresh shell; w
 - Mentor could not add screens to an app created with the **Mobile** application type,
   forcing a Reactive Web app with a phone-width mobile-first layout instead.
   `[SINGLE-OBSERVATION]` `[TENANT]` — confirm on the current tenant in step 3, don't assume.
+- **App creation is a user choice; neither option is the default.** Ask the user: have
+  Mentor create the app (`mentor_start_session` then `mentor_create_asset`), or will they
+  create a shell app from the standard template in Studio/Portal for Fulcrum to load
+  (`mentor_load_asset`). Record the answer. Either way, immediately after creation check
+  screen access and the default screen:
+  `../fulcrum-engine-traps/references/access-security-and-settings.md`. Mechanics:
+  `../fulcrum-mentor-turns/references/mcp-surface.md#creating-and-loading-an-asset`.
 - **Never use a System or template module as the shell.** `Template_*` and sample-data
-  modules are refused by Mentor's Model API. Mint a fresh app instead. `[VERIFIED]`
+  modules are refused by Mentor's Model API. Use a fresh app instead (either path above). `[VERIFIED]`
 - **Disambiguate near-name-collision apps before the first build turn.** A stale scaffold
   with a similar name is how a session builds into the wrong app. Record the exact app
   identifier in `tenant-profile.md`, never the display name.
@@ -159,16 +166,7 @@ replaced wholesale every session. Never a growing narrative of past steps — th
 the append-only build log is for. Scaffold: the derived brief, the plan, `specs/`, a
 per-step build-pattern log, a durable run-id log, `tenant-profile.md`, and that handoff.
 
-Three failures to design against, all observed in the reference corpus `[VERIFIED]`:
-
-1. **Model policy stated in three files at three different strengths.** State each policy
-   in exactly one file; elsewhere link to it.
-2. **Standing rules duplicated across three places, one copy silently missing a
-   prohibition.** A build agent obeying the lossy copy breaks a rule it never saw.
-3. **Every section-anchored cross-reference dangling**, because target files had no
-   numbered headings. Link by relative path and quote the heading verbatim. Never `§`.
-
-Layout, file roles, handoff shape: `references/repo-scaffold.md`, `templates/handoff-template.md`.
+Layout, file roles, handoff shape and three observed failure modes: `references/repo-scaffold.md` (heading "Failures to design against"), `templates/handoff-template.md`.
 
 ## Routing per-app bootstrap
 

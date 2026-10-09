@@ -31,7 +31,7 @@ directly. Otherwise, load `skills/fulcrum`.
 | An app already exists and you need to know how it compares to its requirements, what is missing, or what to build next | `skills/fulcrum-gap-analysis` |
 | Where durable project state lives — `.fulcrum/` file set, the session lease, the halt record | `skills/fulcrum-project-state` |
 | Working through the task list — selecting, dispatching, polling, verifying, recording, advancing | `skills/fulcrum-loop-engine` |
-| About to issue a Mentor turn, chunking a spec, unsure of session vs conversation, or a turn didn't land | `skills/fulcrum-mentor-turns` |
+| About to issue a Mentor turn, chunking a spec, unsure of session reuse vs fresh session, or a turn didn't land | `skills/fulcrum-mentor-turns` |
 | Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
 | Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
 | Seeding, resetting, or debugging sample/demo data | `skills/fulcrum-seed-data` |

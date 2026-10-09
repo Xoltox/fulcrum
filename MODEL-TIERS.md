@@ -10,7 +10,7 @@ that names a concrete model. Skills use the tier names — `deep-reasoning`,
 |---|---|---|
 | `deep-reasoning` | Derivation | Ingesting raw source artifacts, deriving a solution plan from ambiguous input, decomposing a solution into apps/agents/workflows, sizing phases and steps, authoring specs, authoring skills |
 | `workhorse` | Execution and orchestration | Every build session after init: reading state, writing subagent briefs, dispatching, reading reports, driving Mentor turns, verification, seed data, publish sequencing |
-| `poller` | Waiting | Every wait loop: `mentor_get_run` polling, `publish_status` polling, any long-running job supervision, any "sleep then re-check" cycle |
+| `poller` | Waiting | Every wait loop: `mentor_get_run` polling, `publish_status` polling (key from the "Publish" run), any long-running job supervision, any "sleep then re-check" cycle |
 
 ## Vendor mapping
 

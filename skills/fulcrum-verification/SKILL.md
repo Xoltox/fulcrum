@@ -20,7 +20,7 @@ misbehaves, stop and cross-reference instead of writing it here.
 The platform's own success signals are unreliable in **both directions**, and
 model-layer checks are structurally blind to whole defect classes.
 
-- A `change_applied`-style flag can read true on a turn that changed nothing,
+- A `changeApplied`-style flag can read true on a turn that changed nothing,
   and a no-change flag can appear on a turn that did land a change. `[VERIFIED]`
 - Zero validation errors and a clean publish are compatible with blank rows,
   an empty record source, a repeater rendering exactly one item, an icon

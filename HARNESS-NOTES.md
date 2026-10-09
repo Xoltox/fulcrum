@@ -62,8 +62,13 @@ cannot match to your own setup is nearly useless.
 
 ## Contributed observations
 
-Empty. Nothing has been added here yet — that's intentional, not an
-oversight; do not fill it with speculation to make the section look used.
+- **Claude Code CLI - server missing from the tool list** (observed 2026-10-08).
+  The harness keeps per-project enable and disable lists for MCP servers; a
+  disable entry wins over an enable entry; approval of a project-scoped server is
+  granted per project directory; an expired transport login also hides the server
+  until re-authentication. How it was noticed: the OutSystems tools were absent
+  while `auth_status` could not be called. What changed: Fulcrum's pre-flight
+  settles server presence (listed, enabled, connected) before checking auth.
 
 A useful addition names: the harness, exactly what was observed, how it was
 noticed (what tipped you off that something was different from the

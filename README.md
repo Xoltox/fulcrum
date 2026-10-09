@@ -32,7 +32,7 @@ longer, unattended, many-step builds that came after — the kind where nobody
 is watching to notice a Mentor turn quietly go sideways at step 23 of 47.
 
 - **Platform success signals are unreliable in both directions.** Zero validation errors and a clean publish are compatible with blank rows, empty repeaters, unrendered icons, and corrupted content. Model-layer checks are structurally blind to whole defect classes.
-- **Tenant-varying facts get probed once per project during init**, then referenced thereafter. Differences in available UI blocks, icon fonts, meridiem tokens, and Mentor backend identifiers are never hardcoded.
+- **Tenant-varying facts get probed once per project during init**, then referenced thereafter. Differences in available UI blocks, icon fonts, meridiem tokens, and Mentor backend identifiers are never hardcoded. Tool-specific facts live, dated, in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
 - **Every rule carries its failure mode explicitly.** Measured finding: prompts that named *why* a construct fails stopped the failure recurring. Prompts that only said "don't" did not.
 - **Claims carry explicit evidence strength tags:** `[VERIFIED]` (observed multiple times), `[SINGLE-OBSERVATION]` (real but not generalized), `[UNVERIFIED]` (inferred only), `[TENANT]` (deferred to the profile), or `[SCHEMA]` (asserted by the vendor's own MCP tool documentation, not observed live).
 - **Hand-restated rules degrade over a long build.** These rules are packaged as skills so the same logic runs unmodified across many sessions, on any harness.
@@ -46,7 +46,7 @@ is watching to notice a Mentor turn quietly go sideways at step 23 of 47.
 | `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements; producing the brief that `fulcrum-solution-init` ingests | Before any plan exists and nothing is written down yet. |
 | `fulcrum-solution-init` | Ingesting source material; decomposing into apps, agents, workflows; sizing phases and steps; probing tenant capabilities; scaffolding repo and specs | Once per project, before any Mentor turn. Run on deep-reasoning tier. |
 | `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, remediation sequencing | When an app already exists (generated or inherited) and you need to know where it stands against its requirements before planning further work. |
-| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session vs conversation; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start_session` / `mentor_create_asset` / `mentor_load_asset` / `mentor_prompt` call and during turn-by-turn execution. |
+| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session reuse vs fresh session; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start_session` / `mentor_create_asset` / `mentor_load_asset` / `mentor_prompt` call and during turn-by-turn execution. |
 | `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming | When building or editing any screen component or model element. |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static-entity identifiers; reset and teardown paths | Before building any screen that reads from data. |
@@ -81,7 +81,7 @@ For harnesses without skill auto-triggering, `AGENTS.md` is the entry point: it 
 
 2. **Every session after init.** Run on the workhorse tier. `fulcrum-loop-engine` reads the written spec and task list and executes step by step, driving Mentor turns per `fulcrum-mentor-turns`. Do not re-derive the plan; the plan is already written.
 
-3. **Polling and wait loops.** Run on the poller tier. All `mentor_get_run` polling, `publish_status` checking, and long-running supervision happens on the cheapest available model.
+3. **Polling and wait loops.** Run on the poller tier. All `mentor_get_run` polling, `publish_status` polling, and long-running supervision happens on the cheapest available model.
 
 On a harness without skill auto-triggering, load `AGENTS.md` first — it names `fulcrum` as the entry point and carries a manual fallback table for when you already know which skill applies.
 
@@ -95,7 +95,7 @@ These hold even if no skill file is ever loaded (from `AGENTS.md`):
 - One Mentor session at a time **per app** (concurrency across different apps is allowed; the ceiling is unpublished and may change server-side). `[VERIFIED]` Mentor can only handle one prompt at a time per session: a `mentor_prompt` call issued while a prior prompt is still running is silently ignored, not rejected with an error.
 - Aggressive orchestration is the default, not an advanced option: delegate poll loops and read-only inspection to subagents; keep judgement and verification verdicts in the orchestrator. Mutating work is depth 1 always.
 - One subagent depth level. No nesting.
-- The orchestrator never calls Mentor, publish, REST, or gate scripts itself — it dispatches.
+- The orchestrator never calls Mentor, issues the "Publish" turn, polls `publish_status`, calls REST, or runs gate scripts itself - it dispatches.
 - Zero validation errors and a clean publish prove nothing about rendering or logic.
 - Stuck twice on the same problem means stop and report. Never escalate model tier to break a stuck bug.
 - Disclose overruns and deviations. Never absorb them silently.
@@ -130,7 +130,7 @@ Two headline rules:
 <details>
 <summary>Full authoring contract detail</summary>
 
-- **Hard rule 1 — harness agnostic.** Never name a harness-specific tool as the required instrument; say what capability is needed and let the agent map it. Never name a model — use tier vocabulary. ODC MCP tool names (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`, `mentor_prompt`, `mentor_get_run`, `mentor_publish`, `publish_status`, `env_app`, `app_revisions`, `context_*`) are allowed since they are the ODC surface itself, written bare with no harness-specific prefix. No harness-specific frontmatter (`allowed-tools`, slash-command syntax, `$ARGUMENTS`) in a skill body. Harness quirks go in `HARNESS-NOTES.md`, never in a skill.
+- **Hard rule 1 - harness agnostic.** Never name a harness-specific tool as the required instrument; say what capability is needed and let the agent map it. Never name a model - use tier vocabulary. ODC MCP tool names (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`, `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`, `env_app`, `app_revisions`, `context_*`) are allowed since they are the ODC surface itself, written bare with no harness-specific prefix. No harness-specific frontmatter (`allowed-tools`, slash-command syntax, `$ARGUMENTS`) in a skill body. Harness quirks go in `HARNESS-NOTES.md`, never in a skill.
 - **Hard rule 2 — platform truth by default.** Strip all project nouns; keep the consequence, drop the anecdote. Tenant-varying facts are probed once per project by `fulcrum-solution-init` into `tenant-profile.md`, and skills reference the profile rather than hardcoding the answer.
 - **Hard rule 3 — state the mechanism, not just the ban.** A rule that cannot state what breaks is not ready to write.
 - **Hard rule 4 — mark evidence strength** on any claim that is not directly observed: `[VERIFIED]`, `[SINGLE-OBSERVATION]`, `[UNVERIFIED]`, `[TENANT]`.

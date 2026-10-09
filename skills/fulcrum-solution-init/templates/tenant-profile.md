@@ -171,6 +171,21 @@ read-only probe never called — do not upgrade it to "available".
 
 ---
 
+## 11. Portfolio, environments, template screen set
+
+Source: `env_list` (read-only). Lookup rule for this file: project `.fulcrum/` first, then
+nearest parent directory; write a new one in `.fulcrum/` only if none is found.
+
+| Field | Value |
+|---|---|
+| portfolioKey | \<value from env_list\> |
+| Environment keys | \<name = key, one per line\> |
+| New-app template screen set | \<screens present in a fresh app from the standard template, observed\> |
+| Probe / Observed | \<...\> |
+| Date | \<date\> |
+
+---
+
 ## Unresolved rows
 
 | Row | What blocked it | Which planned step it gates |

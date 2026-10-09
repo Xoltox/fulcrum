@@ -97,8 +97,8 @@ The orchestrator does four things: read state, write a self-contained brief,
 dispatch, read the terse report back.
 
 It must **not itself** call `mentor_start_session` / `mentor_create_asset` /
-`mentor_load_asset` / `mentor_prompt` / `mentor_get_run`, call `mentor_publish`
-/ `publish_status`, call a `context_*` inventory tool, curl a REST endpoint, or
+`mentor_load_asset` / `mentor_prompt` (any Mentor turn, including the "Publish"
+turn) / `mentor_get_run`, poll `publish_status`, call a `context_*` inventory tool, curl a REST endpoint, or
 run browser automation or a verification gate script.
 
 The clauses that get violated, so they are stated separately:
@@ -182,7 +182,7 @@ Non-negotiable in every subagent brief:
    brief. [VERIFIED] On the source build this single line surfaced most of the
    corrections to the project's own documented claims: a false choice passed
    along in a brief, an over-broad trap entry, a CSS utility class that did not
-   port across elements, a broken session id/token pair, and a stale invariant
+   port across elements, a wrong session or run id, and a stale invariant
    check. It is a **prompt mechanism, not a model-tier effect** — it does not
    become unnecessary at a higher tier, and it is the cheapest guardrail here.
 10. **The disclosure requirement** — report turn-budget overruns with the actual

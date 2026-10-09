@@ -128,8 +128,8 @@ The orchestrator's job is exactly four things: **read state, write a
 self-contained brief, dispatch, read the terse report back.**
 
 The orchestrator must **not itself** call `mentor_start_session`,
-`mentor_create_asset`, `mentor_load_asset`, `mentor_prompt` or `mentor_get_run`;
-call `mentor_publish` or `publish_status`; call a `context_*` inventory tool;
+`mentor_create_asset`, `mentor_load_asset`, `mentor_prompt` (of any kind,
+including the "Publish" turn) or `mentor_get_run`; poll `publish_status`; call a `context_*` inventory tool;
 curl a REST endpoint; or run browser automation or a verification gate script.
 
 Not to finish a small remaining piece of a step. Not to "just quickly check"

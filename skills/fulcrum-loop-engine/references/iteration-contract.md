@@ -85,8 +85,8 @@ into an undelegated loop.
 - Refresh the lease's `acquired` on every non-terminal poll. A TTL shorter than
   the work it covers manufactures the expiry case on a healthy run.
 - After a poller reports a run terminal, make one direct read of that run
-  yourself before the next start or publish call — the session token is
-  re-issued on every read `[VERIFIED]`.
+  yourself before the next start or publish call - the poller's report is
+  second-hand (see `../../fulcrum-mentor-turns/references/polling.md`).
 
 ## Phase 5 — Verify
 

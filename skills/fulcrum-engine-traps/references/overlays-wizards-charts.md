@@ -61,12 +61,7 @@ inputs are commonly named `List` (the option set), `Values` (or similar,
 the underlying values), `Labels` (display text), and `Variable` (the
 two-way bound selection) instead.
 
-## 5. A newly created screen can ship an unwanted role requirement - moved
-
-Merged into `access-security-and-settings.md` entry 1, with the rest of
-screen access.
-
-## 6. `Columns2`/`Columns3`/`Columns4` fill column-major, not row-major `[VERIFIED]`
+## 5. `Columns2`/`Columns3`/`Columns4` fill column-major, not row-major `[VERIFIED]`
 
 For a fixed grid, these are reliable - but the fill order for N children
 across K columns is column-major: with 3 columns and 6 children, column 1
@@ -82,7 +77,7 @@ explicit children - this is not limited to 2/3/4. For a *wrapping* grid
 constructs are the wrong tool - use a flex/wrap layout instead and treat
 that substitution as sanctioned, not a workaround to avoid.
 
-## 7. Chart styling: per-point vs series, and don't invent CSS for a missing property
+## 6. Chart styling: per-point vs series, and don't invent CSS for a missing property
 
 See `icons-and-theming.md` #11 for per-bar color, per-bar value labels,
 and the donut/pie center-label case - the general rule that applies to
@@ -91,7 +86,7 @@ concluding a visual requirement needs a CSS/DOM workaround; when no real
 property exists for it, reuse an existing convention already used
 elsewhere in the app rather than inventing new one-off CSS.
 
-## 8. A chart bound to a joined aggregate can silently drop zero-value categories
+## 7. A chart bound to a joined aggregate can silently drop zero-value categories
 
 See `aggregates-and-repeaters.md` #3 (join direction) - this is the most
 common way a chart under-reports categories, and it is a join-direction

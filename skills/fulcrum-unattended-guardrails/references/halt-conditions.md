@@ -196,8 +196,10 @@ The generalisable facts:
 The three defences, all of which this skill mandates:
 
 - A **staleness guard before every mutating turn** — verify the session's view
-  of current state against an independent read of the live revision, never
-  against the session's own read-back
+  of current state against an independent read (published-state `context_*`
+  after the index lag, and the live revision via `app_revisions`), never
+  against the session's own read-back; before any "Publish" turn, re-read the
+  revision
   (`../../fulcrum-mentor-turns/SKILL.md`).
 - A **checkpoint that survives the agent**, recording the revision observed
   before changes (`checkpoints.md`).

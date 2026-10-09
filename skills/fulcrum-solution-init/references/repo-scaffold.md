@@ -145,3 +145,14 @@ stub explaining what belongs there:
 - [ ] `.fulcrum/HANDOFF.md` has both parts, and the BRIEF names one next step.
 - [ ] `.fulcrum/RUN-IDS.md` exists and is empty rather than absent.
 - [ ] Phase-one specs are written and each passes the right-sizing test.
+
+## Failures to design against
+
+Three failures to design against, all observed in the reference corpus `[VERIFIED]`:
+
+1. **Model policy stated in three files at three different strengths.** State each policy
+   in exactly one file; elsewhere link to it.
+2. **Standing rules duplicated across three places, one copy silently missing a
+   prohibition.** A build agent obeying the lossy copy breaks a rule it never saw.
+3. **Every section-anchored cross-reference dangling**, because target files had no
+   numbered headings. Link by relative path and quote the heading verbatim. Never `section `.

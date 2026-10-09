@@ -29,8 +29,11 @@ scripted agent loop. Therefore:
   concrete model names, and it does so for more than one vendor.
 - **MCP tool names are allowed** when referring to ODC MCP operations
   (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`,
-  `mentor_prompt`, `mentor_get_run`, `mentor_publish`, `publish_status`,
-  `env_app`, `app_revisions`, `context_*`). These are the ODC surface itself, not
+  `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`,
+  `env_app`, `app_revisions`, `env_list`, `context_*`). Publishing is a
+  `mentor_prompt` "Publish" turn; do not name `mentor_publish` (deprecated),
+  `app_create`, `publish_start`, `mentor_start` or `mentor_cancel` (absent from the
+  live surface) as instruments. These are the ODC surface itself, not
   a harness feature. Write them bare — no `mcp__outsystems__` prefix, which is
   Claude-Code-specific wiring.
 - **No harness-specific frontmatter or syntax in a skill.** `allowed-tools`,
@@ -55,11 +58,24 @@ from one build and not one tenant's configuration.
   child collapses the repeater to one row while validation and publish stay
   clean" is platform truth. "This happened on step 18" is not.
 
+### Tool facts live in one place
+
+Tool-specific facts (names, parameters, error texts, completion signals, publish
+mechanics) live in `skills/fulcrum-mentor-turns/references/mcp-surface.md`, each with
+a date. Every other file links to it and restates at most one line. A tool fact written
+anywhere else will drift when the surface changes. The baseline of tool and parameter
+names is `skills/fulcrum-mentor-turns/references/mcp-snapshots/`.
+
 ### The tenant profile contract
 
 Facts that vary by tenant, licence, or platform version are resolved once per
 project by a read-only capability probe during `fulcrum-solution-init`, which writes
 `tenant-profile.md` into the project repo.
+
+Lookup rule: the agent looks for `tenant-profile.md` in the project's `.fulcrum/`
+first, then walks up parent directories and uses the nearest one found; it writes a
+new one in the project's `.fulcrum/` only if none is found. Users organise folders
+differently, so no layout is imposed.
 
 Skills must **reference the profile, never hardcode the answer**:
 
@@ -105,6 +121,9 @@ Tag any claim that is not directly observed:
 
 Default to `[VERIFIED]` only when the source corpus shows repeat occurrence.
 Do not launder a single observation into a general rule.
+
+Rows labelled "Fulcrum rule" state Fulcrum policy, not platform evidence, and carry no
+evidence tag.
 
 ## Skill file layout
 
@@ -178,7 +197,7 @@ whoever issued them. That cost, not wall clock, is what the cadence optimises.
   context on every iteration, which is cumulative and unrecoverable.
 - The 45 s rate is affordable *only* because a throwaway context absorbs it.
   Never carry that rate into an undelegated loop.
-- Ignore the server's `pollAfterMs` field.
+- The server's pacing field is `pollIntervalMs`; it is a hint that Fulcrum overrides upward. Drain rule: a run is not read until a page returns `hasMore: false` with no `nextCursor` (`skills/fulcrum-mentor-turns/references/mcp-surface.md#reading-a-run`).
 
 **`db_query` returns no rows — universal, not tenant-varying.** `[SCHEMA]` It is
 not a model-layer SQL path. It runs only against a test harness stood up by
@@ -272,7 +291,7 @@ Overlap causes mis-triggering. One topic, one owner:
 | Skill | Owns | Explicitly does NOT own |
 |---|---|---|
 | `fulcrum-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; phase and step sizing; repo scaffold; the tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup |
-| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session vs conversation; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
+| `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session reuse vs fresh session; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
 | `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |

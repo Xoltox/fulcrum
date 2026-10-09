@@ -15,7 +15,7 @@ renders: `.List.Current` resolves to the first row of the aggregate when it
 sits outside any repeater, so exactly **one card renders, with every
 binding correct**.
 
-**Visible to validation/publish?** No. 0 validation errors, `change_applied:
+**Visible to validation/publish?** No. 0 validation errors, `changeApplied:
 true`, clean publish. Only the render shows a 1-card screen where N were
 expected.
 

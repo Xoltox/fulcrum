@@ -2,7 +2,10 @@
 
 Fulcrum drives a narrow slice of the ODC MCP surface: the `mentor_*` turn loop,
 `publish_status`, `app_revisions`/`env_app`, and the `context_*` inventory
-family. Everything below is exposed on the tenant and unused. The highest-value
+family. Everything below is exposed on the tenant and unused. The live surface changed on
+2026-10-09 (dated record: `skills/fulcrum-mentor-turns/references/mcp-surface.md`);
+`app_revisions` and `mentor_get_event` are now live tools, and the live session surface
+has no token. The highest-value
 entries are not new features — they **contradict a rule Fulcrum teaches**,
 chiefly around `db_query` and the diagnostic-endpoint workaround.
 
@@ -21,7 +24,7 @@ inference, loses to `[VERIFIED]` — confirm live before a skill asserts it.
 | `app_health` / `env_health` | Error-rate and latency aggregates per app/env | `fulcrum-verification`, `fulcrum-unattended-guardrails` | Read-only |
 | `deploy_impact` / `deploy_impact_status` | Blast radius before promotion | New: safe-promotion section | Read-only analysis |
 | `deploy_rollback` / `build_list` / `deploy_start` | Cross-environment promotion and an undo for a **deployed** asset | New: safe-promotion section | High — mutating, needs human confirm |
-| `mentor_get_event` | Recover a truncated run event | `fulcrum-mentor-turns` | Read-only |
+| `mentor_get_event` | Recover a truncated run event (now on the live surface) | `fulcrum-mentor-turns` | Read-only |
 | `mentor_request_upload` | Attach **documents** (not images) to a Mentor prompt | `fulcrum-solution-init` | Low |
 | `mentor_create_asset` `templateAssetKey` | Clone an existing app as a template | `fulcrum-solution-init` | Mutating — creates an asset |
 | `submit_feedback` | Agent-side telemetry on wrong-tool / empty-result events | `fulcrum-unattended-guardrails` | Read-only side channel |
@@ -30,9 +33,9 @@ inference, loses to `[VERIFIED]` — confirm live before a skill asserts it.
 
 ## `test_setup_start` / `test_setup_status`
 
-`[SCHEMA]` Forks an OML — either Mentor's in-flight OML (`mentor_session_id` +
-`mentor_session_token` from the last terminal-success `mentor_get_run`) or a
-published revision (`app_key` + optional `revision`) — injects an "ASE harness",
+`[SCHEMA]` Forks a published revision (`app_key` + optional `revision`; the live
+params are `env_key`, `app_key`, `revision`, `idempotency_key`, `query_templates`, with
+no Mentor session parameter - snapshot `skills/fulcrum-mentor-turns/references/mcp-snapshots/2026-10-09.md`) - injects an "ASE harness",
 and publishes the fork to a **non-production** environment. Returns a `setup_id`
 immediately; poll `test_setup_status` (2–3 s, 5–15 s typical) to `ready`, which
 carries `test_app_url`, `shared_secret`, `publication_key` and
@@ -156,12 +159,11 @@ though deployed — pass `build_key` + `revision` explicitly.
 
 ## `mentor_get_event`
 
-`[SCHEMA]` Fetches one run event's full body by `_eventId`, recovering an event
-`mentor_get_run` returned as a truncation marker; `found` is false when the run
-is unknown to the session. `fulcrum-mentor-turns` treats lost event data as unrecoverable
-— this recovers **truncation** only, a different failure from the eviction it
-documents. Cheap, read-only; belongs in the polling procedure as "on a
-truncation marker, fetch the body".
+`[SCHEMA]` Live now (`skills/fulcrum-mentor-turns/references/mcp-surface.md#reading-a-run`).
+Fetches one run event's full body by `eventId`, recovering an event `mentor_get_run`
+returned as a truncation marker. This recovers **truncation** only, a different failure
+from eviction. Cheap, read-only; the polling procedure should say "on a truncation
+marker, fetch the body".
 
 ## `mentor_request_upload` — not an image path
 

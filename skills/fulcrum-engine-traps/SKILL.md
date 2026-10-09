@@ -39,7 +39,7 @@ owns "does this construct have a known failure mode, and what is it."
    file and restate the mechanism (not just the ban) in the Mentor prompt -
    see `../fulcrum-mentor-turns/SKILL.md` for prompt-shaping.
 2. After a turn lands, verify against the trap's stated failure mode, not
-   against `change_applied` or a clean publish - see the "Visible to
+   against `changeApplied` or a clean publish - see the "Visible to
    validation?" column on every entry. If it says "no", validation and
    publish tell you nothing.
 3. Tenant-varying facts (`[TENANT]`) are never asserted here. Check
@@ -52,7 +52,7 @@ that internalizes only this table already avoids most fix-turn overruns.
 
 | Trap | Failure mode | Visible to validation/publish? |
 |---|---|---|
-| **Aggregate/repeater collapse** (16 steps hit this - the single most expensive trap class) | Deleting a `Gallery`'s default `List` child, or omitting it, collapses the repeat to one row: `.List.Current` resolves to the first record with no repeater around it. Screen renders exactly one card, every binding correct. | No - 0 validation errors, clean publish, `change_applied: true`. |
+| **Aggregate/repeater collapse** (16 steps hit this - the single most expensive trap class) | Deleting a `Gallery`'s default `List` child, or omitting it, collapses the repeat to one row: `.List.Current` resolves to the first record with no repeater around it. Screen renders exactly one card, every binding correct. | No - 0 validation errors, clean publish, `changeApplied: true`. |
 | **Link needs an explicit block display** (11 steps) | A link widget defaults to `display:inline`. Wrapping a card/tile in one makes it overflow its own padding box, and restyles the wrapped text to link color. | No - DOM text and bindings are all correct; only the render shows it. |
 | **REST silently drops falsey values** (9 steps) | An Integer `0` or Boolean `False` output vanishes from the JSON response body entirely. "Zero" becomes indistinguishable from "field never set." | No - clean publish; only inspecting the actual response body shows it. |
 | **No model-layer path to live row data** `[SCHEMA]` (9 steps) | No tenant has a model-layer path to live rows. Asking Mentor to inspect live data still returns a plausible, possibly fabricated answer with no error. | No - Mentor reports success/an answer either way. |

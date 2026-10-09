@@ -189,6 +189,22 @@ inconclusive result (e.g. a 404 that could equally mean "no data" as "broken
 dispatch") is not confirmed-unavailable — record it as unresolved with the
 ambiguity stated, never as a broken op.
 
+## 11. Portfolio, environments and template screen set
+
+Read-only, from `env_list`. Record: the **portfolioKey** (creation via
+`mentor_create_asset` needs it in practice, see
+`../../fulcrum-mentor-turns/references/mcp-surface.md#creating-and-loading-an-asset`),
+the **environment keys** (name to key), and the **new-app template screen set**, meaning
+which screens a freshly created app from the standard template already contains
+(observe on a shell app, never assume). Note that `context_*` reflects published state
+only and lags (`mcp-surface.md#published-state-inspection-context_`).
+
+## Where the profile lives
+
+The agent looks for `tenant-profile.md` in the project's `.fulcrum/` first, then walks up
+parent directories and uses the nearest one found. It writes a new one in the project's
+`.fulcrum/` only if none is found. Do not impose a folder layout.
+
 ## Evidence format
 
 Every row in `tenant-profile.md` carries five fields. A row missing any of them is not
