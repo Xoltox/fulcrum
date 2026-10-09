@@ -21,6 +21,11 @@ directory. That is the entire mechanism. There is no per-harness script here
 and there should not be one — state the goal, find the path, copy the
 directories.
 
+Fulcrum also ships three agent roles under `agents/` (`fulcrum-poller`,
+`fulcrum-mentor-driver`, `fulcrum-verifier`). Install them too - see "Agent
+roles" below. Skipping them leaves every orchestrator improvising
+heavyweight general-purpose agents for work these lean roles do.
+
 ## Invariants
 
 - **Additive only.** Never delete anything already present in the target
@@ -52,6 +57,47 @@ default branch. A tag is a revision someone reviewed and froze; the default
 branch may not be. If you were pointed at a branch, say so and suggest the
 latest tag instead before proceeding.
 
+## Agent roles
+
+`agents/roles/*.md` are the canonical, harness-neutral role specs: a tier, a
+list of tool classes, a forbidden list, and the operating prompt.
+`agents/README.md` explains the tool classes and how a role maps onto a
+harness. Install them as follows - again file copies only:
+
+- **Claude Code:** copy `agents/claude-code/*.md` into the agents directory
+  the harness reads (`~/.claude/agents/` for the user, or a project's
+  `.claude/agents/`). These files are ready to use; do not edit them in
+  place. Overwrite only files with the same names; never delete other agent
+  definitions there. If a same-named file exists that does not start its body
+  with the comment `Generated from agents/roles/`, someone hand-made it: show
+  the user the difference and ask before overwriting.
+  Running `install.sh` is the user's own choice (an agent following this file
+  uses the manual route above and does not run it): `./install.sh
+  [target-dir] [--agents-dir <dir>] [--no-agents] [--force-agents]
+  [--dry-run]`. `--agents-dir <dir>` sets where agent definitions go (default
+  `~/.claude/agents`; a missing value or one starting with `-` is rejected).
+  `--no-agents` installs skills only. `--dry-run` prints, per file, `new`,
+  `update`, `up to date` or `skip (not ours)` and changes nothing. A
+  same-named file without the `Generated from agents/roles/` marker is
+  skipped with a warning; `--force-agents` overwrites it. A destination that
+  is the same file as the source (a link made by `link-skills.ps1`) is
+  skipped. Conflicts are checked and printed before anything is written.
+- **Any other harness with agent or subagent definitions:** build one
+  definition per file in `agents/roles/`, in your harness's own format, in
+  your harness's agents location. Map `tier` through `MODEL-TIERS.local.md`
+  (set the model explicitly), map each tool class to your harness's tools and
+  grant nothing else, deny the `forbidden` entries where you can, turn off
+  loading of project instruction files, and use the role body as the system
+  prompt plus a short note naming your concrete wait mechanism. Write these
+  generated definitions only into your harness's agents location, never back
+  into this repository.
+- **A harness with no definition mechanism:** install nothing for agents.
+  Tell the user that briefs will carry the role body inline instead.
+
+**Restart.** Some harnesses load agent definitions only at session start
+(Claude Code does). Tell the user to restart the session after installing or
+updating agent definitions; until then the agent types are not found.
+
 ## The install interview
 
 Ask these before or during install. Keep it short — most users do not care
@@ -80,6 +126,10 @@ Ask in this order — question 1 changes what the later answers mean:
    consuming context, and does it work at any agent depth?** This affects
    whether nesting a poller under an expensive parent is ever worth doing —
    see `HARNESS-NOTES.md`.
+6. **What is the per-agent context ceiling, in tokens?** The user sets it; it
+   is recorded in `MODEL-TIERS.local.md` and the orchestrator checks it from
+   each completion notification (see `MODEL-TIERS.md`, template item 6). No
+   opinion: leave it unset and say so.
 
 If the user has no opinion on 2–4, use the defaults in `MODEL-TIERS.md`
 outright rather than pressing for an answer.
@@ -101,9 +151,11 @@ whether there's only an idea, and dispatches to the right skill itself.
 ## What to report back when done
 
 - The resolved skills directory path.
+- The resolved agents location, which agent definitions were added, updated
+  or skipped (and why), and whether the user was told to restart.
 - Which of the eleven directories were added, which were updated, which were
   skipped, and the reason for each skip.
-- The five interview answers and where you recorded them
+- The interview answers and where you recorded them
   (`MODEL-TIERS.local.md`'s path).
 - Whether you added the operating-mode line to the project's instruction
   file, or the user declined.

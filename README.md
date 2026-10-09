@@ -188,7 +188,11 @@ fulcrum/
     fulcrum-unattended-guardrails/
       SKILL.md
       references/                 # Halt conditions, budgeting, checkpoints, delegation rules
-  install.sh                      # Portable installer: skills/ -> target dir
+  agents/
+    README.md                     # Agent roles: why, tool classes, harness mapping
+    roles/                        # Harness-neutral role specs: poller, mentor driver, verifier
+    claude-code/                  # Claude Code adapters, installed by install.sh
+  install.sh                      # Portable installer: skills/ and Claude Code agents
   AGENTS.md                       # Entry point for harnesses without skill auto-triggering
   CONVENTIONS.md                  # Authoring contract (binding)
   MODEL-TIERS.md                  # Tier vocabulary and vendor mapping

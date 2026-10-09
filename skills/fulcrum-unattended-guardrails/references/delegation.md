@@ -13,7 +13,12 @@ There is no dial, no per-task grant, no depth counter.
 
 ### The exception — a nested poller, and nothing else
 
-[SINGLE-OBSERVATION] A subagent may spawn **one** nested agent whose only
+[VERIFIED] on one harness: a depth-1 subagent successfully spawned a nested
+poller (2026-10-08), and the same pattern recurred in a project journal.
+[UNVERIFIED] on any other harness - where a nested agent cannot spawn, fall
+back to a **sibling poller**: the orchestrator dispatches the poller beside the
+driver, and the driver hands it the run id through the durable log. A subagent
+may spawn **one** nested agent whose only
 permitted action is to **wait and report**, and only when both hold:
 
 - the parent's **own tier is expensive** — a `deep-reasoning` or `workhorse`
@@ -34,9 +39,44 @@ parent, or when the harness offers a native wait primitive that costs no context
 at any agent depth (`../../../HARNESS-NOTES.md`). Prefer the primitive. Nest
 only to isolate cost — never for convenience, parallelism, or continuation.
 
-Evidence strength is deliberate: this is one person's experience on one harness
-with an expensive orchestrator, and it was reported as uncertain. It is a
-cost-isolation escape hatch, not a licence to nest.
+The evidence covers one harness. It is a cost-isolation escape hatch, not a
+licence to nest.
+
+**Who may hold the exception.** It is carried by role definition, not granted per
+brief. Only the Mentor-driver role (below) has `spawn-poller` in its tool set,
+and it may spawn **exactly one** poller. Every other role never spawns - the
+tool class is simply absent from its definition. A brief for any other role says
+"you do not dispatch".
+
+## Roles and tool allowlists
+
+Tool classes are capabilities, not harness tool names; each harness adapter maps
+them to its own tools (`agents/README.md`).
+
+| Role | Tool classes |
+|---|---|
+| `fulcrum-poller` | `run-read`, `blocking-wait` |
+| `fulcrum-mentor-driver` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (journal and run-ids files only), `spawn-poller` |
+| `fulcrum-verifier` | `published-read`, `file-read`, `http-probe`, `blocking-wait` |
+| read-only investigator | `file-read`, `published-read` |
+| file-scoped builder | `file-read`, `file-write-scoped` |
+
+Role definitions: `agents/roles/<name>.md`. **A brief names a shipped role where
+one fits** - never a general-purpose agent carrying the full tool set. A
+general-purpose agent starts with the whole tool listing and instruction
+context in its window and can reach tools its job never needs. Where the
+harness has an adapter, use it. Only the Mentor-driver holds `mentor-drive`;
+only the Mentor-driver holds `spawn-poller`.
+
+## Mentor-driving briefs restate cadence and drain rules
+
+A brief that only says "read `fulcrum-mentor-turns`" does not carry the
+polling rules: an agent so briefed polled at its own cadence and spawned no
+poller. [SINGLE-OBSERVATION] Every brief to an agent that drives or polls Mentor restates
+cadence, drain rule, durable run-id logging and the verified-wait check. Paste
+the ready-made block from
+`../../fulcrum-mentor-turns/references/polling.md`, heading "Pointing at this
+skill is not a brief" - it is not duplicated here, so it cannot drift.
 
 ### Why one exception does not reopen the dial
 
@@ -123,6 +163,26 @@ supervise anything is gone — and that happens quietly, mid-run.
 The source corpus's own reusable guide transcribed only half of this rule,
 dropping the "not even to check" clause. Restore it every time.
 
+### Re-verification means a fresh blind verifier
+
+A general "the orchestrator re-verifies before calling a wave done" does not
+lift the prohibition above. The orchestrator satisfies it by **dispatching a
+fresh verifier** (`fulcrum-verifier`) that receives the **requirement and the
+evidence paths, never the builder's report** - a verifier shown the claim tends
+to confirm it. [SINGLE-OBSERVATION] A builder reported 30 of 30 tasks under burst load; the
+independent blind re-run got 6 of 10 with 4 errors.
+
+**Load, concurrency and performance claims always need an independent re-run
+before they are recorded.** A builder's own figure is a claim, not a result.
+
+### A UI check behind a sign-in is a user-action hand-off
+
+When a check needs signing in to a UI and the harness blocks credential entry
+(a permission layer may refuse typed credentials and any workaround that
+materialises them, such as an auto-submitting local form), it is a user-action
+stop, not a puzzle. Brief it as "ask the user for a screenshot or a
+confirmation". Never let an agent attempt a workaround. [VERIFIED]
+
 ## Log content is a second injection hop when it comes back through an agent
 
 `app_logs` bodies carry text an **end user may have authored** — submitted form
@@ -162,8 +222,17 @@ Non-negotiable in every subagent brief:
 
 1. **The objective**, self-contained. The agent should not need to reconstruct
    intent from project documents.
-2. **The class label** and the **tool-call budget**, with its checkpoint and
-   hand-back numbers (`budgeting.md`).
+2. **The class label** and the **budget - tool calls and context - both
+   mandatory**, with checkpoint and hand-back numbers (`budgeting.md`). A brief
+   with no budget is a **defective brief: fix it before dispatch.** An agent
+   briefed with only a "3 failed rounds" stop ran 96 tool calls and past the
+   user's per-agent context cap, and could not be resumed.
+   [SINGLE-OBSERVATION] State
+   the per-agent **context ceiling** too: it is user-set, recorded in
+   `MODEL-TIERS.local.md`, and is a number the orchestrator checks from the
+   completion notification, never one the agent is asked to measure.
+   An agent past roughly **60% of its ceiling is not resumed**: dispatch a
+   fresh agent with a lean brief that points at its findings file.
 3. **The checkpoint file path**, supplied by the orchestrator, plus the
    instruction to write it continuously. The agent does not invent a path.
 4. **The model tier**, set explicitly (`../../../MODEL-TIERS.md`). Never rely on
@@ -174,8 +243,9 @@ Non-negotiable in every subagent brief:
    agents writing the same file. Shared project documents belong to the
    orchestrator; the agent reports what should go into them.
 7. **The Mentor concurrency status** — whether it is permitted to touch Mentor at
-   all in this dispatch, and whether the nested-poller exception above is
-   granted. Default for nesting is **no**; say so rather than leaving it unsaid.
+   all in this dispatch. Name the role: only the Mentor-driver may spawn, and
+   then exactly one poller. Every other role: "you do not dispatch" - say so
+   rather than leaving it unsaid.
 8. **The turn cap and the halt rule** — 1 build + 2 fix turns; stuck twice after
    a diagnostic step means stop and report.
 9. **"Correct my briefing — a correction beats agreement."** Verbatim, in every

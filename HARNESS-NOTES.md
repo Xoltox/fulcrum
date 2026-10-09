@@ -51,6 +51,23 @@ cannot match to your own setup is nearly useless.
   elsewhere has a known case to compare against, not so they copy the
   workaround blind.
 
+### Claude Code CLI - the wait at subagent depth, observed 2026-10
+
+Observations from one harness across several sessions. Each is a symptom to
+compare against, not a fix to copy.
+
+- **[VERIFIED]** (Claude Code CLI, 2026-10, several sessions) At subagent depth the shell
+  `sleep` form was blocked or swallowed. Two further forms, a background shell
+  sleep and a monitor-style until-loop, returned immediately, so a poller looped
+  back-to-back with no cadence; one burned 40 turns in 75 seconds. A single
+  foreground shell call running a one-line Python `time.sleep(N)` with a
+  150000 ms call timeout did block. A poller that ran this way and a driver
+  told to self-poll this way both kept cadence.
+- How it was noticed: poll timestamps a second or two apart, and turn counts far
+  above the poll count the cadence implies. What changed: Fulcrum's rule is to
+  time one short wait before the first poll. **Verify your wait blocks**; do not
+  take this list as the answer for another harness or another harness version.
+
 ## Install observations
 
 - **[OBSERVED — Antigravity]** The harness resolved its own skills directory
@@ -69,6 +86,43 @@ cannot match to your own setup is nearly useless.
   until re-authentication. How it was noticed: the OutSystems tools were absent
   while `auth_status` could not be called. What changed: Fulcrum's pre-flight
   settles server presence (listed, enabled, connected) before checking auth.
+
+- **Claude Code CLI - depth-1 subagents can spawn a nested poller** (observed
+  2026-10-08). A depth-1 subagent spawned a cheaper-tier poller subagent
+  successfully, and the pattern recurred in a project journal. Evidence:
+  `[VERIFIED]` on this harness only. How noticed: the open question whether the
+  nested-poller exception was usable here. What changed: the exception is
+  documented as usable on this harness, with a sibling-poller fallback kept for
+  harnesses where a nested agent cannot spawn.
+- **Claude Code CLI - agent definitions load at session start** (observed
+  2026-10). Editing or adding an agent definition mid-session has no effect until
+  the session restarts; agents already running keep the old definition. A
+  definition in a parent folder's agents directory is discovered from a session
+  started in a child folder. How noticed: a corrected poller definition did not
+  change a running driver's behaviour. What changed: drivers already running
+  were told the corrected wait in their brief, and the fix is applied at the next
+  restart.
+- **Claude Code CLI - lean agent definitions are much cheaper** (measured
+  2026-10, `[SINGLE-OBSERVATION]`). A lean, tool-scoped poller definition cost
+  about 5.8k tokens for a 3-call run; a general-purpose agent doing similar work
+  started above 50k tokens, inheriting the full tool set and instruction
+  context. How noticed: the user read the transcript. What changed: roles ship as
+  scoped definitions (see Agent definitions below).
+- **Claude Code CLI - auto mode permission classifier** (observed 2026-10).
+  The classifier blocked typing a credential into a browser, and blocked an
+  auto-submitting local form written to get around that. A browser snapshot tool
+  also failed repeatedly in one session (tool version unknown, so treat as
+  observed once, not as a known bug). `[VERIFIED]` for the classifier blocks.
+  How noticed: the UI check could not complete unattended. What changed: a
+  sign-in-gated UI check is a user-action hand-off, briefed as "ask the user for
+  a screenshot or a confirmation".
+
+## Agent definitions
+
+Harness-neutral role definitions live in `agents/roles/`. Adapters for a
+harness live in `agents/<harness>/`; the Claude Code adapters ship in
+`agents/claude-code/` and are installed by `install.sh`. Overview:
+`agents/README.md`.
 
 A useful addition names: the harness, exactly what was observed, how it was
 noticed (what tipped you off that something was different from the

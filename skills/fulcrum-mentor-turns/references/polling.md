@@ -51,14 +51,17 @@ that still has `hasMore: true` `[VERIFIED]`. So:
   report exactly that, with the cursor, and stop.
 - A page lost to a rejected response is re-read by passing the previous
   `nextCursor` (or `0` for the whole run) as `cursor`.
-- Draining a long answer is expensive (~8k tokens for one) - a poller should
-  return the final answer text and the `result` object, not the event stream.
+- Draining a long answer is expensive (~8k tokens for one), so the poller does
+  not carry it back. The poller reports only terminal state, drained yes/no,
+  run id, read count, and the publish key and revision if it saw them. The
+  driver gets the answer text and the `result` object from its own direct read
+  of the run from the start (`cursor: 0`, drained to `hasMore: false`).
 
 ## The wait must actually block
 
 Waiting is a capability (canonical preference order:
 `../../../CONVENTIONS.md`, the heading beginning "Canonical facts"). A wait mechanism that returns immediately turns a poll loop into a
-back-to-back hammer on Mentor with no cadence at all; this has been seen at
+back-to-back hammer on Mentor with no cadence at all (the observed wait history is in `../../../HARNESS-NOTES.md`, heading "Claude Code CLI - the wait at subagent depth"); this has been seen at
 subagent depth more than once `[VERIFIED]`. Before the first poll in any
 agent, verify the chosen wait suspends for the requested time (time one
 short wait). If it does not, pick another mechanism; if none blocks, stop and
@@ -85,8 +88,10 @@ Mentor driver rules (restated, binding):
 - Drain: while hasMore is true, read the next page at once. The run is
   read only when hasMore is false and nextCursor is absent. Report only
   then. Never summarise a page you did not read.
-- Report: final status, final answer text, the result object, any
-  publish* events with revision and publicationKey. Not the event stream.
+- Report (poller): terminal state, drained yes/no, run id, read count, and
+  the publicationKey and revision if a publish event appeared. Not the answer
+  text, not the result object, not the event stream - the driver reads those
+  itself (cursor 0, drained).
 - Never answer a Mentor offer to publish. Publish only when briefed to.
 - Never put a secret value in a prompt.
 ```

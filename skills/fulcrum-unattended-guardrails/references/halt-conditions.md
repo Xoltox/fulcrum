@@ -70,13 +70,41 @@ Write the checkpoint, then stop and report. Do not work around any of these.
 | Turn cap exceeded on one step | 1 build + 2 fix |
 | A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
 | A previously verified behaviour now fails | Regression. Continuing builds on a corrupted state |
-| A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path. Retrying does not create a capability |
+| A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
+| **Mentor capacity stop** | An asset load still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
 | The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause — if so, fix it and disclose prominently"* |
 | Two candidate actions would both touch Mentor concurrently | Serialise, or stop and ask |
 | A step depends on an op **confirmed unavailable** with **no fallback** recorded in `tenant-profile.md` | See "Halt on an unavailable op with no fallback" below |
 | The plan for the current step does not exist in writing | Deriving a plan mid-unattended-run is the highest-risk act available |
 | **Runtime error step-change across a build step** | `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` falling inside the after window. See below |
+
+## User-action stops
+
+A user-action stop differs from a halt: nothing has gone wrong, the next step is
+simply not the agent's to take. Write the checkpoint, mark the step `PARKED`,
+and report one concrete ask. Do not retry, and do not look for a way around it.
+
+- **The user sets a secret in the Portal.** A secret value never goes in a
+  Mentor prompt, a brief, a journal or a report. The agent names the secret
+  setting, where to set it, and what to confirm back (that it is set, never its
+  value), then waits for that confirmation.
+- **A check that needs signing in to a UI**, when the harness blocks credential
+  entry (a permission layer may refuse typed credentials and any workaround that
+  materialises them, such as an auto-submitting local form). [VERIFIED] Brief it
+  as "ask the user for a screenshot or a confirmation". Never let an agent
+  attempt a workaround; the refusal is the control working, not an obstacle.
+- Re-auth, a portal-only operation and an upload with no MCP path follow the
+  same shape.
+
+## Mentor capacity stop
+
+When loading an asset is refused with the capacity text after the bounded
+retry in `mcp-surface.md` (at most 3 attempts, growing backoff, each wait
+verified to block): close the session, halt, and report **"Mentor capacity
+stop"**. It is not a model failure, an auth failure or a trap. The session is
+not stale and no work was lost; the ask to the user is to retry later. Retrying
+past the bound consumes window for no new information.
 
 ## The runtime-shaped stop
 

@@ -57,6 +57,20 @@ already in flight.
 - Write it **before** any long, risky, or opaque operation, not after.
 - No transcript, no tool output, no restatement of the spec.
 
+## Recording a stop in the checkpoint
+
+When a run ends on a stop, the checkpoint's Known gaps names which kind it was,
+so a resuming agent knows whether to wait or to investigate:
+
+- **User-action stop** - the ask, who owes it, and the step it unblocks. Covers
+  a secret the user sets in the Portal and a sign-in-gated UI check, briefed as
+  "ask the user for a screenshot or a confirmation"
+  (`halt-conditions.md`, heading "User-action stops"). Never a secret value.
+- **Mentor capacity stop** - the attempts made and the session that was closed
+  (`halt-conditions.md`, heading "Mentor capacity stop"). Resume by retrying the
+  load later with a fresh session; do not treat it as a defect.
+- **Halt** - every other hard stop, with the last verified-good revision.
+
 ## Two-part handoff structure
 
 A project-level handoff document, as distinct from an agent checkpoint, has two

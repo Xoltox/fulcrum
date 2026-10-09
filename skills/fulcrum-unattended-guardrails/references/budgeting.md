@@ -23,6 +23,19 @@ What an agent *can* count reliably is **its own tool calls** — that is a count
 of its own actions, not an introspection of hidden state. So budgets are
 expressed in tool calls.
 
+## The brief carries both budgets
+
+Every brief states a **tool-call budget** and a **per-agent context ceiling**.
+The ceiling is a number the user sets, recorded in `MODEL-TIERS.local.md`; it
+is the same figure the budget arithmetic below calls the window. A brief
+missing either is defective: fix it before dispatch. [VERIFIED] An agent briefed
+with only a failure-count stop ran 96 tool calls and went past the user's
+per-agent cap, and could not be resumed.
+
+**An agent past roughly 60% of its ceiling is not resumed.** Its context is the
+cost. Start a fresh agent with a lean brief that points at the first agent's
+findings file instead of replaying its transcript.
+
 ## Evidence base
 
 Nine measured subagents, one session, real completion-notification counts.

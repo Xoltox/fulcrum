@@ -41,6 +41,12 @@ work on the cheapest available and keep the loop bodies trivial.
    downgrade, not a free one: expect the plan to need more correction turns. It
    is still better than skipping the planning phase.
 
+The Claude Code adapters in `agents/claude-code/` bind roles to models: the
+poller role to the Anthropic `poller` tier (Haiku) and the workhorse roles to the
+`workhorse` tier (Sonnet). That binding reads this table and does not replace
+it - **this file remains the one place that maps tiers to vendor models**; when
+a row here changes, the adapters follow.
+
 Set the tier **explicitly on every dispatch**. Subagents otherwise inherit the
 session's tier, and inheritance is what makes a tier policy silently untrue.
 
@@ -124,7 +130,7 @@ At runtime it resolves to one, in this priority order, first match wins:
 ### The install interview must not edit installed files
 
 This is a hard constraint, not a style preference. The install interview
-(`INSTALL.md`) records its five answers into a separate, generated
+(`INSTALL.md`) records its answers into a separate, generated
 `MODEL-TIERS.local.md`. It must never rewrite the installed skill files or
 this file. An installer that edits installed content makes every future
 update fight the user's own edits, and lets the deployed copy silently drift
@@ -147,6 +153,9 @@ Harness: <harness name, as it identified itself>
 3. workhorse tier: <model>
 4. poller tier: <model>
 5. Native context-free wait primitive available at any depth: <yes / no>
+   (if no: record a wait form verified to block at subagent depth - time one
+   short wait; see HARNESS-NOTES.md for what has and has not blocked)
+6. Per-agent context ceiling: <tokens, set by the user>
 ```
 
 ### Degradation path

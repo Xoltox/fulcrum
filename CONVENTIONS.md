@@ -137,10 +137,25 @@ skills/<skill-name>/
 self-sufficient for the common path and must say explicitly which reference file
 to open for which situation. Do not write a 600-line SKILL.md.
 
-**Reviewed exception:** `skills/fulcrum-unattended-guardrails/SKILL.md` runs
-~238 lines. The repo owner reviewed and accepted this as a one-time exception
+**Reviewed exception:** `skills/fulcrum-unattended-guardrails/SKILL.md` ran
+~238 lines before being trimmed to about 200; the exception stands for growth. The repo owner reviewed and accepted this as a one-time exception
 specific to that file — do not "fix" it by gutting content, and do not cite it
 as licence to ignore the <200 target elsewhere.
+
+### Agent role layout
+
+```
+agents/
+  roles/<name>.md           # harness-neutral role definition
+  <harness>/<name>.md       # adapter for one harness
+```
+
+`agents/roles/` follows the same rules as skills: no harness names, no model
+names, tool classes only (`run-read`, `mentor-drive`, `published-read`,
+`blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller`, `http-probe`).
+`agents/<harness>/` adapters may use that harness's names, tools and models.
+Skills reference roles **by role name only** (`fulcrum-poller`,
+`fulcrum-mentor-driver`, `fulcrum-verifier`), never by adapter path.
 
 ### Frontmatter — portable subset only
 
@@ -224,10 +239,12 @@ for live row data is `exec_in_app` against a harness fork; that procedure is
 
 - Mutating work is **depth 1**, always: the orchestrator dispatches directly and
   no build agent spawns its own children.
-- **Exception, polling only.** A subagent may spawn one nested poller when its
-  own tier is expensive and the phase is long — otherwise the expensive parent
-  accumulates poll traffic in its context for the whole run. The nested agent
-  may do nothing but wait and report. [SINGLE-OBSERVATION]
+- **Exception, polling only.** The Mentor-driver role may spawn exactly one
+  nested poller when its own tier is expensive and the phase is long - otherwise
+  the expensive parent accumulates poll traffic in its context for the whole run.
+  The nested agent may do nothing but wait and report; every other role never
+  spawns. [VERIFIED] on one harness (2026-10-08, repeated in a project journal);
+  [UNVERIFIED] elsewhere, where a sibling poller is the fallback.
 - This exception buys nothing when the poller tier is already cheap, or when the
   harness offers a native wait primitive that costs no context at any depth.
   Prefer the primitive; nest only to isolate cost.

@@ -50,9 +50,10 @@ These hold even if no skill file is ever loaded:
   poll loops and read-only inspection to subagents; keep judgement and
   verification verdicts in the orchestrator. Mutating work is depth 1 always.
   See `skills/fulcrum-unattended-guardrails` for the rules.
-- One subagent depth level, with a single narrow exception: a subagent may
-  spawn one nested poller when its own tier is expensive and the phase is
-  long, and that poller does nothing but wait and report. No other nesting.
+- One subagent depth level, with a single narrow exception: only the
+  Mentor-driver role may spawn exactly one nested poller, when its own tier is
+  expensive and the phase is long, and that poller does nothing but wait and
+  report. No other role nests.
   See `skills/fulcrum-unattended-guardrails`.
 - The orchestrator never calls Mentor, publish, REST, or gate scripts itself
   — it dispatches.
