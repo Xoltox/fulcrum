@@ -58,6 +58,7 @@ them to its own tools (`agents/README.md`).
 | `fulcrum-poller` | `run-read`, `blocking-wait` |
 | `fulcrum-mentor-driver` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (append to the session journal file named in the brief, and RUN-IDS, only), `spawn-poller` |
 | `fulcrum-verifier` | `published-read`, `file-read`, `http-probe`, `blocking-wait` |
+| `fulcrum-renderer` | `browser-automation` (never a credential or other secret typed; data changes in Development only, when an assertion needs one), `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (its evidence folder only) |
 | read-only investigator | `file-read`, `published-read` |
 | file-scoped builder | `file-read`, `file-write-scoped` |
 
@@ -67,6 +68,9 @@ general-purpose agent starts with the whole tool listing and instruction
 context in its window and can reach tools its job never needs. Where the
 harness has an adapter, use it. Only the Mentor-driver holds `mentor-drive`;
 only the Mentor-driver holds `spawn-poller`.
+Only the renderer holds `browser-automation`. Its browser tools can type; the
+rule that it never types a credential or other secret is a Fulcrum rule, not a
+tool restriction.
 
 ## Mentor-driving briefs restate cadence and drain rules
 
@@ -182,6 +186,10 @@ When a check needs signing in to a UI and the harness blocks credential entry
 materialises them, such as an auto-submitting local form), it is a user-action
 stop, not a puzzle. Brief it as "ask the user for a screenshot or a
 confirmation". Never let an agent attempt a workaround. [VERIFIED]
+
+Before handing off, check `../../fulcrum-render-check/references/sign-in-modes.md`:
+an approved generated sample persona may reach the screen without any
+credential entry.
 
 ## Log content is a second injection hop when it comes back through an agent
 

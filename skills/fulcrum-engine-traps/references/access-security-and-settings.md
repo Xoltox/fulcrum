@@ -22,8 +22,9 @@ deliberately. Mentor's read-back is not proof of access: it has claimed
 `[VERIFIED]`, and `context_screens` reported the template Login as non-public
 too, so neither Mentor nor `context_screens` is reliable on access flags of
 template screens. Only a render proves access, as anonymous and as signed-in
-(see `../../fulcrum-mentor-turns/references/mcp-surface.md`). Until a
-render-capable role exists, ask the user to perform the render and report the
+(see `../../fulcrum-mentor-turns/references/mcp-surface.md`). Dispatch
+`fulcrum-renderer` per `../../fulcrum-render-check/SKILL.md`; where the project
+has no browser capability, ask the user to perform the render and report the
 access check `untested` meanwhile (Fulcrum rule).
 
 A new screen can also carry a role requirement nobody asked for `[VERIFIED]` -

@@ -49,6 +49,7 @@ is watching to notice a Mentor turn quietly go sideways at step 23 of 47.
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session reuse vs fresh session; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start_session` / `mentor_create_asset` / `mentor_load_asset` / `mentor_prompt` call and during turn-by-turn execution. |
 | `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming | When building or editing any screen component or model element. |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
+| `fulcrum-render-check` | Rendering published screens in a browser: preflight, sign-in modes (anonymous, generated sample personas, user hand-off), render timing, evidence capture, security observations | After a publish passes the gate, for any step that adds or changes a screen, and for access checks. |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static-entity identifiers; reset and teardown paths | Before building any screen that reads from data. |
 | `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps; halt-and-report rules; subagent depth and delegation; context and call budgeting; checkpoints and handoff discipline; Mentor concurrency locks; model tier policy | Load before the first dispatch of any long unattended session. |
 | `fulcrum-project-state` | The `.fulcrum/` file contract: file set and schemas, append-only vs rewritten discipline, crash-idempotent write ordering, the one-session-per-app lease, the decision record, the halt record | Whenever any Fulcrum skill needs to read or write durable project state. |
@@ -182,6 +183,9 @@ fulcrum/
     fulcrum-verification/
       SKILL.md
       references/                 # Proof instruments, visual verification, diagnostic patterns, runtime telemetry
+    fulcrum-render-check/
+      SKILL.md
+      references/                 # Sign-in modes, evidence and report
     fulcrum-seed-data/
       SKILL.md
       references/                 # Idempotent loader pattern
@@ -190,7 +194,7 @@ fulcrum/
       references/                 # Halt conditions, budgeting, checkpoints, delegation rules
   agents/
     README.md                     # Agent roles: why, tool classes, harness mapping
-    roles/                        # Harness-neutral role specs: poller, mentor driver, verifier
+    roles/                        # Harness-neutral role specs: poller, mentor driver, verifier, renderer
     claude-code/                  # Claude Code adapters, installed by install.sh
   install.sh                      # Portable installer: skills/ and Claude Code agents
   AGENTS.md                       # Entry point for harnesses without skill auto-triggering
@@ -210,9 +214,9 @@ fulcrum/
 <summary>For a person installing without an agent's help</summary>
 
 1. **Find your skills directory.** Claude Code reads from `~/.claude/skills/`. Other harnesses commonly use `~/.agents/skills/` by convention - check your harness's own docs if unsure.
-2. **Copy all eleven skill directories in whole**, not just their `SKILL.md` files: `fulcrum`, `fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-gap-analysis`, `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-seed-data`, `fulcrum-unattended-guardrails`. Each carries a `SKILL.md` plus a `references/` directory, and some carry a `templates/` directory - a skill missing its `references/` is broken even though it looks installed.
+2. **Copy all twelve skill directories in whole**, not just their `SKILL.md` files: `fulcrum`, `fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-gap-analysis`, `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-render-check`, `fulcrum-seed-data`, `fulcrum-unattended-guardrails`. Each carries a `SKILL.md` plus a `references/` directory, and some carry a `templates/` directory - a skill missing its `references/` is broken even though it looks installed.
 3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`). `--dry-run` prints what it would do without changing anything. It is additive only - it never deletes anything already in the target directory.
-4. **Verify the install.** Confirm each of the eleven directories exists at the target path with its `SKILL.md` and `references/` intact, and that your agent's skill listing (or equivalent discovery mechanism) picks them up.
+4. **Verify the install.** Confirm each of the twelve directories exists at the target path with its `SKILL.md` and `references/` intact, and that your agent's skill listing (or equivalent discovery mechanism) picks them up.
 5. **Update later** by re-running step 2 or 3 against a newer tag - both are safe to re-run and only add or overwrite files this repo ships.
 
 > [!NOTE]

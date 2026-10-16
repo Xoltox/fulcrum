@@ -4,11 +4,10 @@ Rung 6 of the proof ladder catches defect classes nothing cheaper can reach
 (see `defect-instrument-matrix.md`). This file is how to run that rung
 without fooling yourself.
 
-Interim (Fulcrum rule): no shipped role can run this rung, and the
-orchestrator never does browser automation. Until a render-capable role
-exists, rungs 6-7 are reported `untested` unless the user (or a
-harness-provided browser the user has enabled) performs the render. This file
-applies whenever that happens.
+Rungs 6-7 are executed by `fulcrum-renderer` (`../../fulcrum-render-check/SKILL.md`);
+the orchestrator never does browser automation. Without a browser capability
+they are `untested` unless the user renders. This file applies to every
+render, whoever runs it. (Fulcrum rule)
 
 ## The capture trap, generalised
 

@@ -129,6 +129,13 @@ harness live in `agents/<harness>/`; the Claude Code adapters ship in
   restrict which agent types it may spawn; whether the restriction is honoured
   at subagent level has not been tested. `[UNVERIFIED]` The driver body states
   the same rule in prose, so behaviour is bounded either way.
+- **Claude Code CLI - `fulcrum-renderer` is browser-agnostic** (recorded
+  2026-10-16, not yet observed). The adapter has no `tools:` line, so it
+  inherits the session's tools and whatever browser MCP the user has; it
+  denies only the mutating OutSystems tools, Edit, NotebookEdit and Agent.
+  Credential entry is not tool-blocked: the no-credential rule is prose.
+  Untested: whether a subagent inheriting a browser MCP can drive a session the
+  user signed into. `[UNVERIFIED]`
 
 A useful addition names: the harness, exactly what was observed, how it was
 noticed (what tipped you off that something was different from the

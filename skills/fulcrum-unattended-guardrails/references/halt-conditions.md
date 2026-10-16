@@ -98,6 +98,9 @@ simply not the agent's to take. Write the checkpoint, set the `TASKS.md` row to 
   materialises them, such as an auto-submitting local form). [VERIFIED] Brief it
   as "ask the user for a screenshot or a confirmation". Never let an agent
   attempt a workaround; the refusal is the control working, not an obstacle.
+  Before handing off, try an approved generated sample persona
+  (`delegation.md`, heading "A UI check behind a sign-in is a user-action
+  hand-off").
 - Re-auth, a portal-only operation and an upload with no MCP path follow the
   same shape.
 

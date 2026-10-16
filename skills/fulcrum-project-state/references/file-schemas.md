@@ -42,6 +42,7 @@ writer per shared file removes the race and makes staleness one agent's job to f
 | `HALT.md` | whoever stopped the run | Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
 | `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
 | `checkpoints/<agent-label>.md` | that agent | - |
+| `evidence/render/<task-id>/<UTC-stamp>/*` | `fulcrum-renderer`, only the folder its brief names | The orchestrator links the folder from the session journal line; nobody edits evidence after the run |
 
 A **driver** (a delegated agent running turns) writes nothing outside appended rows in
 the session journal file its brief names, its `RUN-IDS.md` lines and, if it stops the
@@ -83,6 +84,7 @@ Rewritten. Identity and settings only - no history, no task state.
 | `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
 | `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
+| `browser` | Optional. The render preflight result for this project: state (`callable` \| `unavailable` \| `unknown`), the browser tool set found (e.g. the MCP server prefix), the capabilities it covers, and the date. Per project, because the harness and its browser can differ between projects. Written per `../../fulcrum-render-check/SKILL.md`, heading "Preflight - once per project". |
 | `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` -> a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution - how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override - an empty section reads as a decision and pins nothing. |
 
 `project.md` carries no run outcome, gate verdict or halt status: those are in
@@ -454,6 +456,18 @@ these H2 sections, in this order: `## Endpoint and auth`, `## Payload contract`,
 Optional, one per run, for detail too large for a session-file line - a full prompt, a
 diff, a failure dump. The session-file line and the `RUN-IDS.md` entry are mandatory; this
 file is not. Never make it the only record of a run id.
+
+## evidence/render/<task-id>/<UTC-stamp>/
+
+Written once by `fulcrum-renderer`, never edited. `report.md` plus capture
+files; layout and the per-assertion record:
+`../../fulcrum-render-check/references/evidence-and-report.md`. `<UTC-stamp>`
+is compact UTC (`20261016T140311Z`). `report.md` is committed. Screenshots can
+contain real data, so whether they are committed is the user's choice, asked
+before the first render and recorded in `DECISIONS.md`. Until it is recorded a
+render writes no screenshot file (page text and DOM snapshot only); Fulcrum
+never adds an ignore entry or leaves files untracked on its own. Never a
+secret, token or cookie.
 
 ## checkpoints/<agent-label>.md
 

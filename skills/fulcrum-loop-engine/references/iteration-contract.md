@@ -217,8 +217,9 @@ T-014 | Bind OrderList to GetOrders | app: orders-web | Turn: build | Verify: 1,
               build turn; run id appended to RUN-IDS.md with "T-014"; Publish turn
 4 poll        90 s cadence, same run id, no lease writes -> terminal
 5 verify      rung 1 verbatim read-back -> pass; rung 3 revision query -> pass;
-              rung 6 untested (render hand-off to the user until a
-              render-capable role exists) -> unproven until the user's render returns
+              rung 6 untested (no browser capability recorded for this project, so
+              fulcrum-renderer cannot run; render hand-off to the user) -> unproven
+              until the user's render returns
 6 record      TASKS: Verdict unproven (rung 6 hand-off), no [x]; session-file outcome line;
               JOURNAL Tasks += T-014:unproven, InFlight -> -;
               DECISIONS D-009, Decider: mentor, Affects: orders-web / OrderList, GetOrders

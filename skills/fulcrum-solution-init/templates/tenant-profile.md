@@ -165,6 +165,8 @@ An unknown ceiling means every long spec risks truncation, whose failure mode is
 | Revision at init | \<value\> |
 | Can Mentor add screens to this application type? | \<observed answer\> |
 | Confusable apps on the tenant - NOT the target | \<list, or None\> |
+| Generated sample sign-in picker present (Login screen "Log in as ..." buttons, `GetSampleUserVerificationCode`) | \<yes / no / unknown - per app, from published-state reads\> |
+| Sample-persona use approved by the user | \<yes / no / not asked - DECISIONS.md entry id\> |
 | Date | \<date\> |
 
 ---
@@ -180,6 +182,7 @@ read-only probe never called - do not upgrade it to "available".
 | Op | State (callable / unavailable / unknown) | Evidence (result or exact error text) | Fallback if unavailable | Date |
 |---|---|---|---|---|
 | \<op name\> | \<...\> | \<...\> | \<see tool-availability-and-fallback.md, or "none - halt"\> | \<...\> |
+| browser-automation (delegable role) | per project - see each project's `project.md` field `browser` | - | \<rungs 6-7 `untested`; user renders\> | - |
 
 ---
 

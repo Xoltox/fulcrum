@@ -272,3 +272,10 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   and parameters against the latest `mcp-snapshots/*.md` and emits only the delta,
   so the orchestrator never loads schemas itself. Until then the preflight drift
   check is names-only (`skills/fulcrum/references/tool-preflight.md`).
+- **Design-compare skill.** Pixel or structural comparison of
+  `fulcrum-render-check` screenshots against a reference design. The render
+  skill deliberately stops at capture; this would consume its evidence folder.
+- **Probe the renderer end to end** on one generated app in Dev: confirm the
+  sample-persona flow, sign-out, and what console/network signal the browser
+  tool really returns; then promote the `[SINGLE-OBSERVATION]` / `[UNVERIFIED]`
+  tags in `fulcrum-render-check`.

@@ -25,6 +25,7 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | Decomposing source material into a plan and repo scaffold | `../fulcrum-solution-init/SKILL.md` |
 | Assessing an existing app against its requirements | `../fulcrum-gap-analysis/SKILL.md` |
 | Running the task list once resumed | `../fulcrum-loop-engine/SKILL.md` |
+| Rendering a published screen in a browser (rungs 6-7, the render obligation, access checks) | `../fulcrum-render-check/SKILL.md` |
 | A small engagement run on the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
 | **Out of family:** external systems and integration targets (an integration target or external system (another vendor's server, a workflow engine, a third-party API)) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
 | What `mode` and `posture` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |

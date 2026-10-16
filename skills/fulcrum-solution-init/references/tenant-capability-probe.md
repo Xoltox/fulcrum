@@ -168,6 +168,12 @@ Also record here the answer to the mobile-application-type question from step 2 
 `../SKILL.md`: whether Mentor can add screens to an app of the type you intend to use, as
 observed on this tenant.
 
+Also record whether the app carries the generated sample sign-in picker
+(detection: `../../fulcrum-render-check/references/sign-in-modes.md`, heading
+"Detecting it (published-state reads, after the lag)"). It is an app fact:
+re-check when the Login screen changes. Whether to use it is a user decision
+recorded in `DECISIONS.md`, never defaulted on.
+
 ## 10. Tool availability - three states, not two
 
 **A schema that loads is not a tool that dispatches.** Tool discovery and tool
@@ -194,6 +200,13 @@ the three states resulted, plus the exact error text on a failure. An
 inconclusive result (e.g. a 404 that could equally mean "no data" as "broken
 dispatch") is not confirmed-unavailable - record it as unresolved with the
 ambiguity stated, never as a broken op.
+
+`browser-automation` for a delegable role gates rungs 6-7 the same way, but
+it is a harness capability, not an ODC op, and the browser can differ between
+projects: it is probed per project by `fulcrum-renderer` on a probe-only brief
+and recorded in that project's `project.md` field `browser`
+(`../../fulcrum-render-check/SKILL.md`, heading "Preflight - once per
+project").
 
 ## 11. Portfolio, environments and template screen set
 

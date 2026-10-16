@@ -58,12 +58,12 @@ it came back clean; stop because the next rung is inapplicable.
 | 7 | Interaction proof: click, then reload or re-fetch, then confirm the state persisted. A confirmation banner alone is never accepted | Persistence of a state change | Nothing it claims - this is the strongest per-action rung |
 | 8 | Regression sweep across the app after any shared-block change | No collateral damage elsewhere | A scoped-only run is acceptable ONLY when the change touches no shared block, and that must be justified explicitly in the report |
 
-**Rungs 6 and 7 are `untested` by default (Fulcrum rule, interim).** No
-shipped role renders a page, and the orchestrator never does browser
-automation itself. Until a render-capable role exists, report rungs 6-7 as
-`untested` unless the user (or a harness-provided browser the user has
-enabled) performs the render and hands back the result. An `untested` rung is
-a stated gap, never a pass.
+**Rungs 6 and 7 are executed by `fulcrum-renderer`** (procedure:
+`../fulcrum-render-check/SKILL.md`). The orchestrator never does browser
+automation itself. Where the harness has no browser capability for a
+delegated role, or no sign-in mode can reach the screen, rungs 6-7 are
+`untested` unless the user performs the render and hands back the result.
+An `untested` rung is a stated gap, never a pass. (Fulcrum rule)
 
 **Rung 4 is asymmetric and is never a pass.** `[SCHEMA]` An `Error` entry is
 proof of a real runtime failure - treat it as a hard fail and stop. An empty
@@ -90,8 +90,8 @@ order:
 
 1. A browser automation capability native to the harness, where one exists and
    the user has enabled it for this work - usually the most reliable,
-   lowest-friction option for visual and interaction proof. No shipped role
-   holds it yet: see the interim `untested` rule under the proof ladder.
+   lowest-friction option for visual and interaction proof. Held by
+   `fulcrum-renderer`; see `../fulcrum-render-check/SKILL.md`.
 2. A headless browser driver (e.g. Playwright) otherwise, for the same
    obligations.
 3. A scripted HTTP client for API-level ground truth - required for rung 5
@@ -129,15 +129,13 @@ Before a build step that creates an app or adds screens is called done, render
 the default screen signed out and reach one authenticated screen. A clean
 publish and a clean read-back are not a render.
 
-Interim (Fulcrum rule): until a render-capable role exists, the render
-obligation is reported `untested` unless the user (or a harness-provided
-browser the user has enabled) performs it. The orchestrator does not run
-browser automation, and the shipped verifier cannot render (curl does not run
-a client-side ODC screen). Ask the user for a screenshot or a confirmation, and
-never attempt a workaround. The same hand-off applies when the harness cannot
-sign in (credential entry is blocked)
-(`../fulcrum-unattended-guardrails/references/delegation.md`, heading "A UI
-check behind a sign-in is a user-action hand-off").
+Dispatch `fulcrum-renderer` per `../fulcrum-render-check/SKILL.md`. The
+orchestrator does not run browser automation, and the verifier cannot render
+(curl does not run a client-side ODC screen). When the harness has no browser
+capability, or no sign-in mode reaches the screen, the obligation is
+`untested`: ask the user for a screenshot or a confirmation and never attempt
+a workaround (`../fulcrum-unattended-guardrails/references/delegation.md`,
+heading "A UI check behind a sign-in is a user-action hand-off"). (Fulcrum rule)
 
 ## Gates that read published state
 
@@ -148,6 +146,8 @@ false FAIL that passed on re-read).
 
 ## Where the depth lives
 
+- `../fulcrum-render-check/SKILL.md` - executing rungs 6-7 and the render
+  obligation: browser preflight, sign-in modes, evidence capture.
 - `references/defect-instrument-matrix.md` - the empirical map of which
   instrument actually caught which defect class, and what cheaper checks
   missed. Read this before designing any verification pass.

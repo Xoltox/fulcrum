@@ -2,14 +2,16 @@
 
 Fulcrum prescribes delegation: a poller absorbs every Mentor wait, a Mentor
 driver runs the turns for one app, and a blind verifier judges the result.
-This folder ships those three roles as definitions, so no orchestrator has to
+A renderer captures what a published screen actually shows. This folder ships
+those four roles as definitions, so no orchestrator has to
 improvise them and no user has to ask their harness to build them.
 
 | Role | Tier | Tool classes | Job |
 |---|---|---|---|
 | `fulcrum-poller` | `poller` | `run-read`, `blocking-wait` | Wait on one Mentor run, drain it, report in 3 lines |
 | `fulcrum-mentor-driver` | `workhorse` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller` | Drive Mentor turns for one app per a written plan step (one dispatch per step, one session inside it); ends each mutating step with its Publish turn |
-| `fulcrum-verifier` | `workhorse` | `published-read`, `file-read`, `http-probe`, `blocking-wait` | Verify the live app against stated claims, blind to how it was built. Cannot render: render and proof rungs 6-7 are reported `untested` until a render-capable role exists |
+| `fulcrum-verifier` | `workhorse` | `published-read`, `file-read`, `http-probe`, `blocking-wait` | Verify the live app against stated claims, blind to how it was built. Cannot render: judges rungs 6-7 from `fulcrum-renderer` evidence, else `untested` |
+| `fulcrum-renderer` | `workhorse` | `browser-automation`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` | Render published screens (anonymous, approved sample persona, or user session) and record evidence; never types credentials, never gives the verdict |
 
 ## Why they exist - context cost
 
@@ -47,7 +49,8 @@ the end. Edit the role first, then mirror the body into each adapter.
 | `published-read` | `context_*`, `app_info`, `app_revisions`, `app_logs`, `app_traces`, `app_health`, `env_list`, `env_app`, `publish_status`, `publish_logs`, `auth_status` |
 | `blocking-wait` | A wait that actually suspends for the requested time (verified, see `../HARNESS-NOTES.md`, "Waiting") |
 | `file-read` | Read and search files |
-| `file-write-scoped` | Write only the paths named in the brief (the driver: append to the session journal file and RUN-IDS; never the lease, the `JOURNAL.md` index or TASKS) |
+| `file-write-scoped` | Write only the paths named in the brief (the driver: append to the session journal file and RUN-IDS; the renderer: its evidence folder only; never the lease, the `JOURNAL.md` index or TASKS) |
+| `browser-automation` | Open and navigate a page, read a DOM snapshot and page text, screenshot, click, hover, press keys, type and fill forms, upload, read console/network output. Never type a password, token, API key or other secret (a Fulcrum rule, not a tool restriction); data-changing interactions only when an assertion requires it, in Development only |
 | `spawn-poller` | Start exactly one nested `fulcrum-poller` |
 | `http-probe` | Outbound HTTP to the app's own endpoints |
 
@@ -61,6 +64,9 @@ the end. Edit the role first, then mirror the body into each adapter.
    `install.sh --force-agents` would overwrite it, so redo it afterwards).
 2. **Tool classes to tools:** grant the harness's own tools for each listed
    class and nothing more. Deny the `forbidden` entries where the harness can.
+   The renderer's adapter grants no browser tool by name: it inherits the
+   session's tools, so whatever browser MCP the user has is available, and
+   denies only the mutating OutSystems tools, Edit, NotebookEdit and Agent.
 3. **Lean context:** turn off loading of project instruction files and skill
    preloading where the harness allows it.
 4. **Body:** use the role body as the agent's system prompt, plus a short
@@ -82,6 +88,6 @@ brief of the subagent you dispatch instead.
 ## Using them
 
 Orchestrator briefs name the role (`fulcrum-poller`, `fulcrum-mentor-driver`,
-`fulcrum-verifier`), not a general-purpose agent. The brief still carries the
+`fulcrum-verifier`, `fulcrum-renderer`), not a general-purpose agent. The brief still carries the
 task-specific inputs each role lists under "Inputs": ids, cadence, paths,
 budget, permissions.

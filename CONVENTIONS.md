@@ -152,10 +152,11 @@ agents/
 
 `agents/roles/` follows the same rules as skills: no harness names, no model
 names, tool classes only (`run-read`, `mentor-drive`, `published-read`,
-`blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller`, `http-probe`).
+`blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller`, `http-probe`,
+`browser-automation`).
 `agents/<harness>/` adapters may use that harness's names, tools and models.
 Skills reference roles **by role name only** (`fulcrum-poller`,
-`fulcrum-mentor-driver`, `fulcrum-verifier`), never by adapter path.
+`fulcrum-mentor-driver`, `fulcrum-verifier`, `fulcrum-renderer`), never by adapter path.
 
 ### Frontmatter - portable subset only
 
@@ -308,6 +309,7 @@ Overlap causes mis-triggering. One topic, one owner:
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session reuse vs fresh session; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
 | `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
 | `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
+| `fulcrum-render-check` | Executing renders: browser preflight, sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after publish, evidence capture, security observations a render surfaces | What counts as proof (verification); why a construct renders wrong (traps); the verdict |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
 | `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: establishing build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, repair-versus-rebuild, sequencing remediation | How to build or prove any individual fix; trap causes |
 | `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps as a ceiling; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific; the iteration mechanism itself - selecting, dispatching, polling, recording and advancing a task is `fulcrum-loop-engine`'s |
