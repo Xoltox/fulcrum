@@ -39,7 +39,7 @@ token or resume call to recover it; the `sessionId` is finished.
 
 Recovery: start a new session and load the asset again. Anything the old
 session held **unpublished is gone** - re-establish what the published
-revision contains (`context_*` after the index lag, or a read-only turn)
+revision contains (`context_*` once indexed - the lag is variable - or a read-only turn)
 before re-issuing the lost work. A session that created its asset and never
 published leaves nothing to load `[UNVERIFIED]`; the create step starts
 over. This is why a created asset is published once early (`../SKILL.md`,

@@ -27,10 +27,11 @@ work. (Fulcrum rule)
   Mentor driver ends every mutating step with its own Publish turn; the gate
   is `env_app` live `revision` equal to the publication's
   `applicationRevision` (`../fulcrum-mentor-turns/references/mcp-surface.md`,
-  heading "Publishing"). Then allow about 2 minutes: that figure is the
-  `context_*` index lag (same file, heading "Published-state inspection
-  (context_*)"); that runtime page loads lag the same way is an inference
-  `[UNVERIFIED]`, which is why the procedure also retries. A render of the
+  heading "Publishing"). A render does not read the `context_*` index, so it
+  does not wait on the index lag (variable; same file, heading
+  "Published-state inspection (context_*)"). How long a runtime page takes to
+  serve the new revision after the gate passes is a separate question and
+  `[UNVERIFIED]`, which is why the procedure retries. A render of the
   previous revision proves nothing about this one.
 - **Every step that adds or changes a screen**: rung 6 for that screen.
 - **Every step that creates an app or adds screens**: the render obligation -
@@ -123,7 +124,7 @@ rule)
 2. **Confirm live revision** with `env_app` before the first load.
 3. **Lag and retry.** A 404, the previous revision's content, or a
    generic error page right after a publish is not a FAIL. Wait (a real
-   blocking wait) 60 s and reload; at most 3 tries after the initial lag;
+   blocking wait) 60 s and reload; at most 3 tries after the first load;
    then record the observation and stop that assertion.
 4. **One page per run.** List pages first; never touch a page the renderer did
    not open (in mode c it belongs to the user). Close every page it opened.

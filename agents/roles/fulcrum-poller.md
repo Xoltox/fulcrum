@@ -38,7 +38,8 @@ read the run and wait. Nothing else.
    - While a page has `hasMore: true` or carries a `nextCursor`, read the next
      page at once, with no wait (pass the `nextCursor` as `cursor`).
    - The run is read only when a page returns `hasMore: false` and no
-     `nextCursor`. Report only after that page.
+     `nextCursor`. Report only after that page. A terminal page may omit the
+     `nextCursor` and `pollIntervalMs` keys entirely; that is normal.
    - While draining, note any `publishAccepted` event (its `revision` and
      `publicationKey`), any `publishSucceeded` revision, and any `OS-*` error
      code. A truncated event marker on a publish event may be fetched in full

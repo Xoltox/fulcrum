@@ -63,7 +63,7 @@ inferred (F-020).
 `[VERIFIED]`
 
 - When a read-back contradicts published-state inspection (`context_*`,
-  after the index lag) or wire evidence (a request log, a probe endpoint),
+  once indexed; the lag is variable) or wire evidence (a request log, a probe endpoint),
   **trust the instrument** and write the contradiction to the journal.
 - Before the first publish, read-back is the only view of the working model.
   Treat it as a lead to check after publish, not as a verdict.

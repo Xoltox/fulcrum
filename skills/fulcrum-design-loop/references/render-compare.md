@@ -9,7 +9,8 @@ image, the judge, the diff vocabulary and the triage to
 
 After the step's Publish passes the publish gate (`env_app` revision equals the
 publication's `applicationRevision`; `../../fulcrum-mentor-turns/references/mcp-surface.md`,
-heading "Publishing") and the lag wait in render-check's "When to run". A compare
+heading "Publishing"), timed per render-check's "When to run" (a render does not
+wait on the `context_*` index). A compare
 against the previous revision proves nothing about this one.
 
 ## 1. Capture
@@ -89,7 +90,7 @@ session closed at Publish.
    step is not optional").
 2. A fix turn led by the measured symptom ("the table renders one row; the capture
    shows ..."), not by a restated spec.
-3. Publish, publish gate, lag, re-render, re-judge with a fresh verifier: round r2.
+3. Publish, publish gate, re-render, re-judge with a fresh verifier: round r2.
 
 **At most 3 compare rounds per screen** (the initial judge plus one re-judge per fix
 turn; fix turns stay <= 2). A diff surviving round 3, or the fix cap, -> the row's verdict is `fail` and the guardrails
@@ -110,7 +111,10 @@ The row's `TASKS.md` `Verdict` is the orchestrator's, from this file.
 
 ## Tier C - no render instrument
 
-Per screen: `context_screens` after the index lag; a verbatim Mentor read-back per
+Per screen: `context_screens` read lag-tolerantly (empty means not yet indexed; at
+the ceiling the screen stays `unproven`; `context_graph` may show it sooner -
+`../../fulcrum-verification/SKILL.md`, heading "Gates that read published state");
+a verbatim Mentor read-back per
 region (rung 1 - belief, not proof); `context_themes` content if it exposes CSS
 (`[UNVERIFIED]`: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading
 "Published-state inspection"; probe once and record the answer in `tenant-profile.md`); seed proof

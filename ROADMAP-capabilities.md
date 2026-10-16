@@ -10,9 +10,10 @@ entries are not new features - they **contradict a rule Fulcrum teaches**,
 chiefly around `db_query` and the diagnostic-endpoint workaround.
 
 **Status 2026-10-16:** `test_setup_start` / `test_setup_status`, `exec_in_app` and
-`db_query` were absent on the 2026-10-16 listing (listed 2026-10-09). Absence may be per
+`db_query` were absent on the 2026-10-16 listing (listed 2026-10-09), and the full
+re-probe the same day confirmed it (not listed, not callable). Absence may be per
 tenant or per server version, so the entries that depend on them below are **parked,
-not dropped**: re-check on the next probe, and record per-tenant availability in
+not dropped**: re-check on a later probe, and record per-tenant availability in
 `tenant-profile.md` section 1. Until they list again, live row data stays on the
 diagnostic REST endpoint (`skills/fulcrum-verification/references/diagnostic-endpoint.md`).
 
@@ -40,7 +41,7 @@ inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 
 ## `test_setup_start` / `test_setup_status`
 
-Parked: absent on the 2026-10-16 listing; re-check on the next probe. Text below is the
+Parked: absent since 2026-10-16 (full re-probe); re-check on a later probe. Text below is the
 2026-10-09 schema reading.
 
 `[SCHEMA]` Forks a published revision (`app_key` + optional `revision`; the live
@@ -75,7 +76,7 @@ once and record in `tenant-profile.md` before any skill depends on it.
 
 ## `exec_in_app` - the diagnostic-endpoint replacement
 
-Parked: absent on the 2026-10-16 listing; re-check on the next probe. Text below is the
+Parked: absent since 2026-10-16 (full re-probe); re-check on a later probe. Text below is the
 2026-10-09 schema reading; the diagnostic endpoint remains the live-data instrument.
 
 `[SCHEMA]` Invokes a Server Action at `/__ase/invoke/<module>/<action>` with
@@ -155,7 +156,9 @@ first** - while false, an empty `report` is not "no impacts". The verdict is
 `report.status` (`NoIssuesFound`/`WarningsFound`/`ErrorsFound`); read
 `report.total` and `report.truncated`, not the capped `impactedAssets` length.
 `build_list` gives a revision's `buildKey` once a `Release` build is `Finished`;
-`deploy_start` promotes it; `deploy_rollback` reverts a deployed asset.
+`deploy_start` promotes it; `deploy_rollback` reverts a deployed asset. `env_app`'s
+`buildKey` is the Debug build, not the promotable one `[SINGLE-OBSERVATION]`
+(`skills/fulcrum-mentor-turns/references/mcp-surface.md#publishing`).
 
 **A real safe-promotion story and a partial undo** - Fulcrum ends at a
 dev-environment publish with no promotion or rollback concept at all. **But it
@@ -189,12 +192,15 @@ session start - useful to `fulcrum-solution-init`, which today ingests source ma
 entirely into agent context. Figma/screenshot ingestion stays the agent's own
 image-inspection job (`fulcrum-design-loop`'s capturer for one design and one app).
 
-**Attachment experiment - deferred to the design loop's live evaluation.** `.md` is
-an allowed extension, so a region's anatomy file could ride as an attachment instead
-of inline prompt text, possibly raising per-turn structure past the prompt ceiling.
-Untested: one throwaway turn in the live evaluation (Development only, throwaway app)
-decides it; no tenant call before then. Until it is observed, region turns carry
-their subtree inline (`fulcrum-design-loop`).
+**Attachment experiment - done at the schema and call level 2026-10-16; attaching
+still untested.** `.md` is an allowed extension, so a region's anatomy file could ride
+as an attachment instead of inline prompt text, possibly raising per-turn structure
+past the prompt ceiling. The full re-probe obtained an upload slot for a `.md` file and
+saw the extension and size limits enforced server-side `[SINGLE-OBSERVATION]`
+(`skills/fulcrum-mentor-turns/references/mcp-surface.md#tool-families`). Still untested:
+uploading to the slot and referencing it from a prompt - one throwaway turn in the
+design loop's live evaluation (Development only, throwaway app) decides it. Until it is
+observed, region turns carry their subtree inline (`fulcrum-design-loop`).
 
 ## `context_graph` vs the rest of `context_*`
 
@@ -211,6 +217,11 @@ the same caller may not both fit** - the likeliest source of `server_busy` is
 your own parallel call. That directly constrains fan-out: `context_graph` is
 one-at-a-time, never spread across subagents. `oml_work_gate_misconfigured` is
 permanent - report, do not retry.
+
+Since 2026-10-16 it pages (`cursor`) and reads a stored graph; it showed a publish
+well before `context_entities` / `context_screens` indexed it `[SINGLE-OBSERVATION]`,
+so it is the preferred structure check inside the index lag
+(`skills/fulcrum-mentor-turns/references/mcp-surface.md#published-state-inspection-context_`).
 
 ## `extlib_*`
 
@@ -287,6 +298,20 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   the live evaluation on a throwaway app, including the attachment experiment
   above; until it runs, the loop's render-compare and capture are `[UNVERIFIED]`
   end to end.
+- **Full MCP re-probe - done 2026-10-16** (snapshot
+  `skills/fulcrum-mentor-turns/references/mcp-snapshots/2026-10-16.md`; rows in
+  `mcp-surface.md`). Not tested on it, open as follow-ups: `portfolioKey` omission;
+  one asset per session; closing a session before the first publish; reload-by-prompt
+  discarding unpublished changes; the capacity throttle; a second prompt while one
+  runs; `mentor_cancel_prompt`; idle session garbage collection; a working-state
+  `mentor_get_run` page (pacing and cursor fields while working); `succeeded` with
+  `hasMore: true`; an `unknown` publish outcome; `Workflow` and library invisibility;
+  publishing while a previous publish is non-terminal; owned-only and template
+  access-flag rows, settings and REST structures, and `context_themes` CSS (nothing
+  was indexed); how long the `context_*` index takes for a new app's first publish
+  (more than 25 minutes, end not seen) and `context_graph`'s own lag; the error texts
+  `Portfolio ID is required.`, `asset_type_not_listable_by_env_app` and
+  `invalid_env_key`; uploading to an attachment slot and attaching it to a prompt.
 - **Probe the renderer end to end** on one generated app in Dev: confirm the
   sample-persona flow, sign-out, and what console/network signal the browser
   tool really returns; then promote the `[SINGLE-OBSERVATION]` / `[UNVERIFIED]`

@@ -132,8 +132,11 @@ Run **exactly** the rungs named in the row's `Verify` column, from
 because the publish was clean; not a different set because a cheaper one came
 back green.
 
-- A check that reads published state waits out the index lag, re-reads, then
-  decides; a FAIL inside the lag window is not a FAIL. A build step that
+- A check that reads published state is lag-tolerant
+  (`../../fulcrum-verification/SKILL.md`, heading "Gates that read published
+  state"): publish confirmed by the `env_app` gate first, empty means not yet
+  indexed, re-read up to the brief's ceiling, `untested` at the ceiling; a
+  FAIL inside the lag window is not a FAIL. A build step that
   created an app or added screens is not done until the render obligation is
   met (`../../fulcrum-verification/SKILL.md`, heading "Render obligation");
   a sign-in the harness cannot perform is a user-action hand-off.

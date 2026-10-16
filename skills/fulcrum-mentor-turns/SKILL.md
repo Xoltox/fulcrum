@@ -205,7 +205,13 @@ heading "Publishing".
   Neither is a reason to re-publish.
 - Never trust Mentor's prose about a publish - confirm the revision, then
   prove the change per `../fulcrum-verification/SKILL.md`; `context_*`
-  lags a publish by about 2 minutes.
+  lags a publish by a variable time (about 2 minutes to more than 25
+  observed), so gates reading it are lag-tolerant
+  (`references/mcp-surface.md`, heading "Published-state inspection
+  (context_*)").
+- A promotion with `deploy_start` needs the `Release` build key from
+  `build_list`, not `env_app`'s `buildKey` (the Debug build):
+  `references/mcp-surface.md`, heading "Publishing".
 - Publishes serialize; freeze them before a demo; Production needs explicit
   user confirmation (`references/granularity.md`, "Publish budgeting").
 

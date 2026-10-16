@@ -51,7 +51,7 @@ Which instrument can see which state. Facts about the tools live in
 | State | Instrument | Trust |
 |---|---|---|
 | Pre-publish working model | Mentor read-back only. No published-state view exists for it. | Weak: belief, not model. `[VERIFIED]` (FULCRUM-FEEDBACK F-020, and this skill's earlier finding that Mentor read-back and arithmetic over live data are untrustworthy.) Plan the proof for after publish. |
-| Published model | `context_*`, only after publish and after the index lag; re-read once before calling an absence real. | Good for owned elements; see blind spots below. |
+| Published model | `context_*`, only after a publish confirmed by the `env_app` gate, read lag-tolerantly (the lag is variable; empty means not yet indexed; at the ceiling the check is `untested`); `context_graph` showed a publish sooner `[SINGLE-OBSERVATION]`. Gate rule: `../SKILL.md`, heading "Gates that read published state". | Good for owned elements; see blind spots below. |
 | Settings; consumed REST structures and their JSON names | No published-state read path `[SINGLE-OBSERVATION]`. Proof is behavioural or wire-level: the target's own log (grep the request id or field names after one real call; log paths from the project's `.fulcrum/external/<system>.md`, section `## Log locations`), or a probe endpoint that echoes the request. | The wire is the only proof. |
 | Screen access on template screens | Render only: anonymous request, then signed-in request. Published-state flags and Mentor read-back have disagreed with each other. `[VERIFIED]` | The render. |
 | Rendered output of a newly created app or new screens | Render obligation in `../SKILL.md`, heading "Render obligation". | The render. |

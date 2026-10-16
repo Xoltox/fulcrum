@@ -50,8 +50,12 @@ Automation, or a Timer:
 model, so an unpublished edit is invisible. Details and the index lag:
 `../../fulcrum-mentor-turns/references/mcp-surface.md#published-state-inspection-context_`.
 
-- Inventory only after publish and after the lag; re-read once before filing
-  an absence.
+- Inventory only after a publish confirmed by the `env_app` gate, and only
+  once it is indexed: the lag is variable (about 2 minutes to more than 25
+  observed). An empty read is "not yet indexed", never an absence; re-read up
+  to a set ceiling, and at the ceiling file the row unresolved, not absent.
+  `context_graph` has shown a publish before the index did
+  `[SINGLE-OBSERVATION]`; use it to confirm structure while waiting.
 - Owned elements only: inherited or referenced entities do not appear.
   `[SINGLE-OBSERVATION]`
 - Settings and consumed REST structures (and their JSON names) have no

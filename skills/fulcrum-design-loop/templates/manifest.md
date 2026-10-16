@@ -51,7 +51,6 @@ verify rungs 1 and 3 only.
 - **Commit design source / render screenshots:** \<yes|no\> / \<yes|no\> - \<D-NNN\>
 - **Assets:** \<Studio upload | placeholders | empty\> - \<D-NNN\>
 - **Form factor:** \<desktop | phone width | n/a (source unambiguous)\> - \<D-NNN or -\>
-- **MCP re-probe:** \<re-probe first | risk accepted | n/a (none owed)\> - \<D-NNN or -\>
 
 ## Decisions
 

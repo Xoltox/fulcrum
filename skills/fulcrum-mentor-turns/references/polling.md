@@ -29,8 +29,10 @@ window is, and it is the one resource no later economy restores.
 
 ## The server's pacing hint is overridden on purpose
 
-The run response carries `pollIntervalMs` (about 1 s while working, 0 at the
-end) `[SINGLE-OBSERVATION]`. That is the server saying how often it *can* be
+The run response carries `pollIntervalMs` (about 1 s while working)
+`[VERIFIED]`; at the end it read 0 once and was absent once, because terminal
+pages omit both `pollIntervalMs` and `nextCursor` `[SINGLE-OBSERVATION]`
+(`mcp-surface.md`, heading "Reading a run"). That is the server saying how often it *can* be
 asked, not how often it is worth asking. Fulcrum deliberately waits longer:
 the cadence above governs, and `pollIntervalMs` never shortens a wait. There
 is no `pollAfterMs` field; text naming one is stale.
@@ -44,7 +46,9 @@ that still has `hasMore: true` `[VERIFIED]`. So:
   is the gap between "the run is still working" reads, never between pages of
   an already-finished run.
 - A run is read only when a page returns `hasMore: false` and no
-  `nextCursor`. **A poller reports only after that page.**
+  `nextCursor`. **A poller reports only after that page.** A terminal page
+  with neither `nextCursor` nor `pollIntervalMs` keys is normal, not an
+  error; `hasMore: false` is what ends the drain.
 - **Never paraphrase or summarise unread pages.** A poller that stopped on the
   first terminal page and described the tail it never read has produced a
   fabricated report `[SINGLE-OBSERVATION]`. If a page could not be read,
@@ -89,7 +93,8 @@ Mentor driver rules (restated, binding):
   immediately, stop and report.
 - Drain: while hasMore is true, read the next page at once. The run is
   read only when hasMore is false and nextCursor is absent. Report only
-  then. Never summarise a page you did not read.
+  then. Never summarise a page you did not read. Terminal pages may lack
+  the nextCursor and pollIntervalMs keys entirely; that is normal.
 - Report (poller): terminal state, drained yes/no, run id, read count, and
   the publicationKey and revision if a publish event appeared. Not the answer
   text, not the result object, not the event stream - the driver reads those

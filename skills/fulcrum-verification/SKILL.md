@@ -111,8 +111,10 @@ order:
 
 - **Before publish** there is no published-state view; Mentor read-back is the
   only instrument and it is belief, not model. Plan the proof for after publish.
-- **After publish**, published-state inspection is valid only after the index
-  lag; re-read once before calling an absence real
+- **After publish**, published-state inspection is valid only once the
+  publish is indexed, and the index lag is variable (about 2 minutes to more
+  than 25 observed). Confirm the publish with the `env_app` gate first; an
+  empty result after that is "not yet indexed", never absence
   (`../fulcrum-mentor-turns/references/mcp-surface.md#published-state-inspection-context_`).
 - **Settings and consumed REST structures** have no published-state read path.
   Proof is wire-level or behavioural: the target's own log after one real call,
@@ -145,9 +147,23 @@ heading "A UI check behind a sign-in is a user-action hand-off"). (Fulcrum rule)
 ## Gates that read published state
 
 Any liveness or existence gate that reads published state must tolerate the
-index lag: wait the lag, re-read, then decide. A FAIL observed inside the lag
-window is not a FAIL. `[SINGLE-OBSERVATION]` (a fresh-shell gate reported a
-false FAIL that passed on re-read).
+index lag, which is variable (about 2 minutes on 2026-10-09; more than 25
+minutes for a new app's first publish on 2026-10-16, both
+`[SINGLE-OBSERVATION]`). The gate:
+
+1. Confirms the publish first with the `env_app` gate (live `revision` equals
+   `applicationRevision`), which does not wait on the index.
+2. Treats an empty `context_*` result after that as "not yet indexed", never
+   as absence.
+3. Re-reads with a blocking wait up to a ceiling the brief sets.
+4. Prefers `context_graph` for structure checks where it covers the element
+   (it showed a publish the index did not yet, `[SINGLE-OBSERVATION]`).
+5. At the ceiling reports `untested` / `unproven`, never `fail`.
+
+A FAIL observed inside the lag window is not a FAIL. `[SINGLE-OBSERVATION]`
+(a fresh-shell gate reported a false FAIL that passed on re-read). Rule and
+evidence: `../fulcrum-mentor-turns/references/mcp-surface.md`, heading
+"Published-state inspection (context_*)".
 
 ## Where the depth lives
 

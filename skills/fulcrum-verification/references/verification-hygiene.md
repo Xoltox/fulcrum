@@ -83,7 +83,10 @@ contract file, and only then treat a missing log as meaningful.
 
 ## Gates that read published state
 
-A gate that reads `context_*` must wait out the index lag, re-read, and only
-then decide; a FAIL inside the lag window is not a FAIL. When Mentor read-back
+A gate that reads `context_*` must be lag-tolerant: confirm the publish with
+the `env_app` gate first, treat an empty result as "not yet indexed", re-read
+up to the brief's ceiling, and at the ceiling report `untested`, never `fail`
+(the lag is variable; `../SKILL.md`, heading "Gates that read published
+state"). A FAIL inside the lag window is not a FAIL. When Mentor read-back
 contradicts an independent instrument, trust the instrument and journal the
 contradiction. See `../SKILL.md`, heading "Pick the instrument by model state".

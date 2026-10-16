@@ -46,9 +46,6 @@ still asked - nothing is defaulted. Never one question per turn.
    phone-width layout in a Reactive Web app? (Mobile type refused Mentor screens once
    `[SINGLE-OBSERVATION]`.)" Source of the caveat:
    `../../fulcrum-solution-init/SKILL.md`, step 2.
-8. **MCP re-probe** - only while `mcp-surface.md` says "Re-probe owed since": "(a)
-   re-probe on a throwaway app first; (b) accept the risk for this run, recorded.
-   Recommended: (a)."
 
 ### Dependencies
 
@@ -63,7 +60,6 @@ still asked - nothing is defaulted. Never one question per turn.
 | Q4 (c) | Tier C: every screen `unproven`; the report leads with render-only classes |
 | Q5 | `manifest.md`, Policy line **Commit design source / render screenshots**; render briefs say whether screenshots may be written |
 | Q6 (a) | A `manual` upload row on P1.03 |
-| Q8 (a) | No mutating step until the re-probe snapshot exists |
 
 ### Expert pre-answer form
 
@@ -71,7 +67,7 @@ still asked - nothing is defaulted. Never one question per turn.
 design-loop: create=<mentor|shell:<app key>> access=<all-signin|public:<S..>|roles:<role>=<S..>;...>
   bar=<structural|visual> render=<browser|user|skip> personas=<yes|no|n/a>
   commit-source=<yes|no> commit-screens=<yes|no> assets=<studio|placeholder|empty>
-  form=<desktop|phone|n/a> reprobe=<first|accept|n/a> go=<preapproved|ask>
+  form=<desktop|phone|n/a> go=<preapproved|ask>
 ```
 
 Parse it, show what was read in one line, and ask only for what is missing or
@@ -81,7 +77,7 @@ unparseable.
 
 One `DECISIONS.md` record per answer, `Decider: user`, `Affects` naming the concrete
 artifacts (the app, the screens by `SID` and name, `design/source/`). Each D-id goes on
-its `manifest.md` Policy line (Q1-Q8; Q7 and Q8 `-` when not asked) and all of them in
+its `manifest.md` Policy line (Q1-Q7; Q7 `-` when not asked) and all of them in
 the **Decisions** section. Block choices, data model, KPI sources, chart types, token
 values and turn decomposition are agent decisions (`Decider: agent`), recorded once
 the gate passes.

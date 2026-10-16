@@ -44,4 +44,6 @@ A long answer costs thousands of tokens to drain; ask for short answers.
 
 Publishes serialize, so budget wall clock for them. A mid-flight publish is a live
 outage; freeze publishing before a demo. Production needs explicit user
-confirmation.
+confirmation. A promotion (`deploy_start`) takes the `Release` build key from
+`build_list`, not `env_app`'s `buildKey`, which is the Debug build
+(`mcp-surface.md`, heading "Publishing").

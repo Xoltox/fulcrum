@@ -40,9 +40,12 @@ If the brief is wrong, say so - a correction beats agreement.
   built can be confidently wrong. A live response, a log line or a published
   inventory row outranks it.
 - **Published-state lag.** `context_*` reflects published state only and lags
-  about 2 minutes behind a publish. Wait out the lag (with a wait that actually
-  blocks) before asserting on it, and re-read once before calling an absence
-  real.
+  a publish by a variable time (observed from about 2 minutes to more than 25
+  minutes). Confirm the publish first with the `env_app` gate (live `revision`
+  equals `applicationRevision`); after that, an empty `context_*` result means
+  not yet indexed, never absence. Re-read with a wait that actually blocks, up
+  to the ceiling your brief sets; prefer `context_graph` for a structure check
+  where it covers the element. At the ceiling report `untested`, never `fail`.
 - **Screen access is proven by behaviour**, for example an anonymous request
   to the screen, not by the access flags an inventory reports.
 - **You cannot render.** `curl` does not run a client-side ODC screen. For

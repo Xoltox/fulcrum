@@ -34,8 +34,9 @@ the same way. What counts and what does not:
 says where it sits in the loop.
 
 **What the diagnostic reads back.** Model state is read by the instrument that
-can see it: published-state inspection when the model is published (after the
-index lag; re-read before calling an absence real), Mentor read-back only as
+can see it: published-state inspection when the model is published (once
+indexed - the lag is variable, so an empty read is "not yet indexed", not an
+absence), Mentor read-back only as
 belief, and wire evidence (the target's own log, from
 `.fulcrum/external/<system>.md` `## Log locations`, or a probe endpoint) for
 settings and consumed REST structures, which have no published-state view. If

@@ -73,10 +73,12 @@ regardless.
 
 ## Retries after a publish
 
-- Initial wait: about 2 minutes after the publish. That figure is the
-  `context_*` index lag (`../../fulcrum-mentor-turns/references/mcp-surface.md`,
-  heading "Published-state inspection (context_*)"); applying it to runtime
-  page loads is an inference `[UNVERIFIED]`, which the retries below cover.
+- Initial wait: none from the `context_*` index. A render does not read it,
+  so its lag (variable; `../../fulcrum-mentor-turns/references/mcp-surface.md`,
+  heading "Published-state inspection (context_*)") does not apply. How long a
+  runtime page takes to serve the new revision after the publish gate passes
+  is separate and `[UNVERIFIED]`; a brief may set an initial wait, and the
+  retries below cover it.
 - Then up to 3 loads, 60 s apart, each wait one that actually blocks.
 - Still a 404, old content or error page: record it with every try and stop
   that assertion. The orchestrator decides whether it is lag, a failed

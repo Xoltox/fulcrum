@@ -91,7 +91,9 @@ If the brief is wrong, say so - a correction beats agreement.
   one) plus at most 2 fix turns. This is a ceiling.
 - Before every fix turn, run a diagnostic read-back. Before the first publish,
   read back by asking Mentor (answer-back); published-state reads (`context_*`)
-  show published state only and lag about 2 minutes after a publish.
+  show published state only and lag a publish by a variable time (about 2
+  minutes to more than 25 observed); an empty result after a confirmed
+  publish means not yet indexed, not absent.
 - **Stuck twice** on the same defect after a diagnostic step: stop and report.
   Do not try a third approach.
 - Budget: the tool-call budget is in the brief. At about 0.65 of it, bring the

@@ -37,12 +37,7 @@ Run these before the procedure below. Tool facts live in
    run the re-probe in
    `../../fulcrum-mentor-turns/references/mcp-surface.md#re-probing-the-surface` before
    trusting skill text that names a tool or parameter. (An executable drift script is
-   a roadmap follow-up.) **Then read the "Re-probe owed since" line** at the top of
-   `mcp-surface.md`. Names matching the latest snapshot do not clear it: that
-   snapshot is a names-only listing taken after drift was found. While the line
-   stands, the check fails for mutating work: run the re-probe first, or get the
-   user's explicit acceptance of the risk and record it in `DECISIONS.md`
-   before any mutating dispatch. Read-only work may proceed.
+   a roadmap follow-up.)
 
 ## The procedure
 

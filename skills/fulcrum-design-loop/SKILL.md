@@ -81,8 +81,8 @@ Entered from the router (batch A: mode; "design loop or full path"), or from
 `fulcrum-solution-init`. Entry from `fulcrum-solution-init` is at Intake, with Q1 (app
 creation) and Q7 (form factor, if applicable) pre-answered there, not re-asked. Of the
 intake steps below, these still run: step 1 (copy into `source/`), step 2 for every
-batch B question still unanswered (bar, access, instrument, personas, evidence, assets,
-re-probe), in one batch before capture - never defaulted; step 3 (`manifest.md` and
+batch B question still unanswered (bar, access, instrument, personas, evidence,
+assets), in one batch before capture - never defaulted; step 3 (`manifest.md` and
 the per-app `design` entry); step 4's browser preflight and official-skill detection.
 Step ids come from the solution plan; P1.04 Data and P1.05 Seed are omitted when that
 plan already has the entity and seed steps. Paths below then sit under
@@ -154,7 +154,7 @@ variant line), `TASKS.md`, `JOURNAL.md`, `RUN-IDS.md`, then ask batch C.
 | P1.01 Shell | Create or load the user's shell (per batch B); access on template screens; default screen; first Publish | 1,3,6 | A created asset exists only in its session until the first publish |
 | P1.02 Theme | `:root` overrides; `theme.css` groups, one turn each | 1,3,6 | Identical-shape groups may batch |
 | P1.03 Chrome | N empty screens with Layout and access; Menu links; title; user info; logo per batch B; icon probe if flagged | 1,3,6 | Navigation before content |
-| P1.04 Data | Entities, static entities (explicit Ids), KPI metric entity | 1,3 | Verify after the index lag |
+| P1.04 Data | Entities, static entities (explicit Ids), KPI metric entity | 1,3 | Verify after the publish gate, lag-tolerant: `context_graph` first; empty `context_*` = not yet indexed; ceiling -> `untested` |
 | P1.05 Seed | Loaders from `data.md` per `../fulcrum-seed-data/SKILL.md` | its "Verifying a seed" | Own step; expect 3+ turns |
 | P1.06+ Screen | One screen per step: skeleton, then regions | 1,3,4,6 (+7 for create/edit) | Below |
 
@@ -172,7 +172,8 @@ contents: `references/design-spec-format.md`, "Step decomposition". (Fulcrum rul
 ## Render-compare and fix
 
 When `project.md` has `design`, rung 6 on a screen row runs
-`references/render-compare.md` after the publish gate and the lag wait:
+`references/render-compare.md` after the publish gate (a render does not wait on the
+`context_*` index):
 
 1. **Capture** - `fulcrum-renderer` at the manifest viewport(s) (tier A); the user's
    screenshot via a parked `manual` row (tier B); tier C has no capture and every
