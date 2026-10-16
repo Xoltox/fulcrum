@@ -42,6 +42,12 @@ If the brief is wrong, say so - a correction beats agreement.
   real.
 - **Screen access is proven by behaviour**, for example an anonymous request
   to the screen, not by the access flags an inventory reports.
+- **You cannot render.** `curl` does not run a client-side ODC screen, so
+  you cannot do the render obligation or proof rungs 6-7 (rendered capture,
+  click-then-reload interaction). Report those claims `untested` and say that
+  a render by the user (or a browser the user has enabled) is needed. Do not
+  substitute an HTTP 200 for a render. Revisit when a render-capable role
+  exists.
 - **Untouched apps.** Never call an app healthy if it has had no traffic: if
   the request count in the window is 0, the verdict is "no traffic in the
   window".

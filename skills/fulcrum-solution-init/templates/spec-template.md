@@ -1,6 +1,6 @@
 # Step spec template
 
-Copy per step to `specs/step-<NN>-<slug>.md`. Replace every `<…>`. Delete no section - an
+Copy per step to `specs/step-<NN>-<slug>.md`. Replace every `<...>`. Delete no section - an
 empty section is itself information, so write "None" rather than removing it.
 
 A good spec reads as an **executable test plan**, not a design brief. Reference corpus:
@@ -35,7 +35,7 @@ Anything genuinely ambiguous in the source that this step touches goes here. An 
 left unresolved becomes an improvisation, and an improvisation becomes a fix turn.
 
 - \<Ambiguity\> -> **Decided:** \<decision\>. \<one-clause reason\>
-- \<…\>
+- \<...\>
 
 **Do not re-litigate these.** If a resolution turns out to be wrong, halt and report
 rather than substituting a different decision mid-step.
@@ -48,7 +48,7 @@ Read the current state and confirm each before making any change. **If any check
 stop and report. Do not attempt a fix and do not proceed.**
 
 1. \<Precondition, stated as something observable\> - expected: \<observation\>
-2. \<…\>
+2. \<...\>
 
 Rationale: a step that starts from an unexpected state produces damage that is more
 expensive to unwind than the step was to run.
@@ -98,13 +98,13 @@ tree that reads ambiguously.\>
 
 ### \<Next element\>
 
-\<…\>
+\<...\>
 
 ---
 
-## Turn \<n+1\> - \<…\>
+## Turn \<n+1\> - \<...\>
 
-\<…\>
+\<...\>
 
 ---
 
@@ -115,7 +115,7 @@ Explicit. Not aspirations deferred, but things this step must **not** do:
 - \<Non-goal\>
 - Cosmetic parity beyond what the acceptance checklist asserts. A cosmetic gap is never
   worth a capped turn.
-- \<…\>
+- \<...\>
 
 ---
 
@@ -130,7 +130,7 @@ Those are unfalsifiable, so they always pass.
 
 1. \<Assertion\> - verified by: \<screenshot at \<viewport\> showing \<what\> / the value
    \<x\> in \<where\> / a count of \<n\> \<of what\>\>
-2. \<…\>
+2. \<...\>
 
 Each item names its instrument. Which instrument catches which defect class:
 `../../fulcrum-verification/SKILL.md`.

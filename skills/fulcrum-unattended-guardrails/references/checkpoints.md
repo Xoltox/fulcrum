@@ -98,7 +98,7 @@ Brief: orchestrator message; spec summary is inlined there - do NOT re-read the 
 
 ## Handles (written on issue, never only in context)
 - Mentor session id: <id>
-- current Mentor run id: <id>   (poll the summary form, with a cursor)
+- current Mentor run id: <id>   (skip `reasoning` events; drain with `cursor`)
 - app revision before changes: 41
 
 ## Landed

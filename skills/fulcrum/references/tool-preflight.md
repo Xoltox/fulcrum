@@ -28,11 +28,21 @@ Run these before the procedure below. Tool facts live in
    an auth event, not a tool fault: see
    `../../fulcrum-mentor-turns/references/recovery.md`, heading "1. Transport-level
    auth expires mid-turn".
-3. **Surface drift check.** At session start compare the live tool names and parameter
-   names against the latest `../../fulcrum-mentor-turns/references/mcp-snapshots/*.md`. On any difference, stop and
+3. **Surface drift check.** At session start compare the live tool **names** only
+   (the tool list, no schemas loaded) against the latest
+   `../../fulcrum-mentor-turns/references/mcp-snapshots/*.md`. Do not load parameter
+   schemas into the orchestrator context for this. Diff parameters only when a name
+   changed or a tool call fails schema validation, and delegate that diff to a
+   read-only investigator that returns the delta. On any difference, stop and
    run the re-probe in
    `../../fulcrum-mentor-turns/references/mcp-surface.md#re-probing-the-surface` before
-   trusting skill text that names a tool or parameter.
+   trusting skill text that names a tool or parameter. (An executable drift script is
+   a roadmap follow-up.) **Then read the "Re-probe owed since" line** at the top of
+   `mcp-surface.md`. Names matching the latest snapshot do not clear it: that
+   snapshot is a names-only listing taken after drift was found. While the line
+   stands, the check fails for mutating work: run the re-probe first, or get the
+   user's explicit acceptance of the risk and record it in `DECISIONS.md`
+   before any mutating dispatch. Read-only work may proceed.
 
 ## The procedure
 

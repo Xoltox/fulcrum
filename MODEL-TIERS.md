@@ -47,6 +47,12 @@ poller role to the Anthropic `poller` tier (Haiku) and the workhorse roles to th
 it - **this file remains the one place that maps tiers to vendor models**; when
 a row here changes, the adapters follow.
 
+The Claude Code adapters hardcode `model:` (`haiku` for the poller, `sonnet`
+for the other two). A `MODEL-TIERS.local.md` override reaches a role only if
+you edit that adapter's `model:` line in the installed copy. That one edit is
+allowed; `install.sh --force-agents` would overwrite it, so redo it after
+forcing.
+
 Set the tier **explicitly on every dispatch**. Subagents otherwise inherit the
 session's tier, and inheritance is what makes a tier policy silently untrue.
 

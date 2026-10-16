@@ -8,8 +8,8 @@ improvise them and no user has to ask their harness to build them.
 | Role | Tier | Tool classes | Job |
 |---|---|---|---|
 | `fulcrum-poller` | `poller` | `run-read`, `blocking-wait` | Wait on one Mentor run, drain it, report in 3 lines |
-| `fulcrum-mentor-driver` | `workhorse` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller` | Drive Mentor turns for one app per a written plan step; publish only at the planned step |
-| `fulcrum-verifier` | `workhorse` | `published-read`, `file-read`, `http-probe`, `blocking-wait` | Verify the live app against stated claims, blind to how it was built |
+| `fulcrum-mentor-driver` | `workhorse` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller` | Drive Mentor turns for one app per a written plan step (one dispatch per step, one session inside it); ends each mutating step with its Publish turn |
+| `fulcrum-verifier` | `workhorse` | `published-read`, `file-read`, `http-probe`, `blocking-wait` | Verify the live app against stated claims, blind to how it was built. Cannot render: render and proof rungs 6-7 are reported `untested` until a render-capable role exists |
 
 ## Why they exist - context cost
 
@@ -47,7 +47,7 @@ the end. Edit the role first, then mirror the body into each adapter.
 | `published-read` | `context_*`, `app_info`, `app_revisions`, `app_logs`, `app_traces`, `app_health`, `env_list`, `env_app`, `publish_status`, `publish_logs`, `auth_status` |
 | `blocking-wait` | A wait that actually suspends for the requested time (verified, see `../HARNESS-NOTES.md`, "Waiting") |
 | `file-read` | Read and search files |
-| `file-write-scoped` | Write only the paths named in the brief |
+| `file-write-scoped` | Write only the paths named in the brief (the driver: append to the session journal file and RUN-IDS; never the lease, the `JOURNAL.md` index or TASKS) |
 | `spawn-poller` | Start exactly one nested `fulcrum-poller` |
 | `http-probe` | Outbound HTTP to the app's own endpoints |
 
@@ -55,7 +55,10 @@ the end. Edit the role first, then mirror the body into each adapter.
 
 1. **Tier to model:** resolve the role's `tier` through `MODEL-TIERS.local.md`
    (then the defaults in `../MODEL-TIERS.md`). Set it explicitly on the
-   definition; never let it inherit the session's model.
+   definition; never let it inherit the session's model. The shipped Claude
+   Code adapters hardcode `model:` defaults; to apply a local override, edit
+   that adapter's `model:` line in the installed copy (the one allowed edit;
+   `install.sh --force-agents` would overwrite it, so redo it afterwards).
 2. **Tool classes to tools:** grant the harness's own tools for each listed
    class and nothing more. Deny the `forbidden` entries where the harness can.
 3. **Lean context:** turn off loading of project instruction files and skill

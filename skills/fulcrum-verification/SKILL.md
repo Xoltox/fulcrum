@@ -2,7 +2,7 @@
 name: fulcrum-verification
 description: Proves that a change to an ODC app actually landed and actually works, rather than trusting that the platform said so. Owns proof obligations, which instrument catches which defect class, visual capture and comparison, the diagnostic REST endpoint pattern for live data, and what the platform's own success signals do and do not mean. Use when asked to verify a change landed, "did the publish work", "check the screen renders correctly", "prove the data is right", "regression check my ODC app", "did anything error at runtime", "check the app's runtime logs", or before marking any build step done.
 version: "1.0.0"
-requires: ODC MCP surface for model read-back and revision queries (context_*, app_revisions) and for read-only runtime telemetry (app_logs, app_traces, app_health); a browser automation capability for visual and interaction proof (a browser MCP tool where the harness has one, a headless browser driver such as Playwright otherwise); a scripted HTTP client for API-level ground truth; ability to stand up a temporary diagnostic REST endpoint, since `db_query` has no live model-layer path to row data in v1, on any tenant.
+requires: ODC MCP surface for model read-back and revision queries (context_*, app_revisions) and for read-only runtime telemetry (app_logs, app_traces, app_health); a browser automation capability for visual and interaction proof (a browser MCP tool where the harness has one, a headless browser driver such as Playwright otherwise); a scripted HTTP client for API-level ground truth; ability to stand up a temporary diagnostic REST endpoint, since there is no model-layer path to live row data on any tenant (`db_query` and `exec_in_app` absent on the 2026-10-16 listing; see mentor-turns references/mcp-surface.md).
 ---
 
 # fulcrum-verification
@@ -58,6 +58,13 @@ it came back clean; stop because the next rung is inapplicable.
 | 7 | Interaction proof: click, then reload or re-fetch, then confirm the state persisted. A confirmation banner alone is never accepted | Persistence of a state change | Nothing it claims - this is the strongest per-action rung |
 | 8 | Regression sweep across the app after any shared-block change | No collateral damage elsewhere | A scoped-only run is acceptable ONLY when the change touches no shared block, and that must be justified explicitly in the report |
 
+**Rungs 6 and 7 are `untested` by default (Fulcrum rule, interim).** No
+shipped role renders a page, and the orchestrator never does browser
+automation itself. Until a render-capable role exists, report rungs 6-7 as
+`untested` unless the user (or a harness-provided browser the user has
+enabled) performs the render and hands back the result. An `untested` rung is
+a stated gap, never a pass.
+
 **Rung 4 is asymmetric and is never a pass.** `[SCHEMA]` An `Error` entry is
 proof of a real runtime failure - treat it as a hard fail and stop. An empty
 result is the absence of evidence, not evidence of correctness: a silent
@@ -81,9 +88,10 @@ count. Treat any paraphrased read-back as unverified.
 State the proof obligation first, then pick an instrument in this preference
 order:
 
-1. A browser automation capability native to the harness, where one exists - 
-   usually the most reliable, lowest-friction option for visual and
-   interaction proof.
+1. A browser automation capability native to the harness, where one exists and
+   the user has enabled it for this work - usually the most reliable,
+   lowest-friction option for visual and interaction proof. No shipped role
+   holds it yet: see the interim `untested` rule under the proof ladder.
 2. A headless browser driver (e.g. Playwright) otherwise, for the same
    obligations.
 3. A scripted HTTP client for API-level ground truth - required for rung 5
@@ -119,9 +127,15 @@ preference order above.
 
 Before a build step that creates an app or adds screens is called done, render
 the default screen signed out and reach one authenticated screen. A clean
-publish and a clean read-back are not a render. If the harness cannot sign in
-(credential entry is blocked), this is a user-action hand-off: ask the user for
-a screenshot or a confirmation, and never attempt a workaround
+publish and a clean read-back are not a render.
+
+Interim (Fulcrum rule): until a render-capable role exists, the render
+obligation is reported `untested` unless the user (or a harness-provided
+browser the user has enabled) performs it. The orchestrator does not run
+browser automation, and the shipped verifier cannot render (curl does not run
+a client-side ODC screen). Ask the user for a screenshot or a confirmation, and
+never attempt a workaround. The same hand-off applies when the harness cannot
+sign in (credential entry is blocked)
 (`../fulcrum-unattended-guardrails/references/delegation.md`, heading "A UI
 check behind a sign-in is a user-action hand-off").
 

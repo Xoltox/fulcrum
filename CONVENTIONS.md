@@ -31,8 +31,8 @@ scripted agent loop. Therefore:
   (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`,
   `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`,
   `env_app`, `app_revisions`, `env_list`, `context_*`). Publishing is a
-  `mentor_prompt` "Publish" turn; do not name `mentor_publish` (deprecated),
-  `app_create`, `publish_start`, `mentor_start` or `mentor_cancel` (absent from the
+  `mentor_prompt` "Publish" turn; do not name `mentor_publish` (deprecated; absent on the
+  2026-10-16 listing), `app_create`, `publish_start`, `mentor_start` or `mentor_cancel` (absent from the
   live surface) as instruments. These are the ODC surface itself, not
   a harness feature. Write them bare - no `mcp__outsystems__` prefix, which is
   Claude-Code-specific wiring.
@@ -214,17 +214,17 @@ whoever issued them. That cost, not wall clock, is what the cadence optimises.
   Never carry that rate into an undelegated loop.
 - The server's pacing field is `pollIntervalMs`; it is a hint that Fulcrum overrides upward. Drain rule: a run is not read until a page returns `hasMore: false` with no `nextCursor` (`skills/fulcrum-mentor-turns/references/mcp-surface.md#reading-a-run`).
 
-**`db_query` returns no rows - universal, not tenant-varying.** `[SCHEMA]` It is
-not a model-layer SQL path. It runs only against a test harness stood up by
-`test_setup_start`, requires that call's `test_app_url` + `shared_secret`, and
-accepts only SQL templates declared upfront in its `query_templates`. Its own
-schema states that no template, `SELECT` included, returns rows in v1 - every
-template comes back with rowcount 0. So an empty result is a documented v1
-platform limitation on every tenant, not tenant variance: there is no
-model-layer path to live row data anywhere. Do not probe it, do not carry a
-`db_query` row in `tenant-profile.md`, and do not re-derive this. The instrument
-for live row data is `exec_in_app` against a harness fork; that procedure is
-`skills/fulcrum-verification/`'s, not this file's.
+**No model-layer path to live row data.** `db_query`, `exec_in_app` and
+`test_setup_start` / `test_setup_status` were absent on the 2026-10-16 listing
+(listed on 2026-10-09; absence may be per tenant or per server version,
+re-check on the next probe). While absent, do not plan on them. Even when
+`db_query` listed, its own schema said no template returns rows in v1
+(`[SCHEMA]`, 2026-10-09), so it was never a row-data instrument. Live row
+data comes from a temporary diagnostic REST endpoint probed over HTTP, read
+with `app_logs` / `app_traces` and published structure from `context_*`;
+Mentor answer-back is belief only. The procedure is
+`skills/fulcrum-verification/references/diagnostic-endpoint.md`; tool
+availability is in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
 
 **Model tiering - phase-based, not flat:**
 

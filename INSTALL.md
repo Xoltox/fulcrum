@@ -67,17 +67,33 @@ harness. Install them as follows - again file copies only:
 - **Claude Code:** copy `agents/claude-code/*.md` into the agents directory
   the harness reads (`~/.claude/agents/` for the user, or a project's
   `.claude/agents/`). These files are ready to use; do not edit them in
-  place. Overwrite only files with the same names; never delete other agent
+  place, with one allowed exception: to apply a `MODEL-TIERS.local.md`
+  override to a role, edit that adapter's `model:` line in the installed copy
+  (the adapters hardcode `haiku` for the poller and `sonnet` for the other
+  two). `install.sh --force-agents` would overwrite that edit, so redo it
+  afterwards. Overwrite only files with the same names; never delete other agent
   definitions there. If a same-named file exists that does not start its body
   with the comment `Generated from agents/roles/`, someone hand-made it: show
   the user the difference and ask before overwriting.
+  Skills are copied the same careful way by `install.sh`: a file already
+  installed that differs from the source is skipped and listed unless
+  `--force` is given, and `--dry-run` lists each skill file as `new`,
+  `overwrite (--force ...)` or `skip: differs (...)`, with a summary count of
+  files already up to date. `install.sh` keeps no manifest, so it cannot tell
+  a file you edited from one left by an older Fulcrum version: both are
+  reported as differing. **Upgrading an existing install over files that
+  changed upstream therefore needs `--force`**, run after reviewing the
+  `--dry-run` list for files you edited yourself. A target that is a link
+  (for example a junction made by `link-skills.ps1`) is skipped with a
+  message.
   Running `install.sh` is the user's own choice (an agent following this file
   uses the manual route above and does not run it): `./install.sh
   [target-dir] [--agents-dir <dir>] [--no-agents] [--force-agents]
-  [--dry-run]`. `--agents-dir <dir>` sets where agent definitions go (default
+  [--force] [--dry-run]`. `--agents-dir <dir>` sets where agent definitions go (default
   `~/.claude/agents`; a missing value or one starting with `-` is rejected).
-  `--no-agents` installs skills only. `--dry-run` prints, per file, `new`,
-  `update`, `up to date` or `skip (not ours)` and changes nothing. A
+  `--no-agents` installs skills only. `--dry-run` changes nothing; for agent
+  definitions it prints, per file, `new`, `update`, `up to date` or
+  `skip (not ours)`. A
   same-named file without the `Generated from agents/roles/` marker is
   skipped with a warning; `--force-agents` overwrites it. A destination that
   is the same file as the source (a link made by `link-skills.ps1`) is

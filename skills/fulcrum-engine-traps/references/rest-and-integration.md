@@ -126,7 +126,8 @@ exposed endpoint's raw response, or an in-app probe. See
 ## 7. No model-layer path to live row data `[SCHEMA]`
 
 **Failure mode.** There is no model-layer SQL path to live row values on any
-tenant (the canonical fact is in `CONVENTIONS.md`, "db_query returns no rows").
+tenant (the canonical fact is in `CONVENTIONS.md`, "No model-layer path to live row
+data").
 Mentor only has model/schema visibility, yet it will still *answer* a
 question about live data - plausibly, confidently, with no error - and if
 pressed can fabricate a value instead of refusing.

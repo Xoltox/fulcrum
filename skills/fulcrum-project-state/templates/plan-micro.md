@@ -42,10 +42,16 @@ the system starts.\>
 
 | Step | What it produces | Turn kinds | Proof (acceptance items) |
 |---|---|---|---|
-| P1.01 | \<e.g. the Claim entity and its static Status values\> | build | 1 |
-| P1.02 | \<...\> | build, verify | 1, 2 |
+| P1.01 | \<e.g. create the app; the Claim entity and its static Status values\> | build, publish | 1 |
+| P1.02 | \<...\> | build, publish, verify | 1, 2 |
 
-At most about five rows. Each step must pass the right-sizing test in
+At most about five rows. Every mutating step ends with its Publish turn (publish
+points are per step). Step 1 always ends with `publish`: a created asset exists only
+inside its Mentor session until its first publish, and "no revision yet" on the
+pre-publish revision read means first publish, not a blocker
+(`../../fulcrum-mentor-turns/SKILL.md`, heading "7. Publish sequencing").
+
+Each step must pass the right-sizing test in
 `../../fulcrum-solution-init/references/decomposition-and-sizing.md`, heading
 "The right-sizing test".
 

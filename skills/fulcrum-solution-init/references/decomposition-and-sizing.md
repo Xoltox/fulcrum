@@ -29,7 +29,7 @@ and justify each additional one in the plan.
 
 For each behaviour, classify it and write the classification down:
 
-| It is a… | When |
+| It is a... | When |
 |---|---|
 | Server action | Deterministic, synchronous, inside one request |
 | Workflow | Multi-step, long-running, or spanning a human wait or an external event |

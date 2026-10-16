@@ -39,7 +39,7 @@ Session index. Detail for any row: `journal/<Session>.md`.
 
 ## Values
 
-`State`: `open` · `clean` · `halted` · `aborted`
+`State`: `open`, `clean`, `halted`, `aborted`
 `Tasks`: `<task-id>:<pass|fail|unproven|->`, comma-separated, written as each task
 reaches a terminal state - **not** at session close, so a crashed attempt still shows.
 `-` means "not applicable or not yet known". Never leave a cell empty.

@@ -19,8 +19,12 @@ template can change, so read it, do not assume. No default screen was
 explicitly configured in the probe, so the **default screen** must be set
 deliberately. Mentor's read-back is not proof of access: it has claimed
 "all screens are anonymous" while published state showed Login non-public
-`[VERIFIED]` - where read-back and an independent instrument disagree, trust
-the instrument and record it (the read-back row in `../SKILL.md`).
+`[VERIFIED]`, and `context_screens` reported the template Login as non-public
+too, so neither Mentor nor `context_screens` is reliable on access flags of
+template screens. Only a render proves access, as anonymous and as signed-in
+(see `../../fulcrum-mentor-turns/references/mcp-surface.md`). Until a
+render-capable role exists, ask the user to perform the render and report the
+access check `untested` meanwhile (Fulcrum rule).
 
 A new screen can also carry a role requirement nobody asked for `[VERIFIED]` -
 the default-children instinct extends to screen-level *properties*, so check

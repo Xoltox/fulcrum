@@ -55,7 +55,9 @@ that still has `hasMore: true` `[VERIFIED]`. So:
   not carry it back. The poller reports only terminal state, drained yes/no,
   run id, read count, and the publish key and revision if it saw them. The
   driver gets the answer text and the `result` object from its own direct read
-  of the run from the start (`cursor: 0`, drained to `hasMore: false`).
+  of the run from the start (`cursor: 0`, drained to `hasMore: false`). This pays
+  for one long answer twice (once in the poller, once in the driver); accepted
+  for a clean driver context.
 
 ## The wait must actually block
 

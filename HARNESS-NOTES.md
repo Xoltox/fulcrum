@@ -124,6 +124,12 @@ harness live in `agents/<harness>/`; the Claude Code adapters ship in
 `agents/claude-code/` and are installed by `install.sh`. Overview:
 `agents/README.md`.
 
+- **Claude Code CLI - `Agent(fulcrum-poller)` in a subagent's `tools:`**
+  (recorded 2026-10-16, not yet observed). The driver adapter lists `Agent(fulcrum-poller)` to
+  restrict which agent types it may spawn; whether the restriction is honoured
+  at subagent level has not been tested. `[UNVERIFIED]` The driver body states
+  the same rule in prose, so behaviour is bounded either way.
+
 A useful addition names: the harness, exactly what was observed, how it was
 noticed (what tipped you off that something was different from the
 documented property), and what you changed as a result. An entry missing

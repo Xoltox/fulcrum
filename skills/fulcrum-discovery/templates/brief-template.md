@@ -25,7 +25,7 @@ questions** as `undecided`, not in a requirement table. See
 
 **Derived by:** discovery interview, \<ISO-8601 UTC\>
 **Source material:** \<what existed before the interview, by path - or "none; interview only"\>
-**Batches run:** \<n\> of 3 · **Questions asked:** \<n\> of 15
+**Batches run:** \<n\> of 3 - **Questions asked:** \<n\> of 15
 **Stopped because:** \<readiness set satisfied / ceiling reached / early-stop signal, named\>
 
 ## 1. What this is, and who uses it
@@ -33,8 +33,8 @@ questions** as `undecided`, not in a requirement table. See
 \<Two or three sentences. The persona and its scope, stated explicitly. A wrong persona
 mis-shapes every entity, so state it even when it feels obvious.\>
 
-- **Primary persona:** \<…\> · Confidence: \<…\>
-- **Scope boundary - what this is NOT for:** \<…\> · Confidence: \<…\>
+- **Primary persona:** \<...\> - Confidence: \<...\>
+- **Scope boundary - what this is NOT for:** \<...\> - Confidence: \<...\>
 
 ## 2. Roles and personas
 
@@ -43,20 +43,20 @@ document, or an interviewer assumption the user accepted.
 
 | Role | What they do | Evidence | Confidence |
 |---|---|---|---|
-| \<Manager\> | \<…\> | \<"user stated, batch 1 Q2"\> | held |
+| \<Manager\> | \<...\> | \<"user stated, batch 1 Q2"\> | held |
 
 \<If only one role appeared, say so explicitly and say you are assuming single-role -
 do not let the absence read as a decision.\>
 
 **Prohibitions** - what a role must NOT be able to do. Users rarely volunteer these:
 
-- \<Role\> must not \<observable action\> on \<named screen or entity\> · Confidence: \<…\>
+- \<Role\> must not \<observable action\> on \<named screen or entity\> - Confidence: \<...\>
 
 ## 3. Core entities
 
 | Entity | Key attributes | Relationships | Fixed value sets | Confidence |
 |---|---|---|---|---|
-| `Order` | \<…\> | one `Customer`, many `Shipment` | `OrderStatus`: \<enumerate\> | held |
+| `Order` | \<...\> | one `Customer`, many `Shipment` | `OrderStatus`: \<enumerate\> | held |
 
 - **Ambiguities noted:** \<anything the user was unsure of, and what it affects\>
 - **Two references to the same entity:** \<e.g. `Order` names both a requester and an
@@ -74,7 +74,7 @@ Grouped by area. One line per screen, each with its access rule and its mode.
 | Screen | Purpose | Roles - read | Roles - write | Mode | Empty state | Confidence |
 |---|---|---|---|---|---|---|
 | `OrderList` | \<...\> | Manager, Agent | - | read-only | \<what shows with no rows\> | held |
-| `ShipmentDetail` | \<…\> | Manager | Manager | transactional | \<…\> | elicited |
+| `ShipmentDetail` | \<...\> | Manager | Manager | transactional | \<...\> | elicited |
 
 **Mode** is `read-only` or `transactional`, per screen, always stated. A missing mode is
 read as static by the build agent
@@ -88,8 +88,8 @@ only, no source artifact"\>
 
 | Decision | Value | Confidence |
 |---|---|---|
-| Web or mobile | \<…\> | \<…\> |
-| Phone-width or desktop layout | \<…\> | \<…\> |
+| Web or mobile | \<...\> | \<...\> |
+| Phone-width or desktop layout | \<...\> | \<...\> |
 
 **Consequence, stated:** reversing this means re-creating the app and rebuilding every
 screen. Confirmed against `../../fulcrum-solution-init/SKILL.md`, step 2 - which owns
@@ -99,7 +99,7 @@ the final decision; this section records what the user wants, not the verdict.
 
 | System | Direction | Data | Timing | System of record? | Confidence |
 |---|---|---|---|---|---|
-| \<…\> | in / out / both | \<…\> | while the user waits / scheduled | yes / no | \<…\> |
+| \<...\> | in / out / both | \<...\> | while the user waits / scheduled | yes / no | \<...\> |
 
 ## 7. Data needed to demonstrate this
 
@@ -108,7 +108,7 @@ reads it (`../../fulcrum-seed-data/SKILL.md`).
 
 | Entity | Rows | Spread / states to cover | Real values available? | Confidence |
 |---|---|---|---|---|
-| `Order` | \<n\> | \<…\> | invented | elicited |
+| `Order` | \<n\> | \<...\> | invented | elicited |
 
 ## 8. Acceptance - one observable statement per screen
 
@@ -128,7 +128,7 @@ phases or steps - sizing is `fulcrum-solution-init`'s.\>
 
 | Asset | Exists? | Source | Who uploads | Confidence |
 |---|---|---|---|---|
-| Logo | \<…\> | \<path or "must be produced"\> | \<named person\> | \<…\> |
+| Logo | \<...\> | \<path or "must be produced"\> | \<named person\> | \<...\> |
 
 Uploads are a human handoff - there is no asset-upload path over the ODC MCP surface
 (`../../fulcrum-solution-init/references/source-triage.md`, heading "Assets are a human
@@ -139,7 +139,7 @@ handoff - plan for it"). An asset with no named owner is an unowned blocker.
 Written as corrections, next to the claim each overturns - never as quiet replacements.
 An unrecorded correction gets re-litigated by a later session.
 
-- **Was assumed:** \<…\> -> **Corrected:** \<…\> \<one-line reason\>
+- **Was assumed:** \<...\> -> **Corrected:** \<...\> \<one-line reason\>
 
 ## 12. Open questions
 
@@ -147,7 +147,7 @@ An unrecorded correction gets re-litigated by a later session.
 
 | # | Question | Who decides | What it blocks |
 |---|---|---|---|
-| 1 | \<…\> | \<…\> | \<readiness item or step\> |
+| 1 | \<...\> | \<...\> | \<readiness item or step\> |
 
 ### Non-blocking - resolve at the step that needs them
 
@@ -161,7 +161,7 @@ the app - `../../fulcrum-gap-analysis/references/finding-classes.md`.
 
 Interview decisions live in `.fulcrum/DECISIONS.md`, not here. List the record IDs only:
 
-- `D-001`, `D-002`, \<…\>
+- `D-001`, `D-002`, \<...\>
 
 ---
 

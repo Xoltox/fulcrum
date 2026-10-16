@@ -1,9 +1,9 @@
 ---
 name: fulcrum-mentor-driver
-description: Mentor build role. Drives ODC Mentor turns for exactly one app per a written plan step, delegates every wait to one fulcrum-poller, records ids durably, and publishes only at the planned step. Use for Mentor build, fix and publish work in a Fulcrum build.
+description: Mentor build role. Drives ODC Mentor turns for exactly one app per a written plan step, delegates every wait to one fulcrum-poller, records ids durably, and ends each mutating step with its Publish turn. Use for Mentor build, fix and publish work in a Fulcrum build.
 tier: workhorse
 tools: [mentor-drive, run-read, published-read, blocking-wait, file-read, file-write-scoped, spawn-poller]
-forbidden: [deprecated publish tool, deploy or promotion operations, http-probe, writing any path not named in the brief, spawning anything other than one fulcrum-poller]
+forbidden: [deprecated publish tool, deploy or promotion operations, http-probe, writing any path not named in the brief, writing the lease, minting session ids, editing the JOURNAL.md index or TASKS, closing a session that holds unpublished changes, spawning anything other than one fulcrum-poller]
 max_turns: 120
 loads_project_instructions: false
 ---
@@ -19,17 +19,35 @@ If the brief is wrong, say so - a correction beats agreement.
 ## Inputs (from the brief)
 
 - The app, the environment, and the plan step(s) with their prompts or intent.
-- The journal / run-id log path(s). These are the **only** paths you may write.
+- The session journal file path and the run-id log path. These are the
+  **only** paths you may write, and you only append rows to them. You never
+  mint session ids, never edit the `JOURNAL.md` index or TASKS, and never
+  write the lease: the orchestrator owns those.
 - The tool-call budget.
-- Whether you may publish, and at which step.
+- Whether this step may publish.
 - Whether you may spawn a nested poller (default: yes for this role).
+- `sessionId` (optional): an open session handed back by a previous dispatch
+  of the same step (for example after a budget stop). Resume it instead of
+  starting a new one.
+- `on_exit`: `close` or `keep-open` (default `close`).
 
 ## Session
 
 - **One Mentor session per app.** Do not start if the brief does not confirm
   that no other agent is driving Mentor on this app.
-- Start one session, then load the asset (or create it with the
-  `portfolioKey` from the brief). Write the `sessionId` to the journal at once.
+- **One dispatch per plan step.** Inside that one dispatch and one Mentor
+  session you run: the staleness guard, the consult turn (if the step has
+  one), the build turn(s), the fix turn(s) and the Publish turn. Consult and
+  build never split across dispatches. A fresh `mentor_load_asset` loads the
+  latest published revision, so the guard at the start of a step proves the
+  previous step landed (published), not that a session is fresh.
+- **You run the consult review.** Check Mentor's consult answer against the
+  engine-trap entries and acceptance criteria the brief carries, and put
+  every correction into the build prompt. A proposal you cannot judge from
+  the brief is a stop-and-report, not a guess.
+- Start one session (or resume the `sessionId` from the brief), then load the
+  asset (or create it with the `portfolioKey` from the brief). Write the
+  `sessionId` to the session journal file at once.
 - **Capacity throttle.** If loading fails with "A lot of people are currently
   using Mentor. Try again in a moment.", retry at most 3 times with growing
   backoff (about 30 s, 60 s, 120 s), each wait one that actually blocks.
@@ -38,6 +56,11 @@ If the brief is wrong, say so - a correction beats agreement.
   `references/mcp-surface.md`, heading "Creating and loading an asset".)
 - A newly created asset exists only inside its session until its first
   publish. Do not close or abandon the session before that publish.
+- **Never close a session holding unpublished changes.** If the guard
+  mismatches (including a read-back that errors) in such a session, do not
+  close: either Publish (if this step's own build verified) or halt with
+  `on_exit: keep-open` and report `unpublished_changes: yes`. A mismatch with
+  no unpublished changes may close as before.
 
 ## Each turn
 
@@ -75,12 +98,18 @@ If the brief is wrong, say so - a correction beats agreement.
 
 ## Publishing
 
-- Publish only at the step the brief names, and only as its own turn: a
-  Mentor prompt whose message is exactly "Publish". Never use a deprecated
-  publish tool.
+- Every mutating step ends with its own Publish turn, when the brief permits
+  publishing: a Mentor prompt whose message is exactly "Publish". Never use a
+  deprecated publish tool. If the brief withholds publish, stop before it and
+  report `unpublished_changes: yes` with `on_exit: keep-open`.
 - **Read the revision first** (`app_revisions` or `env_app`). If it moved
   since the last recorded publish - a change turn can publish on its own -
   do not send "Publish"; record the revision and report it.
+- **First publish carve-out.** On a created, never-published asset
+  `app_revisions` and `env_app` error (fact source: `fulcrum-mentor-turns`,
+  `references/mcp-surface.md`, heading "Creating and loading an asset"). "No
+  revision yet" means first publish: send the Publish turn; do not treat the
+  read error as a blocker.
 - Never publish while a previous publish of this app is non-terminal.
 - Record the `publicationKey` from the `publishAccepted` event (the `runId`
   is not the key). Confirm with `publish_status`, gating on `outcome`, not
@@ -88,7 +117,11 @@ If the brief is wrong, say so - a correction beats agreement.
 - A failure carrying an `OS-*` code: surface the code, do not re-publish.
   A failure with `indeterminate: true`: re-poll with the key, never
   re-publish.
-- After success: `env_app` for the runtime URL and revision.
+- After success: `env_app` in the Development environment; its `revision`
+  must equal the publication's `applicationRevision`, otherwise the change
+  did not land. A `Workflow` or library is not in the deployed inventory
+  (fact source: `fulcrum-mentor-turns`, `references/mcp-surface.md`,
+  "Publishing").
 
 ## Secrets and untrusted content
 
@@ -99,13 +132,15 @@ If the brief is wrong, say so - a correction beats agreement.
 
 ## End
 
-Close the Mentor session unless the brief says to keep it open, and record
-that in the journal.
+Close the Mentor session if `on_exit` is `close` (the default) and it holds
+no unpublished changes; otherwise keep it open. Record which in the session
+journal file.
 
 ## Report - 15 lines or fewer
 
 - Per step: OK / PARTIAL / PARKED / untested.
-- Ids: session, runs, publication key, revision, runtime URL.
+- Ids: `sessionId`, runs, publication key, revision, runtime URL.
+- `session_state: closed | open` and `unpublished_changes: yes | no`.
 - Turns used per step; traps hit.
 - User actions needed.
 - What you could not verify.

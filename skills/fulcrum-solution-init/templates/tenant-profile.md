@@ -29,20 +29,32 @@ answer.
 Pass requires the summary to **name real content from the actual app**. A read-only prompt
 correctly returns `attempted_change` false, so that field is not the signal.
 
-On FAIL: **halt.** Re-gate at the start of every session regardless of this row.
+On FAIL: **halt.** This row does not replace the per-step guard: gate 5 of the loop (the staleness guard at the start of every Mentor dispatch) re-checks liveness on each step regardless of this row.
 
 ---
 
-## 1. Live row data - not a tenant fact
+## 1. Live row data and optional MCP tools
 
-No row here. There is no model-layer path to live row data on any tenant, so nothing
-varies and nothing is probed. `[SCHEMA]` Do not re-add a `db_query` row.
+There is no model-layer path to live row data on any tenant, so there is no row-data probe
+and no `db_query` row. What does vary, by tenant or server version, is which optional
+tools list. Record what this tenant's tool listing shows (names only, read-only); never
+assume from another tenant or an older snapshot.
+
+| Tool | Listed on this tenant | Observed (listing source) | Date |
+|---|---|---|---|
+| `db_query` | \<yes/no\> | \<...\> | \<...\> |
+| `exec_in_app` | | | |
+| `test_setup_start` / `test_setup_status` | | | |
+| `mentor_publish` | | | |
+
+All four were absent on the 2026-10-16 listing (listed 2026-10-09); current record:
+`../../fulcrum-mentor-turns/references/mcp-surface.md`. A tool that lists is still not an
+instrument until that file records what a call does.
 
 Consequence to carry into the plan: row verification needs a separate diagnostic
-instrument - historically a temporary diagnostic endpoint at roughly two Mentor turns and
-two revisions per seed step. Budget accordingly. The instrument for live row data is
-`exec_in_app` against a harness fork `[SCHEMA]`; the procedure lives in
-`fulcrum-verification`, not here.
+instrument - a temporary diagnostic REST endpoint probed over HTTP, at roughly two Mentor
+turns and two revisions per seed step. Budget accordingly. The procedure lives in
+`fulcrum-verification` (`references/diagnostic-endpoint.md`), not here.
 
 ---
 
@@ -52,7 +64,7 @@ Probed by **attempting to reference the block**, never by asking whether it exis
 
 | Block | Exists | Input properties observed (verbatim) | Probe / Observed | Date |
 |---|---|---|---|---|
-| Modal | \<yes/no/unresolved\> | \<…\> | \<…\> | \<…\> |
+| Modal | \<yes/no/unresolved\> | \<...\> | \<...\> | \<...\> |
 | BottomSheet | | | | |
 | ActionSheet | | | | |
 | Sidebar | | | | |
@@ -71,7 +83,7 @@ A Mentor denial with no attempted reference is **unresolved**, not "no".
 | Font family | \<name\> |
 | Name casing convention | \<e.g. PascalCase / kebab-case\> |
 | Confirmed working example | \<exact string that rendered\> |
-| Probe / Observed | \<…\> |
+| Probe / Observed | \<...\> |
 | Date | \<date\> |
 
 A wrongly cased icon name renders blank or falls back with **no error**. Specs must quote
@@ -85,7 +97,7 @@ names in the confirmed convention.
 |---|---|
 | Flags available | \<list, verbatim\> |
 | Flags absent that a spec assumed | \<list, or None\> |
-| Probe / Observed | \<…\> |
+| Probe / Observed | \<...\> |
 | Date | \<date\> |
 
 An absent flag means re-specify, not retry.
@@ -122,7 +134,7 @@ budget line, notably for seeding and diagnostic row reads.
 | Field | Value |
 |---|---|
 | Identifier | \<value\> |
-| Probe / Observed | \<…\> |
+| Probe / Observed | \<...\> |
 | Date | \<date\> |
 
 Without this, this profile cannot be compared against a later one and a regression cannot
@@ -136,7 +148,7 @@ be attributed.
 |---|---|
 | Ceiling | \<value\> |
 | How established | \<documented / reported / bounded escalation on a throwaway read-only turn\> |
-| Observed | \<…\> |
+| Observed | \<...\> |
 | Date | \<date\> |
 
 An unknown ceiling means every long spec risks truncation, whose failure mode is a
@@ -167,7 +179,7 @@ read-only probe never called - do not upgrade it to "available".
 
 | Op | State (callable / unavailable / unknown) | Evidence (result or exact error text) | Fallback if unavailable | Date |
 |---|---|---|---|---|
-| \<op name\> | \<…\> | \<…\> | \<see tool-availability-and-fallback.md, or "none - halt"\> | \<…\> |
+| \<op name\> | \<...\> | \<...\> | \<see tool-availability-and-fallback.md, or "none - halt"\> | \<...\> |
 
 ---
 
@@ -190,4 +202,4 @@ nearest parent directory; write a new one in `.fulcrum/` only if none is found.
 
 | Row | What blocked it | Which planned step it gates |
 |---|---|---|
-| \<…\> | \<…\> | \<…\> |
+| \<...\> | \<...\> | \<...\> |

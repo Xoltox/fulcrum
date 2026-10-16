@@ -96,9 +96,10 @@ their trigger occurs. The router proposes it and the user confirms; `profile` in
 ## Who writes what
 
 One writer per shared file. The orchestrator alone writes `project.md`, `plan.md`,
-`TASKS.md`, `DECISIONS.md`, `HANDOFF.md` and `external/*`. A driver writes only its own
-session file, its own `JOURNAL.md` row, its `RUN-IDS.md` lines, its lease and, if it
-stops the run, `HALT.md`. At every wave close the orchestrator reconciles `TASKS.md`
+`TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*`, the `JOURNAL.md` index (with
+`InFlight` and `Tasks`) and the lease, and it alone mints session ids. A driver only
+appends rows to the session journal file its brief names and to `RUN-IDS.md`, and, if
+it stops the run, writes `HALT.md`. At every wave close the orchestrator reconciles `TASKS.md`
 and `project.md` against the journal and run ids, then commits. In every field project
 inspected, `.fulcrum/` was stale within a day because nobody owned that step.
 `[VERIFIED]` No resume point lives outside `.fulcrum/`. Table and reconciliation
@@ -117,7 +118,8 @@ Before the first mutating call - **including app creation** - and before any wai
 
 1. At session start: create `journal/<session-id>.md` and append the session's
    `JOURNAL.md` index row with `State: open`.
-2. For Mentor work, acquire the lease (`references/lease-and-concurrency.md`; before
+2. For Mentor work, the orchestrator acquires the lease before the dispatch, TTL sized
+   to the dispatch's budget plus margin (`references/lease-and-concurrency.md`; before
    creation it is keyed by the intended app name).
 3. Write the task's `TASKS.md` row with status `active`, then append its `started`
    line to the session file and its id to the row's `InFlight`.
@@ -142,9 +144,12 @@ and it is what tells a resuming session the work needs re-proving.
 
 `lease.json` is the only file here that is **not committed** - a committed lock is
 stale the moment it is pushed. It carries a holder identity, an acquisition
-timestamp, and a TTL. Acquire before opening a Mentor session; a live lease held by
-someone else means wait or halt, never take; an expired lease may be broken, but only
-with a session-file line recording the break. Without it, one-Mentor-session-per-app is
+timestamp, and a TTL sized to the dispatch's budget plus margin. The orchestrator alone
+writes it: acquire before a Mentor dispatch, release when it returns `session_state: closed`,
+hold it (recording the open `sessionId`) when it returns `session_state: open`, no per-poll
+refresh. A live lease held by someone else means wait or halt, never take; an expired
+lease may be broken only when the holder's dispatch is also known dead, and only with a
+session-file line recording the break. Without it, one-Mentor-session-per-app is
 enforceable only inside a single agent's memory, and two sessions on one app is a
 model-corruption path, not a queueing inconvenience. Full rules, including what the
 lease cannot protect against: `references/lease-and-concurrency.md`.

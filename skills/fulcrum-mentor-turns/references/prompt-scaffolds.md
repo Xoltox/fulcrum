@@ -157,11 +157,11 @@ below).
 
 **Decline a publish offer** - when Mentor ends a turn with "publish this?",
 the next turn (if any is planned) opens with:
-> "Do not publish. Publishing happens later as its own step. Continue with
+> "Do not publish yet. Publishing is this step's final turn. Continue with
 > the following only: ..."
 Never send "yes" or "Publish" in reply to the offer. The Publish turn is
-sent only at the planned step, as the bare message "Publish"
-(`../SKILL.md`, section 7).
+sent only as the step's final turn, after its build and fix turns, as the
+bare message "Publish" (`../SKILL.md`, section 7).
 
 **Never a secret value** - a turn that needs a credential creates a secret
 Setting with an empty default and asks for nothing more; the user sets the

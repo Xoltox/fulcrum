@@ -29,11 +29,15 @@ someone held a lock at push time, which is not a question anyone needs answered.
   "app": "<app identifier>",
   "holder": "<stable identity: user or host plus session label>",
   "acquired": "<ISO-8601 UTC timestamp>",
-  "ttl_seconds": 1800,
+  "ttl_seconds": 5400,
   "task": "T-014",
-  "note": "<what is being done, one line>"
+  "note": "<what is being done, one line>",
+  "open_session": "<Mentor sessionId - only while a dispatch returned session_state: open>"
 }
 ```
+
+`ttl_seconds` above is an example (a 75-minute dispatch budget plus margin), not a
+default - see the TTL rule below.
 
 One lease file per app when the solution has several: `lease.<app identifier>.json`.
 The lock is per app, so a single shared file would serialise apps that the platform
@@ -50,34 +54,54 @@ app nobody knew existed. `[SINGLE-OBSERVATION]`
 - `holder` must be stable across a crash and unique across concurrent agents. A
   hostname plus a session label is enough. An agent-generated random id is acceptable
   only if it is written to the lease before anything else happens with it.
-- `ttl_seconds` is a **liveness claim, not a permission window.** Set it to comfortably
-  exceed the longest turn the task will run, and refresh it - rewrite `acquired` - on
-  every poll that comes back non-terminal. A TTL shorter than the work it covers
-  manufactures the expiry case on a perfectly healthy run.
+- **The orchestrator is the sole lease writer** (Fulcrum rule). It takes the lease
+  before a Mentor dispatch and releases it when a dispatch returns
+  `session_state: closed`. A dispatch that returns `session_state: open` keeps the
+  lease (see "Release" below). Drivers and pollers never write it, so there is no
+  per-poll refresh.
+- `ttl_seconds` is a **liveness claim, not a permission window.** Set it to the
+  dispatch's wall-clock budget plus margin - never a fixed figure. One driver dispatch
+  covers a whole plan step (guard, consult, build, fix, Publish), so the TTL must cover
+  all of it. A TTL shorter than the work it covers manufactures the expiry case on a
+  perfectly healthy run.
 
 ## Protocol
 
-**Acquire**, before opening a Mentor session or starting a mutating turn:
+**Acquire** (the orchestrator), before a Mentor dispatch:
 
 1. Read `lease.<app>.json`. Absent -> write it, append a session-file `acquire lease` line,
    proceed.
-2. Present, `holder` is you -> refresh `acquired`, proceed. This is the normal
-   resume-your-own-work path.
+2. Present, `holder` is you -> rewrite `acquired` and `ttl_seconds` for the new
+   dispatch, proceed. This is the normal resume-your-own-work path.
 3. Present, another holder, `acquired + ttl_seconds` **in the future** -> the lease is
    live. **Do not take it.** Either work on a different app, or stop and report. Never
    "check whether the other agent is really running" by starting a turn.
 4. Present, another holder, `acquired + ttl_seconds` **in the past** -> expired. It may
-   be broken, under the rules below.
+   be broken only if the holder's dispatch is also known dead (it never returned and
+   its budget is exceeded), under the rules below.
 
-**Release**, on finishing the turn - including on a failed turn, a halt, and a
-deliberate handoff: delete the file and append a session-file `release lease` line. A lease
-released only on the success path is a lease that leaks on exactly the runs where
-recovery matters.
+**Release** (the orchestrator), when the dispatch returns `session_state: closed` -
+including on a failed turn, a halt, and a deliberate handoff: delete the file and append a
+session-file `release lease` line. A lease released only on the success path is a lease that
+leaks on exactly the runs where recovery matters.
+
+**Hold** (the orchestrator), when the dispatch returns `session_state: open` (a budget stop,
+or a halt with `on_exit: keep-open`, typically with `unpublished_changes: yes`): do **not**
+release. The app still has a live Mentor session, and a second session on it is the
+corruption path this file exists to prevent. Rewrite the lease with `open_session` set to the
+returned `sessionId` and a new `acquired` / `ttl_seconds` sized to the expected resume dispatch
+(or, when the next move is the user's, to a hold until the user decides), and append a
+session-file `hold lease` line naming the sessionId. The next action is either a resume
+dispatch of the **same** step with that `sessionId`, or a halt for the user (`HALT.md`
+records the open sessionId). Release only when a later dispatch returns
+`session_state: closed`. (Fulcrum rule.)
 
 ## Breaking an expired lease
 
 An expired lease means the holder died or the TTL was set too short. Both are real, so
-expiry alone is not proof the app is idle.
+expiry alone is not proof the app is idle. A lease is breakable only after its own TTL
+has expired **and** the holder's dispatch is known dead: no return, and its budget
+exceeded. A holder whose dispatch may still be running is waited on or halted for.
 
 1. Confirm independently that no Mentor run is still in flight on that app: read the
    tail of `RUN-IDS.md` and the previous holder's `journal/<session-id>.md` for a

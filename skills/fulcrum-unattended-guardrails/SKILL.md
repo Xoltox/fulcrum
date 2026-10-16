@@ -74,6 +74,9 @@ turn, a checkpoint that survives the agent, and a halt rule that fires early. Fu
 
 Do not work around any of these. A halt writes `.fulcrum/HALT.md` first, then the
 journal line (`../fulcrum-project-state/references/resume-and-halt.md`), then reports.
+A halt whose dispatch returned `session_state: open` keeps the lease and records the
+open `sessionId` in `HALT.md` (`../fulcrum-project-state/references/lease-and-concurrency.md`,
+"Hold").
 
 | Trigger | Why it is a hard stop |
 |---|---|

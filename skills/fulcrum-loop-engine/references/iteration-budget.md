@@ -35,16 +35,17 @@ A `collaborative` iteration costs the orchestrator roughly:
 | Phase | Orchestrator calls |
 |---|---|
 | 1 Select | 1 read (`TASKS.md`) |
-| 2 Precondition | 1 halt check, 1 journal scan, 1 lease write, 1 dispatch for the invariant turn, 1 report read |
-| 3 Dispatch | 2-3 state writes, 1-2 dispatches (consult, build), 1-2 report reads |
+| 2 Precondition | 1 halt check, 1 journal scan, 1 lease write (the invariant turn runs inside the phase 3 dispatch) |
+| 3 Dispatch | 2-3 state writes, 1 driver dispatch per plan step (guard, consult, build, fix, Publish in one session), 1 report read |
 | 4 Poll | 0 - delegated. It is 0 **only** if delegated |
 | 5 Verify | 1 dispatch per rung group, 1 report read each |
 | 6 Record | 3-4 writes |
 | 7 Advance | 1 lease delete, 0-1 re-scan |
 
-Call it **15-20 orchestrator calls for a clean `collaborative` iteration**, plus
-about 4 per fix-loop attempt. A `directive` iteration saves the consult dispatch
-and its report read - 2 calls, not a different order of magnitude.
+Call it **12-17 orchestrator calls for a clean `collaborative` iteration**, plus
+about 4 per fix-loop attempt. A `directive` iteration saves the consult turn
+inside the driver's dispatch - Mentor turns and driver calls, not orchestrator
+calls.
 
 Do not treat those figures as measured. Derive your own from the recalibration
 loop in `budgeting.md` after three iterations and replace them.
@@ -91,8 +92,9 @@ the second.
   160k agent: clean context each, and a failure loses half as much.
 - **Never inline a summary and also point at the source.** The agent pays twice
   and cannot tell which version is authoritative.
-- **Poll lean.** Request the summary form with a cursor; pull full detail once,
-  on a stall or a failure. A poll loop that re-fetches the full payload each
+- **Poll lean.** Skip `reasoning` events; drain with `cursor`
+  (`../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Reading a
+  run"); read the full answer once, at the end or on a stall or a failure. A poll loop that re-fetches the full payload each
   iteration turns the cheapest class into the most expensive.
 - **An iteration that overran by 3x is usually a mis-sized task, not an
   under-budgeted one.** Check whether the row was really Mentor-turn-shaped

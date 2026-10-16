@@ -9,6 +9,13 @@ has no token. The highest-value
 entries are not new features - they **contradict a rule Fulcrum teaches**,
 chiefly around `db_query` and the diagnostic-endpoint workaround.
 
+**Status 2026-10-16:** `test_setup_start` / `test_setup_status`, `exec_in_app` and
+`db_query` were absent on the 2026-10-16 listing (listed 2026-10-09). Absence may be per
+tenant or per server version, so the entries that depend on them below are **parked,
+not dropped**: re-check on the next probe, and record per-tenant availability in
+`tenant-profile.md` section 1. Until they list again, live row data stays on the
+diagnostic REST endpoint (`skills/fulcrum-verification/references/diagnostic-endpoint.md`).
+
 Evidence rule: nothing here was executed. `[SCHEMA]` means the vendor's tool
 description asserts it; everything else is `[UNVERIFIED]`. `[SCHEMA]` beats
 inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
@@ -18,8 +25,8 @@ inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 
 | Capability | Unlocks | Affects | Risk for unattended use |
 |---|---|---|---|
-| `test_setup_start` / `test_setup_status` | Forked, disposable test app with an invocation harness | New skill: `fulcrum-runtime-harness` | Mutating - publishes a revision; refuses Production |
-| `exec_in_app` | Invoke any Server Action directly, with a log tail | `fulcrum-verification`, `fulcrum-seed-data` | Mutating as the invoked action is; runs against the fork |
+| `test_setup_start` / `test_setup_status` (absent 2026-10-16, parked) | Forked, disposable test app with an invocation harness | New skill: `fulcrum-runtime-harness` | Mutating - publishes a revision; refuses Production |
+| `exec_in_app` (absent 2026-10-16, parked) | Invoke any Server Action directly, with a log tail | `fulcrum-verification`, `fulcrum-seed-data` | Mutating as the invoked action is; runs against the fork |
 | `app_logs` / `app_traces` | Post-deploy error and span evidence | `fulcrum-verification` (new proof rung) | Read-only |
 | `app_health` / `env_health` | Error-rate and latency aggregates per app/env | `fulcrum-verification`, `fulcrum-unattended-guardrails` | Read-only |
 | `deploy_impact` / `deploy_impact_status` | Blast radius before promotion | New: safe-promotion section | Read-only analysis |
@@ -32,6 +39,9 @@ inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 | `extlib_*` | Upload/publish compiled C# libraries | Out of scope - see last section | Mutating, tenant-level asset |
 
 ## `test_setup_start` / `test_setup_status`
+
+Parked: absent on the 2026-10-16 listing; re-check on the next probe. Text below is the
+2026-10-09 schema reading.
 
 `[SCHEMA]` Forks a published revision (`app_key` + optional `revision`; the live
 params are `env_key`, `app_key`, `revision`, `idempotency_key`, `query_templates`, with
@@ -64,6 +74,9 @@ empty. That decides whether the harness can verify seeded data at all - probe
 once and record in `tenant-profile.md` before any skill depends on it.
 
 ## `exec_in_app` - the diagnostic-endpoint replacement
+
+Parked: absent on the 2026-10-16 listing; re-check on the next probe. Text below is the
+2026-10-09 schema reading; the diagnostic endpoint remains the live-data instrument.
 
 `[SCHEMA]` Invokes a Server Action at `/__ase/invoke/<module>/<action>` with
 typed JSON `inputs`, returning `{status, output, error?, logs, logs_degraded,
@@ -195,7 +208,7 @@ permanent - report, do not retry.
 ## `extlib_*`
 
 `[SCHEMA]` `extlib_upload` generates an external library from a compiled .NET
-zip (`zip_b64`, ≤50 MB decoded, `.dll` + `.deps.json` at the zip root), named
+zip (`zip_b64`, <=50 MB decoded, `.dll` + `.deps.json` at the zip root), named
 from `[OSInterface(Name=...)]` - reusing a name produces a new revision.
 `auto_publish` is false by default to preserve human review; `extlib_publish`
 approves a `ReadyForReview` operation into a **tenant-level asset**.
@@ -213,15 +226,18 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
    tenant variance, so the `[TENANT]` framing in `CONVENTIONS.md` hard rule 2 -
    which uses `db_query` as its worked example - is wrong; (c) the probe's
    conclusion, "no model-layer path to live row data", is right for the wrong
-   reason and is right on **every** tenant. Repoint the probe at `exec_in_app`.
-2. **`exec_in_app` collapses the diagnostic-endpoint scaffold.** Recurring
+   reason and is right on **every** tenant. Applied: the probe no longer tests row data
+   and instead records per-tenant tool availability (`db_query` absent on the 2026-10-16
+   listing).
+2. **`exec_in_app` collapses the diagnostic-endpoint scaffold** (parked: absent on the
+   2026-10-16 listing). Recurring
    per-endpoint Mentor turns, revisions and permanent artifact debt become one
    disposable non-prod fork per session. Biggest single reduction in Fulcrum's
    verification cost.
 3. **`app_logs` + `app_traces` are a missing proof rung.** Cheap, read-only,
    no setup, and they serve the core thesis directly. Lowest effort of the top
    three; do this first even though it ranks third by value.
-4. **`test_setup_start` warrants a new skill.** It is the substrate items 2 and
+4. **`test_setup_start` warrants a new skill** (parked: absent on the 2026-10-16 listing). It is the substrate items 2 and
    1 both stand on.
 5. **`app_health` errorPercent as an unattended halt signal.** Fulcrum's stop
    conditions are all model- and turn-shaped; none is runtime-shaped.
@@ -242,10 +258,17 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   promotion story; keep both behind explicit human confirmation. The server
   instructs it and "disclose, never absorb" agrees.
 - **`db_query`.** Not worth wiring while v1 returns no rows for any template.
-  `exec_in_app` covers the same need and returns real output.
+  `exec_in_app` covered the same need when listed (both absent on the 2026-10-16 listing).
 - **`env_health` as a verification instrument.** No per-app identity;
   `app_health` is strictly more useful for every question Fulcrum asks.
 - **`submit_feedback`.** Cheap and genuinely apt (`agent_observation` targets
   exactly the empty-result and wrong-tool-composition events Fulcrum logs), but
   it produces no evidence the run can act on. Mention once in the guardrails
   skill as an optional courtesy; never gate on it.
+
+## Follow-ups
+
+- **Executable surface-drift check.** A small script that diffs `tools/list` names
+  and parameters against the latest `mcp-snapshots/*.md` and emits only the delta,
+  so the orchestrator never loads schemas itself. Until then the preflight drift
+  check is names-only (`skills/fulcrum/references/tool-preflight.md`).

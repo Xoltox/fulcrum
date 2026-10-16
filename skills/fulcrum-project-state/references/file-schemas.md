@@ -35,16 +35,18 @@ writer per shared file removes the race and makes staleness one agent's job to f
 | File | Written by | Others |
 |---|---|---|
 | `project.md`, `plan.md`, `TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*` | **the orchestrator only** | Drivers report outcomes, decisions and facts in their result; the orchestrator records them |
-| `JOURNAL.md` | each session writes **only its own index row** | - |
-| `journal/<session-id>.md` | the session that owns it | - |
+| `JOURNAL.md` | the orchestrator; each working session writes **only its own index row** | Drivers never edit the index, `InFlight` or `Tasks` |
+| `journal/<session-id>.md` | the orchestrator, which mints the session id and creates the file | A driver appends rows only to the session file whose path its brief names |
 | `RUN-IDS.md` | whoever issued the run (a driver, or the orchestrator acting as one) | Append only |
-| `lease.<app>.json` | the agent opening the Mentor session | - |
+| `lease.<app>.json` | **the orchestrator only** (Fulcrum rule): taken before a Mentor dispatch, released when it returns `session_state: closed`; held (with `open_session`) when it returns `session_state: open` | Drivers and pollers never write it; no per-poll refresh |
 | `HALT.md` | whoever stopped the run | Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
 | `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
 | `checkpoints/<agent-label>.md` | that agent | - |
 
-A **driver** (a delegated agent running turns) writes nothing outside its journal, its
-index row, its `RUN-IDS.md` lines, its lease and, if it stops the run, `HALT.md`. When
+A **driver** (a delegated agent running turns) writes nothing outside appended rows in
+the session journal file its brief names, its `RUN-IDS.md` lines and, if it stops the
+run, `HALT.md`. It never mints session ids, never edits the `JOURNAL.md` index or
+`TASKS.md`, and never writes the lease. When
 there is no delegation, the orchestrator is its own driver and the table still holds.
 
 **Reconcile at every wave close.** Before starting the next wave or ending the
@@ -238,7 +240,7 @@ difference. Resolve it against the lease, never by guessing:
 | Lease | Inference | Action |
 |---|---|---|
 | Live lease held by that session id | The session is running now | Wait or halt. Never take. `../../../AGENTS.md`: one Mentor session per app. |
-| No lease, or an expired one | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
+| No lease, or an expired one whose holder's dispatch is known dead (no return, budget exceeded) | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
 
 ### Index growth - the arithmetic
 
@@ -274,13 +276,16 @@ One line per event, pipe-delimited, fixed field order:
   a subagent as a fragment, or concatenated - and the rotation rule above concatenates.
   Ten characters a line is a cheaper premium than a merged archive nobody can attribute.
 - `action` - a short verb phrase: `dispatch build turn`, `poll`, `publish`,
-  `acquire lease`, `break expired lease`, `halt`, `resolve halt`, `withdraw`.
+  `acquire lease`, `break expired lease`, `release lease`, `hold lease`, `halt`, `resolve halt`,
+  `withdraw`.
 - `outcome` - `started`, `ok`, `failed: <reason>`, `blocked: <reason>`, or a value.
 
 **Three ids, three different things. Do not confuse them.** A `session-id` is the
 orchestrating agent's working session - one cold-start-to-stop span, and one file here.
-A **Mentor session id** is the ODC-side session opened against an app and is not
-written to this file. A **run id** is one Mentor or publish run inside that Mentor
+The orchestrator mints it; drivers write lines carrying it but never mint one.
+A **Mentor session id** is the ODC-side session opened against an app and is
+written to this file only as the outcome of a `hold lease` line (a dispatch returned
+`session_state: open`). A **run id** is one Mentor or publish run inside that Mentor
 session, and is field 4 here and in `RUN-IDS.md`. One working session may open several
 Mentor sessions and many runs.
 

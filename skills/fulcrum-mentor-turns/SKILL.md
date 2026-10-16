@@ -99,13 +99,20 @@ fresh-context switch; runs in a session share Mentor's memory. Fresh context
 means close the session, start a new one, load again (`references/mcp-surface.md`,
 heading "Sessions and context").
 
-- **Within a step, one session** - consult, build and fix turns share it, or
-  the review's corrections are silently discarded.
-- **Across consecutive steps, reuse by default** if the step's first turn
-  passes the guard below. Reuse carries Mentor's context but also its stale
-  beliefs; each fresh session is another load exposed to capacity
-  throttling. When to start fresh: `references/sessions.md`.
-- **One session per app at a time**; always close a finished session.
+- **One driver dispatch per plan step, one session per step** (Fulcrum rule).
+  Inside that dispatch and session the driver runs the guard, the consult
+  turn (if the step has one), build turn(s), fix turn(s) and the Publish
+  turn. Consult and build never split across dispatches, or the review's
+  corrections are silently discarded.
+- **A step's session ends with the step.** A fresh `mentor_load_asset` loads
+  the latest published revision, so the guard at the start of the next step
+  proves the previous step landed (published), not session staleness. The
+  only carry-over is a resume of the *same* step: a dispatch stopped on its
+  budget hands back an open `sessionId` (`on_exit: keep-open`) and the next
+  dispatch of that step resumes it. When to start fresh within a step:
+  `references/sessions.md`.
+- **One session per app at a time**; close a finished session - but **never
+  close a session holding unpublished changes** (section 4, "The guard").
 
 **Mentor's read-back is evidence of Mentor's belief, not of the model.** When
 it contradicts published-state inspection or wire evidence, trust the
@@ -126,8 +133,12 @@ handoff), phrased so a mismatch halts - e.g. "how many aggregates does
 screen `<X>` have, and does a widget named `<Y>` exist? If not `<N>` / YES,
 say so and STOP."
 
-- **On mismatch, `mentor_close_session`, then start fresh.** A
-  revision-number check does not substitute.
+- **On mismatch with no unpublished changes, `mentor_close_session`, then
+  start fresh.** A revision-number check does not substitute.
+- **On mismatch (including a read-back that errors) in a session holding
+  unpublished changes, never close it** - close discards that work. Either
+  send the Publish turn (only if the step's own build verified) or halt with
+  `on_exit: keep-open` and report `unpublished_changes: yes`.
 - Each sibling screen gets its **own** check. A wrong count may be a
   read-back error rather than staleness - **the response is the same.**
 
@@ -169,18 +180,25 @@ its verdict on that read.
 ## 7. Publish sequencing
 
 **Publish is its own planned turn:** a `mentor_prompt` whose message is
-"Publish", polled at the mutating cadence, sent only at the step the plan
-names. `mentor_publish` is deprecated. Events, keys and status fields:
-`references/mcp-surface.md`, heading "Publishing".
+"Publish", polled at the mutating cadence. **Every mutating step ends with
+its Publish turn** - the plan's publish points are per step. `mentor_publish`
+is deprecated (absent on the 2026-10-16 listing). Events, keys and status fields: `references/mcp-surface.md`,
+heading "Publishing".
 
 - **Mentor's offers to publish are never accepted inline.** An unattended
   "yes" publishes outside the plan.
 - **Before sending "Publish", read the revision** (`app_revisions` or
   `env_app`). If it moved since the last recorded publish, a change turn
   published on its own - record it, do not publish again.
+- **First publish carve-out:** on a created, never-published asset both reads
+  error (`references/mcp-surface.md`, heading "Creating and loading an
+  asset"). "No revision yet" means first publish: send the Publish turn; the
+  read error is not a blocker.
 - The `runId` is not the publication key: take the key from the
   `publishAccepted` event, confirm with `publish_status` (gate on
-  `outcome`), then `env_app` for revision and URL.
+  `outcome`), then `env_app` in the Development environment: its `revision`
+  must equal the publication's `applicationRevision` (the gate; `Workflow`
+  and library exceptions in `references/mcp-surface.md`, "Publishing").
 - **Never publish while the previous publish is non-terminal.** A failure
   with an `OS-*` build code is the build's result: surface it.
   `indeterminate: true` means re-poll or check the deployed inventory.

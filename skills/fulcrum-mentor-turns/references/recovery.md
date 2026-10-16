@@ -79,7 +79,8 @@ trying to route around a policy denial; see the hard-stop list in
   Do not re-publish unchanged. `[SCHEMA]`
 - `failed` with `indeterminate: true`: the outcome was never observed and
   the build may still succeed. Re-poll `publish_status` with the same
-  publication key, or check `env_app`. **Never re-publish on it** - a second
+  publication key, or check `env_app` (`revision` vs the publication's
+  `applicationRevision`). **Never re-publish on it** - a second
   revision building alongside the first can wedge the app. `[SCHEMA]`
 
 ## 7. Abandoning an in-flight prompt or a whole stale session

@@ -93,6 +93,7 @@ Contents:
 - **App:** <app identifier>
 - **Last run id:** <run id, or `-`>
 - **App revision at halt:** <value, or "not established">
+- **Open Mentor session:** <sessionId and `unpublished_changes: yes|no` when the dispatch returned `session_state: open` (the lease stays held), or `-`>
 
 ## What was being attempted
 <One paragraph.>
@@ -126,6 +127,10 @@ The only legal resume:
 4. Append a `resolve halt` line to the current `journal/<session-id>.md` citing the
    decision id.
 5. Re-establish ground truth before continuing - live app revision, any run in flight,
-   the lease - exactly as for a crash. A halt may be hours or weeks old.
+   the lease - exactly as for a crash. A halt may be hours or weeks old. A halt that
+   records an open Mentor session kept its lease (`lease-and-concurrency.md`, "Hold"):
+   the decision says whether the next dispatch resumes that `sessionId` or the session
+   is abandoned, and the lease is released only when a dispatch returns
+   `session_state: closed`.
 
 Never delete `HALT.md` because it is blocking progress. That is the mechanism working.

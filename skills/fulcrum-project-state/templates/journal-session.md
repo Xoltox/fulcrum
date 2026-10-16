@@ -1,6 +1,6 @@
 # Template - `.fulcrum/journal/<session-id>.md`
 
-Copy to `<project>/.fulcrum/journal/<session-id>.md`, named for the session id minted at
+Copy to `<project>/.fulcrum/journal/<session-id>.md`, named for the session id the orchestrator mints at
 session start. **Append-only.** Never edit a line, never delete one, never insert into
 the middle. Correct a wrong line by appending a later line with the action `withdraw`.
 
@@ -47,9 +47,12 @@ index rotation rule.
 
 ## Actions in use
 
-`open session` · `close session` · `acquire lease` · `refresh lease` ·
-`break expired lease` · `release lease` · `dispatch <turn type> turn` · `poll` ·
-`publish` · `verify rung <n>` · `recover` · `withdraw` · `halt` · `resolve halt`
+`open session`, `close session`, `acquire lease`, `break expired lease`,
+`release lease`, `dispatch <turn type> turn`, `poll`, `publish`, `verify rung <n>`,
+`recover`, `withdraw`, `halt`, `resolve halt`
+
+Lease lines are the orchestrator's (it alone writes the lease; there is no
+`refresh lease`). A driver appends only to the session file its brief names.
 
 Extend the list as needed; keep each action a short verb phrase and reuse an existing
 one before inventing a synonym. Two words for one event makes the file unsearchable.

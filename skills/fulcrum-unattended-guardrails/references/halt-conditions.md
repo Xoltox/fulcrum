@@ -63,7 +63,10 @@ Tier policy is phase-based and is set at dispatch time, not adjusted reactively:
 
 A halt writes `.fulcrum/HALT.md` first (the file before the journal line, per
 `../../fulcrum-project-state/references/resume-and-halt.md`), then stops and
-reports. Do not work around any of these.
+reports. Do not work around any of these. If the halting dispatch returned
+`session_state: open`, the orchestrator keeps the lease and `HALT.md` records the
+open `sessionId` (`../../fulcrum-project-state/references/lease-and-concurrency.md`,
+"Hold").
 
 | Trigger | Detail |
 |---|---|

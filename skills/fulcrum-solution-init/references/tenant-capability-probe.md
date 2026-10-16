@@ -47,28 +47,34 @@ attempt a workaround. Record the failure and the time. Re-gate before any later 
 resumes; a session that starts on a dead backend burns budget producing nothing while
 every status field reads healthy.
 
-Repeat this gate at the start of **every** session, not only at init. It costs one cheap
-read-only turn. Turn mechanics for the probe turn itself:
+After init, this gate has no turn of its own: it is folded into loop gate 5, the
+per-step staleness guard that opens every step's driver dispatch
+(`../../fulcrum-loop-engine/references/iteration-contract.md`, heading "Phase 2 -
+Precondition"). That guard asks about named screens and widgets of the real app, so an
+answer that names real content passes liveness too; a generic or no-app answer is this
+gate's fail and halts the same way. Turn mechanics for the probe turn itself:
 `../../fulcrum-mentor-turns/SKILL.md`.
 
-## 1. Live row data - nothing to probe
+## 1. Live row data - no row probe; record optional-tool availability
 
-**Do not probe this. It does not vary by tenant.** There is no model-layer path to live
-row data on any tenant. `[SCHEMA]` `db_query` is not a general SQL path: it runs only
-against a test harness stood up by `test_setup_start`, accepts only SQL templates
-declared upfront in that call, and its own schema states that no template, `SELECT`
-included, returns rows in v1 - every template comes back with rowcount 0. A "trivial
-constant select" cannot be issued at all without first standing up that harness, so the
-probe that used to sit here could never execute.
+**Do not probe row data. It does not vary by tenant.** There is no model-layer path to
+live row data on any tenant. Even where `db_query` listed (2026-10-09), it ran only
+against a `test_setup_start` harness, accepted only SQL templates declared upfront, and
+its own schema said no template, `SELECT` included, returns rows in v1. `[SCHEMA]`
 
-The conclusion the old probe reached still holds, and holds universally: **reading real
-rows needs a separate diagnostic instrument, and that cost belongs in the budget** -
-historically a temporary diagnostic endpoint at roughly two Mentor turns and two
-revisions per seed step.
+What does vary is which optional tools list: `db_query`, `exec_in_app`,
+`test_setup_start` / `test_setup_status` and `mentor_publish` were all absent on the
+2026-10-16 listing, and absence may be per tenant or per server version. So read this
+tenant's tool listing (names only, read-only, no call) and fill section 1 of the profile
+per tool. Never assume availability from another tenant or an older snapshot; a tool that
+lists is not an instrument until `../../fulcrum-mentor-turns/references/mcp-surface.md`
+records what a call does.
 
-The instrument for live row data is `exec_in_app` against a harness fork. `[SCHEMA]` The
-procedure is not written here - see `../../fulcrum-verification/SKILL.md`; seed
-consequences in `../../fulcrum-seed-data/SKILL.md`.
+The budget conclusion holds universally: **reading real rows needs a separate diagnostic
+instrument** - a temporary diagnostic REST endpoint probed over HTTP, at roughly two
+Mentor turns and two revisions per seed step. Procedure:
+`../../fulcrum-verification/references/diagnostic-endpoint.md`; seed consequences in
+`../../fulcrum-seed-data/SKILL.md`.
 
 ## 2. Which UI blocks exist - and their real inputs
 

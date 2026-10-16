@@ -131,8 +131,9 @@ Ranked by leverage, given that reads dominate:
    its brief - and never do both.** Do not inline a summary *and* say "read the
    source for detail". Pick one. Doing both makes the agent pay twice for the
    same content, and leaves it unsure which version is authoritative.
-2. **Ask for the narrow form.** The summary form, the `details=false` form, the
-   head of the file, grep-with-context. Fetch the full payload only once you
+2. **Ask for the narrow form.** For a Mentor run: skip `reasoning` events and drain
+   with `cursor` (`../../fulcrum-mentor-turns/references/mcp-surface.md`, heading
+   "Reading a run"). For files: the head, grep-with-context. Fetch the full payload only once you
    know you need it. This is what makes a poll loop cheap.
 3. **Read ranges, not files.** Give line ranges or a grep target, not a path.
 4. **Scope tasks to about half the class budget**, not 95% of it. Agents
@@ -150,7 +151,7 @@ Ranked by leverage, given that reads dominate:
 | Anti-pattern | Why it fails |
 |---|---|
 | Token threshold in a prompt ("stop at 150k") | Unevaluable condition. Silent non-compliance. |
-| Poll loop that re-fetches the full payload each iteration | Turns the cheapest class into the most expensive. Poll the summary form with a cursor; fetch detail once, at the end. |
+| Poll loop that re-fetches the full payload each iteration | Turns the cheapest class into the most expensive. Skip `reasoning` events and drain with `cursor`; read the full answer once, at the end. |
 | Re-reading the same file each iteration | Already in context. Re-read only after you changed it and need the result. |
 | "Read everything, then decide" | Unbounded read volume before any narrowing. Search first, read the hits. |
 | Inlining a summary *and* pointing at the source | Pays twice for one content. |

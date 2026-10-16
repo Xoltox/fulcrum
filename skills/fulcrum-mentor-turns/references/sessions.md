@@ -19,7 +19,7 @@ staleness guard". Tool facts cited here are recorded, dated and tagged in
   `[UNVERIFIED]` - publish once early (`../SKILL.md`, heading "Publish
   sequencing").
 
-## Reuse across consecutive steps, or start fresh
+## One session per step, or carry one across steps
 
 The tradeoff, stated so the choice is made rather than defaulted:
 
@@ -34,19 +34,26 @@ Rules that follow:
 - **Within a step: always one session.** Consult, build and its fix turns
   share it. Splitting them makes Mentor re-derive an approach and silently
   drops the review's corrections (`posture.md`).
-- **Across consecutive steps on the same app: reuse by default**, provided
-  the step's first turn passes the staleness guard. Reuse is a decision made
-  fresh at each step, not a precedent.
-- **Start fresh when** the guard fails or a read-back contradicts published
-  state; the previous step ended in a halt, a cancel, or an interrupted run;
-  the session has sat idle long enough that its survival is in doubt
-  (idle GC is `[UNVERIFIED]`); or several steps of accumulated conversation
-  are now more liability than help.
+- **Across steps: a fresh session per step** (Fulcrum rule). Each step is one
+  driver dispatch, and a fresh `mentor_load_asset` loads the latest published
+  revision, so the step's staleness guard proves the previous step landed.
+  Carrying a session into the next step trades that proof for remembered
+  context; restate any cross-step dependency in the prompt instead.
+- **Resume a session only within the same step**: the orchestrator passes the
+  `sessionId` a previous dispatch of that step handed back with
+  `session_state: open` (budget stop, halt with unpublished changes). Do not
+  resume when the guard fails or a read-back contradicts published state and
+  the session holds no unpublished changes, after a cancel or an interrupted
+  run, or after idle long enough that its survival is in doubt (idle GC is
+  `[UNVERIFIED]`).
+- **Never close a session holding unpublished changes**: publish or halt with
+  it kept open (`../SKILL.md`, staleness guard).
 - **One session per app at a time**, held under the lease
   (`../../fulcrum-project-state/SKILL.md`). Concurrent sessions on different
   apps are allowed.
-- **Always close** a session you are done with. Nothing states that idle
-  release frees its workspace context or slot.
+- **Always close** a session you are done with and that holds no unpublished
+  changes. Nothing states that idle release frees its workspace context or
+  slot.
 
 ## Mentor's read-back is belief, not proof
 

@@ -5,16 +5,18 @@ in v1, on any tenant. This is the workaround, and the debt it creates.
 
 ## Why there is no model-layer path
 
-`[SCHEMA]` `db_query` is not a model-layer SQL path. It requires a harness stood
-up by `test_setup_start`, accepts only SQL templates declared upfront in that
-harness's `query_templates`, and its own schema states that no template - `SELECT` included - returns rows in v1: every template comes back with
-rowcount 0. This is a universal v1 platform limitation, not tenant variance.
-Do not probe it per project and do not carry a `db_query` row in
-`tenant-profile.md`.
+`db_query`, `exec_in_app` and `test_setup_start` / `test_setup_status` were
+absent on the 2026-10-16 listing (listed on 2026-10-09; absence may be per
+tenant or per server version, re-check on the next probe; availability per
+tenant goes in `tenant-profile.md`). Even when it listed, `db_query` was not a
+model-layer SQL path: it needed a `test_setup_start` harness, accepted only
+templates declared upfront, and its own schema said no template - `SELECT`
+included - returns rows in v1 (`[SCHEMA]`, 2026-10-09). Current tool facts:
+`../../fulcrum-mentor-turns/references/mcp-surface.md`.
 
-Build a temporary diagnostic endpoint instead of relying on `db_query` for
-live row data. The instrument for a real query path is `exec_in_app` against a
-harness fork - that procedure is future work, not written here.
+So this endpoint, probed over HTTP, is the instrument for live row data.
+Around it: `context_*` for published structure, `app_logs` / `app_traces` for
+what the runtime did. Mentor answer-back is belief, never proof.
 
 ## The pattern that works
 
