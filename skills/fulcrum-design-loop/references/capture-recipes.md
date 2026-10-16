@@ -68,8 +68,9 @@ The source already is an anatomy.
 With a design-tool read capability: frames larger than 100 x 50 are candidates;
 skip decorative layers under 50 px; read variables into `tokens.md`; layer names drive
 source-name -> block (a layer named Tabs, Carousel, Wizard or Accordion is honoured
-as that block). Without one: a `manual` stop asks the user to export each frame as
-an image at the design width, then Recipe A.
+as that block). Without one: Intake step 4 detects the gap and batch B asks the user
+to export each frame as an image at the design width (no `manual` stop: `TASKS.md`
+does not exist yet), then Recipe A.
 
 ## Reference images
 
@@ -84,8 +85,9 @@ capturer or the renderer. (Fulcrum rule)
   `fulcrum-renderer` to render the local file at the manifest viewport into its own
   evidence folder (`../../fulcrum-render-check/SKILL.md`, heading "Local-file
   reference render - no app"); the orchestrator then copies that capture into
-  `design/reference/<SID>.png`. Without a browser: capture from code, and compare
-  later against the user's screenshot (tier B) or structure only (tier C).
+  `design/reference/<SID>.png`. Without a browser: capture from code; the tier-B judge
+  then uses the source file read as text plus any user-rendered screenshot of it
+  (`render-compare.md`, "2. Judge"), or tier C compares structure only.
 
 ## Multi-image sources
 

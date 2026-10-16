@@ -37,7 +37,8 @@ state and the micro profile `../fulcrum-project-state/SKILL.md`; iteration
 
 The design loop **is** the micro file set plus `.fulcrum/design/`, with a design step
 allowance of 5 + N steps, N <= 6 screens, plus one step per split screen step; the
-ceiling is 11 steps (5 + 6) with splits counted. Entered from `fulcrum-solution-init`
+ceiling is N <= 6 screens and 5 + 2N steps with splits counted; promotion is proposed
+only beyond that. Entered from `fulcrum-solution-init`
 on the full profile, each app has its own `.fulcrum/design/<app>/` and the 6-screen cap
 applies per app. (Fulcrum rule)
 
@@ -77,10 +78,15 @@ rule)
 ## Intake
 
 Entered from the router (batch A: mode; "design loop or full path"), or from
-`fulcrum-solution-init` at phase 1 with its app, shell decision and step ids (not re-asked).
-On entry from `fulcrum-solution-init`, every batch B question it has not answered (bar,
-instrument, personas, evidence, assets, form factor, re-probe) is asked in one batch
-before capture - never defaulted. Paths below then sit under `.fulcrum/design/<app>/`.
+`fulcrum-solution-init`. Entry from `fulcrum-solution-init` is at Intake, with Q1 (app
+creation) and Q7 (form factor, if applicable) pre-answered there, not re-asked. Of the
+intake steps below, these still run: step 1 (copy into `source/`), step 2 for every
+batch B question still unanswered (bar, access, instrument, personas, evidence, assets,
+re-probe), in one batch before capture - never defaulted; step 3 (`manifest.md` and
+the per-app `design` entry); step 4's browser preflight and official-skill detection.
+Step ids come from the solution plan; P1.04 Data and P1.05 Seed are omitted when that
+plan already has the entity and seed steps. Paths below then sit under
+`.fulcrum/design/<app>/`.
 
 1. Copy the design verbatim into `.fulcrum/design/source/` (write-once).
 2. Ask **batch B in one batch** (exact text, conditions, recording:
@@ -95,7 +101,9 @@ before capture - never defaulted. Paths below then sit under `.fulcrum/design/<a
    `env_list` keys into `tenant-profile.md` per the micro profile procedure; the
    browser preflight in `../fulcrum-render-check/SKILL.md`, heading "Preflight - once
    per project", when the instrument answer is (a); official-skill detection
-   (`references/official-skill-interop.md`).
+   (`references/official-skill-interop.md`); for a Figma source, the design-tool read
+   check, run before batch B is sent so a frame-export ask joins it
+   (`references/capture-recipes.md`, heading "Figma").
 
 ## Capture and the design spec
 
@@ -104,7 +112,9 @@ assigns `SID`s (reported; the orchestrator records them in `manifest.md`) and wr
 the app-wide files `tokens.md`, `theme.css` and `data.md`. Then one dispatch per <= 3
 screens, in parallel, each writing only its `screens/<SID>.md`; a class, token or
 entity a screen needs that the shared files lack is reported, and one serial shared
-dispatch adds it before the gate. Every brief names the exact `design/` paths it may
+dispatch adds it before the gate. The orchestrator copies references into
+`reference/` after the shared dispatch reports SIDs, before the screen dispatches and
+the gate. Every brief names the exact `design/` paths it may
 write; `reference/` is the orchestrator's (`references/capture-recipes.md`, heading
 "Reference images"). Recipes (images, HTML/TSX, Figma, reference images):
 `references/capture-recipes.md`. Region-to-block lookup: `references/block-map.md`;
@@ -154,7 +164,8 @@ Publish. One region per turn; identical-shape regions may batch; a chart, a
 table/repeater, a form and an overlay never share a turn. **Build pass <= 4 short
 turns, counted as the one build turn** of `../fulcrum-unattended-guardrails/references/halt-conditions.md`,
 "The turn cap"; more -> split into two steps, each ending in Publish; a split step
-counts in the step allowance and the batch C estimate. Fix turns <= 2 per step. READ-then-MIRROR only against a region already render-verified. Briefs
+counts in the step allowance and the batch C estimate. Render-compare runs once, after
+the last step of a split screen; earlier split steps verify rungs 1 and 3 only. Fix turns <= 2 per step. READ-then-MIRROR only against a region already render-verified. Briefs
 carry region subtrees inline, never a path to the whole spec; row shapes and brief
 contents: `references/design-spec-format.md`, "Step decomposition". (Fulcrum rule)
 
@@ -172,7 +183,8 @@ When `project.md` has `design`, rung 6 on a screen row runs
    from a theme class, token or chrome element is a **pattern**: one `fix` row on the
    owning step, then re-compare every affected screen.
 4. **Fix** - diagnostic first, a fix turn led by the measured symptom, Publish,
-   re-judge. At most 2 compare rounds per screen; then `fail`, guardrails halt path.
+   re-judge. At most 3 compare rounds per screen (the initial judge plus one re-judge
+   per fix turn; fix turns stay <= 2); then `fail`, guardrails halt path.
 5. **Record** `design/fidelity/<SID>-r<n>.md` from `templates/fidelity.md`.
 
 ## Stop and report
@@ -181,7 +193,8 @@ When `project.md` has `design`, rung 6 on a screen row runs
   and `design/report.md` written from `templates/report.md`.
 - **Halt:** owned by `../fulcrum-unattended-guardrails/SKILL.md`; the design-specific
   trigger is a pattern fix regressing a passed screen.
-- **Caps:** build pass <= 4, fix <= 2, compare rounds <= 2, renders <= 1 per form
+- **Caps:** build pass <= 4, fix <= 2, compare rounds <= 3 (initial judge plus one
+  re-judge per fix turn), renders <= 1 per form
   factor per round, one re-capture and re-gate per screen.
 - **Promotion beyond Development is never done**; the report offers it. (Fulcrum rule)
 

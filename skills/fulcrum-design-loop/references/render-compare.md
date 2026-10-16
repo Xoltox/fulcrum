@@ -39,7 +39,9 @@ Its brief contains only:
 - the reference image (`design/reference/<SID>.<ext>`; for a whole image, the
   manifest's note naming which part is the screen);
 - the capture(s) and the render `report.md` (tier B: the user's screenshot from
-  `design/user-shots/`, no render report);
+  `design/user-shots/`, no render report; for a code source (HTML/TSX) with no browser,
+  the reference is the source file read as text, plus any user-rendered screenshot of
+  it);
 - the screen's F-items from `screens/<SID>.md`, Acceptance section;
 - the fidelity bar from `manifest.md`;
 - the diff vocabulary below.
@@ -70,7 +72,8 @@ can show is not a diff. (Fulcrum rule)
 - blocker and major -> fix candidates; minor -> `design/backlog.md`.
 - **Pattern:** a diff on 2+ screens, or caused by a theme class, token or chrome
   element. One `fix` row on the owning step (P1.02 theme or P1.03 chrome), then
-  re-compare **every** affected screen, passed ones included. Fixing a shared cause per
+  re-compare **every** affected screen, passed ones included; a pattern re-compare of
+  an already-passed screen does not count against that screen's round cap. Fixing a shared cause per
   screen wastes turns and lets the copies drift
   (`visual-verification.md`, "Screenshot comparison against a reference design").
 - A pattern fix that regresses a passed screen is a halt
@@ -88,8 +91,8 @@ session closed at Publish.
    shows ..."), not by a restated spec.
 3. Publish, publish gate, lag, re-render, re-judge with a fresh verifier: round r2.
 
-**At most 2 compare rounds per screen**, inside the step's 2 fix turns. A diff
-surviving round 2, or the fix cap, -> the row's verdict is `fail` and the guardrails
+**At most 3 compare rounds per screen** (the initial judge plus one re-judge per fix
+turn; fix turns stay <= 2). A diff surviving round 3, or the fix cap, -> the row's verdict is `fail` and the guardrails
 halt path runs. The loop engine's oscillation scan covers repeats across sessions
 (`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`).
 
@@ -109,7 +112,8 @@ The row's `TASKS.md` `Verdict` is the orchestrator's, from this file.
 
 Per screen: `context_screens` after the index lag; a verbatim Mentor read-back per
 region (rung 1 - belief, not proof); `context_themes` content if it exposes CSS
-(`[UNVERIFIED]`, probe once and record the answer in `tenant-profile.md`); seed proof
+(`[UNVERIFIED]`: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading
+"Published-state inspection"; probe once and record the answer in `tenant-profile.md`); seed proof
 per `../../fulcrum-seed-data/SKILL.md`, "Verifying a seed". Every screen is
 `unproven`, reason "visual untested".
 

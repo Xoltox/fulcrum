@@ -177,9 +177,9 @@ Route each app's first build by the source type available **for that app**:
 
 | Source for that app | Route to |
 |---|---|
-| Visual or code design - screenshots, concept images, Figma frames, HTML, TSX/React | `../fulcrum-design-loop/SKILL.md`, entered at its phase 1 (Capture) with this plan's app, shell decision and step ids; intake questions already answered here are not re-asked, and every unanswered batch B question is asked before capture. Per app: `.fulcrum/design/<app>/`, one `project.md` `design` entry, at most 6 screens |
+| Visual or code design - screenshots, concept images, Figma frames, HTML, TSX/React | `../fulcrum-design-loop/SKILL.md`, entered at its Intake with Q1 (app creation) and Q7 (form factor, if applicable) pre-answered here and step ids from this plan; the intake steps it still runs are listed in its "Intake" section, and every unanswered batch B question is asked before capture. Per app: `.fulcrum/design/<app>/`, one `project.md` `design` entry, at most 6 screens |
 | Text only - derived brief, prose spec | `../fulcrum-mentor-turns/SKILL.md` per spec |
-| Both | design loop for theme, chrome and screens; this skill's specs for entities and logic |
+| Both | design loop for theme, chrome and screens; this skill's specs for entities and logic, so the design loop omits its P1.04 Data and P1.05 Seed steps when this plan already has the entity and seed steps |
 
 Fulcrum never runs an external bootstrap skill's procedure. Where `outsystems-design-to-app`
 is installed, the design loop may read its reference data as `[UNVERIFIED]` input; its

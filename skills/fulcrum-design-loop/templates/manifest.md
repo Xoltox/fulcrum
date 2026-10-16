@@ -28,7 +28,9 @@ screen rows filled from the shared capture dispatch's report. On the full profil
 ## Screens
 
 At most 6 per app. More means the engagement is not a design loop. `SID`s are
-assigned by the shared capture dispatch. A split screen lists both steps.
+assigned by the shared capture dispatch. A split screen lists both steps;
+render-compare runs once, after the last step of a split screen; earlier split steps
+verify rungs 1 and 3 only.
 
 | SID | Name | Archetype | Reference | Step | Nav label | Access |
 |---|---|---|---|---|---|---|

@@ -127,6 +127,7 @@ source:
 | Owned elements only (`owned_only`): inherited or referenced entities that Mentor lists do not appear in `context_entities`. | `[SINGLE-OBSERVATION]` | 2026-10-08 | project state record |
 | **Access flags on template screens disagree with Mentor.** `context_screens` reported every template screen non-public with the app role, while Mentor reported four of them anonymous. Do not derive screen access from `context_screens` alone; prove access by behaviour (an anonymous request to the screen). | `[VERIFIED]` | 2026-10-08, 2026-10-09 | probe; field |
 | Settings and consumed REST structures have no `context_*` view. | `[SINGLE-OBSERVATION]` | 2026-10-08 | field |
+| Whether `context_themes` exposes a theme's CSS content (not only theme names) is unknown; probe once per tenant and record the answer in `tenant-profile.md`. | `[UNVERIFIED]` (not probed) | - | inference |
 
 ## Completion signals
 

@@ -19,7 +19,7 @@ not micro - see "Leaving the micro profile" in the reference.
 **Profile:** micro - confirmed by the user on \<date\>, `DECISIONS.md` \<D-NNN\>
 **App:** \<app identifier, or the intended name until created\> - \<asset type\>
 **App creation:** \<Mentor creates it / user-made shell loaded\> - `DECISIONS.md` \<D-NNN\>
-**Design:** .fulcrum/design/manifest.md - design variant, 5 + N steps (N <= 6) plus split steps, at most 11 \<optional: this line only on the design variant; omit otherwise\>
+**Design:** .fulcrum/design/manifest.md - design variant, 5 + N steps (N <= 6) plus split steps, at most 5 + 2N \<optional: this line only on the design variant; omit otherwise\>
 
 ## Goal
 
@@ -46,7 +46,7 @@ the system starts.\>
 | P1.01 | \<e.g. create the app; the Claim entity and its static Status values\> | build, publish | 1 |
 | P1.02 | \<...\> | build, publish, verify | 1, 2 |
 
-At most about five rows (5 + N, N <= 6, plus split screen steps, at most 11, on the design variant). Every mutating step ends with its Publish turn (publish
+At most about five rows (5 + N, N <= 6, plus split screen steps, at most 5 + 2N, on the design variant). Every mutating step ends with its Publish turn (publish
 points are per step). Step 1 always ends with `publish`: a created asset exists only
 inside its Mentor session until its first publish, and "no revision yet" on the
 pre-publish revision read means first publish, not a blocker

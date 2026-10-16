@@ -151,7 +151,7 @@ the report. Never silently dropped.
 ## Step decomposition
 
 Design variant of the micro profile: same files, 5 + N steps, N <= 6, plus one per
-split screen step, at most 11 steps with splits counted. Steps and
+split screen step; ceiling N <= 6 and 5 + 2N steps with splits counted. Steps and
 `Verify` rungs: `../SKILL.md`, heading "Steps".
 
 `TASKS.md` rows (schema unchanged): per step a `build` and a `publish` row (P1.05 a

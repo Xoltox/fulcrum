@@ -91,7 +91,8 @@ the gate passes.
 Summary, then one question:
 
 - screens (SID, name, archetype), entities, seed rows, steps (5 + N, plus every split
-  screen step; over 11 steps the engagement promotes to the full profile - say so);
+  screen step; beyond N <= 6 screens or 5 + 2N steps, promotion to the full profile
+  is proposed - say so);
 - estimated turns per step: guard 1 + consult 1 + build <= 4 + publish 1 + fix <= 2;
 - estimated wall clock from `../../fulcrum-mentor-turns/references/granularity.md`
   (about 5-7 min per granular turn) - an estimate, not a promise;

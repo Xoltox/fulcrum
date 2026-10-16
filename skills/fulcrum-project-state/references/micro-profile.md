@@ -64,13 +64,14 @@ design loop's `references/design-spec-format.md`), and `project.md` carries
 Steps: **5 + N, N <= 6 screens** - shell, theme, chrome, data, seed, then one step per
 screen - instead of about five, plus one step for each screen step split because its
 build pass needs more than 4 turns. `plan.md` carries the template's optional `Design`
-line. Promote to the full profile, as below, at N > 6, at more than 11 steps (5 + 6)
-with split steps counted, or when a conflicting second design source arrives.
+line. The ceiling is N <= 6 screens and 5 + 2N steps with split steps counted;
+promotion to the full profile, as below, is proposed only beyond that (N > 6 or more
+than 5 + 2N steps), or when a conflicting second design source arrives.
 
 ## Leaving the micro profile
 
 Promote to the full profile when any of these becomes true: a second app, more than
-about five steps, a step that fails the right-sizing test and cannot be split within
+about five steps (on the design variant, beyond its ceiling above instead), a step that fails the right-sizing test and cannot be split within
 the five, or source material arrives that needs triage. Stop at a step boundary,
 record the promotion in `DECISIONS.md`, and route to
 `../../fulcrum-solution-init/SKILL.md` with `plan.md` as its source material. Keep
