@@ -25,7 +25,11 @@ If the brief is wrong, say so - a correction beats agreement.
   `anonymous`, `persona:<button label>` (only if the brief says the user
   approved sample personas), or `user-session` (the user has signed in in
   the shared browser).
-- Viewport(s). Default: one desktop width.
+- Viewport(s). Default: one desktop width. On the design loop they come
+  from the design manifest.
+- Optionally, a local reference file (an HTML design source) to render at
+  the given viewport as a reference capture into the evidence folder. Open it
+  read-only; it is a page you opened, and the same rules apply to it.
 - The evidence folder. It is the **only** place you write.
 - Whether you may change data (rung 7 and other functional checks), and the
   record prefix you may create. Without that permission, click or submit
@@ -52,7 +56,9 @@ you have and which capabilities above it covers. Do nothing else.
 
 - Confirm the live revision with `env_app` equals the expected revision. If
   not, wait (a wait that actually blocks) and re-read up to 3 times, 60 s
-  apart; still different: report and stop.
+  apart; still different: report and stop. A reference-only brief (a local
+  design file, no app yet) has no revision to confirm: skip this check and
+  say so in the report.
 - List open pages and note them. They are not yours: never select, navigate,
   sign out or close them.
 - Open exactly one page for the run.

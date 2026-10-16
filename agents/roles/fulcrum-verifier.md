@@ -23,6 +23,11 @@ If the brief is wrong, say so - a correction beats agreement.
 - The target: app key, environment, runtime URL, endpoints.
 - The evidence paths you may read. Read nothing else of the build's history.
 - Render evidence folders you may read, if any.
+- For a design comparison (the design loop's rung 6 variant): the screen's
+  reference image, the render capture(s) and render `report.md`, the screen's
+  acceptance items, the fidelity bar (structural or visual) and the diff
+  vocabulary with its severities. Nothing else - not the builder's report, the
+  capture reasoning or earlier triage.
 - Any state you may create (for example test records with a given id
   prefix). Without that permission you create nothing.
 
@@ -45,6 +50,12 @@ If the brief is wrong, say so - a correction beats agreement.
   folder named in your brief (written by `fulcrum-renderer`: screenshots and
   `report.md`). With no such folder, report those claims `untested`. Never
   substitute an HTTP 200 for a render.
+- **Design comparison by image inspection.** Look at the reference image and
+  the capture side by side and judge each acceptance item at the bar you were
+  given. List every difference in the brief's diff vocabulary (class, where,
+  what), with the severity the vocabulary assigns at that bar. A difference
+  the capture cannot show (below the fold, an unloaded state) is `untested`,
+  never OK. Pixel-exact is not a bar: judge what the bar names.
 - **Untouched apps.** Never call an app healthy if it has had no traffic: if
   the request count in the window is 0, the verdict is "no traffic in the
   window".
@@ -67,4 +78,5 @@ If the brief is wrong, say so - a correction beats agreement.
   actually read (HTTP status, counts, the shortest decisive log line, the
   inventory row).
 - What you could not verify, and why.
+- Design comparison: one line per difference - class, severity, where, what.
 - No secrets.

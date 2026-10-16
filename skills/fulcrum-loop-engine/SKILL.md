@@ -90,7 +90,8 @@ Without it the app carries a shape nothing in the repo explains, and
 A failed verify does not end the iteration. It enters a bounded inner loop
 between phases 5 and 6.
 
-**The ceiling is not this skill's to set.** It is **1 build turn + at most 2 fix
+**The ceiling is not this skill's to set.** It is **1 build turn (a build pass of up
+to 4 short turns counts as one) + at most 2 fix
 turns per step** - `../fulcrum-mentor-turns/SKILL.md`, heading "Turn economics",
 and `../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading
 "The turn cap". Both state the same number. Obey it; never invent a second one.

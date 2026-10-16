@@ -27,6 +27,7 @@ directly. Otherwise, load `skills/fulcrum`.
 |---|---|
 | Unsure which skill applies, or resuming an engagement | `skills/fulcrum` |
 | Have an idea for an app but nothing written down yet | `skills/fulcrum-discovery` |
+| One screenshot, mockup, Figma or HTML/TSX design for one app, to be built into a working app | `skills/fulcrum-design-loop` |
 | Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/fulcrum-solution-init` |
 | An app already exists and you need to know how it compares to its requirements, what is missing, or what to build next | `skills/fulcrum-gap-analysis` |
 | Where durable project state lives - `.fulcrum/` file set, the session lease, the halt record | `skills/fulcrum-project-state` |

@@ -114,7 +114,10 @@ rule)
    and the Development `env_key`, the assertions as observable outcomes, the
    sign-in mode and persona per assertion, viewport(s), the evidence folder,
    the expected revision, whether it may change data, and whether screenshots
-   are allowed. Not the build's intent narrative. Plus everything in
+   are allowed. On the design loop the viewport(s) come from
+   `.fulcrum/design/manifest.md`, and a brief may also ask for a reference
+   render of a local design file (an HTML source) into the evidence folder it
+   names (heading "Local-file reference render - no app"). Not the build's intent narrative. Plus everything in
    `../fulcrum-unattended-guardrails/references/delegation.md`, heading "What
    a brief must contain".
 2. **Confirm live revision** with `env_app` before the first load.
@@ -134,6 +137,19 @@ rule)
    reload or re-navigate, then capture again. A confirmation toast alone is
    never evidence. Data changes follow the rule under "When to run".
 8. **Report** observations only; the orchestrator gives the verdict.
+
+## Local-file reference render - no app
+
+The design loop's HTML reference render runs in its capture phase, before any app
+exists. Its brief names the local file, the viewport(s), the evidence folder
+(`.fulcrum/evidence/render/design-ref/<UTC-stamp>/` while no `TASKS.md` row exists)
+and whether screenshots are allowed. Steps 2 and 3 above do not apply - there is no
+publish, no revision and no lag - and there is no sign-in; steps 4, 6 and 8 do. Whether
+the harness's browser opens a `file://` URL is `[UNVERIFIED]`: on a refusal the
+renderer reports it and the source falls to capture from code (the design loop's
+tier B or C). The renderer writes only the evidence folder; copying the capture into
+`design/reference/` is the orchestrator's
+(`../fulcrum-design-loop/references/capture-recipes.md`, heading "Reference images").
 
 ## Render obligation - what to look for
 
@@ -184,8 +200,9 @@ not captured. (Fulcrum rule)
 
 ## What this skill does not do
 
-- Pixel diff against a design. Hook for a future design-compare skill: it
-  would consume this skill's screenshots as its input.
+- Comparison against a design, pixel or otherwise. The design loop's
+  render-compare consumes this skill's captures:
+  `../fulcrum-design-loop/references/render-compare.md`.
 - Load or performance testing.
 - Credential entry, account creation outside mode b, or role grants.
 - Diagnosis or repair of what it sees.

@@ -80,7 +80,8 @@ if used >= 0.65 x budget:               write the checkpoint, continue
 
 `cost_of_one_iteration` is the class-calibrated figure above, plus the fix-loop
 allowance if the task's history suggests it will need one. **Budget for the
-ceiling, not the happy path**: a task allowed 1 build + 2 fix turns can consume
+ceiling, not the happy path**: a task allowed 1 build turn (a pass of up to 4
+short turns counts as one) + 2 fix turns can consume
 all three, and an iteration budgeted for one turn hands back in the middle of
 the second.
 

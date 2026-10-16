@@ -57,8 +57,9 @@ them to its own tools (`agents/README.md`).
 |---|---|
 | `fulcrum-poller` | `run-read`, `blocking-wait` |
 | `fulcrum-mentor-driver` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (append to the session journal file named in the brief, and RUN-IDS, only), `spawn-poller` |
-| `fulcrum-verifier` | `published-read`, `file-read`, `http-probe`, `blocking-wait` |
+| `fulcrum-verifier` | `published-read`, `file-read` (including image inspection of reference and render images named in the brief), `http-probe`, `blocking-wait` |
 | `fulcrum-renderer` | `browser-automation` (never a credential or other secret typed; data changes in Development only, when an assertion needs one), `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (its evidence folder only) |
+| `fulcrum-capturer` | `file-read` (including image inspection), `file-write-scoped` (the `.fulcrum/design/` paths named in the brief only), `design-source-read` |
 | read-only investigator | `file-read`, `published-read` |
 | file-scoped builder | `file-read`, `file-write-scoped` |
 
@@ -68,7 +69,8 @@ general-purpose agent starts with the whole tool listing and instruction
 context in its window and can reach tools its job never needs. Where the
 harness has an adapter, use it. Only the Mentor-driver holds `mentor-drive`;
 only the Mentor-driver holds `spawn-poller`.
-Only the renderer holds `browser-automation`. Its browser tools can type; the
+Only the renderer holds `browser-automation`. Only the capturer holds
+`design-source-read`. Its browser tools can type; the
 rule that it never types a credential or other secret is a Fulcrum rule, not a
 tool restriction.
 
@@ -254,7 +256,8 @@ Non-negotiable in every subagent brief:
    all in this dispatch. Name the role: only the Mentor-driver may spawn, and
    then exactly one poller. Every other role: "you do not dispatch" - say so
    rather than leaving it unsaid.
-8. **The turn cap and the halt rule** - 1 build + 2 fix turns; stuck twice after
+8. **The turn cap and the halt rule** - 1 build turn (a build pass of up to 4
+   short turns counts as one) + 2 fix turns; stuck twice after
    a diagnostic step means stop and report.
 9. **"Correct my briefing - a correction beats agreement."** Verbatim, in every
    brief. [VERIFIED] On the source build this single line surfaced most of the

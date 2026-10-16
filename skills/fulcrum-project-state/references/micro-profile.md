@@ -54,6 +54,19 @@ per-action log was the field workaround, and it lost the index row that answers
    pass both to the driver. Then hand to `../../fulcrum-loop-engine/SKILL.md`. Write ordering, ownership and
    halt rules are exactly the full profile's: `../SKILL.md`.
 
+## Design variant
+
+The design loop (`../../fulcrum-design-loop/SKILL.md`) runs on this profile with one
+addition and one larger allowance. Files: the micro set above plus `.fulcrum/design/`
+(manifest, source copies, per-screen specs, gate and fidelity records; schemas in the
+design loop's `references/design-spec-format.md`), and `project.md` carries
+`design: .fulcrum/design/manifest.md` (`file-schemas.md`, heading "`project.md`").
+Steps: **5 + N, N <= 6 screens** - shell, theme, chrome, data, seed, then one step per
+screen - instead of about five, plus one step for each screen step split because its
+build pass needs more than 4 turns. `plan.md` carries the template's optional `Design`
+line. Promote to the full profile, as below, at N > 6, at more than 11 steps (5 + 6)
+with split steps counted, or when a conflicting second design source arrives.
+
 ## Leaving the micro profile
 
 Promote to the full profile when any of these becomes true: a second app, more than

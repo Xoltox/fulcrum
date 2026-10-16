@@ -81,7 +81,7 @@ open `sessionId` in `HALT.md` (`../fulcrum-project-state/references/lease-and-co
 | Trigger | Why it is a hard stop |
 |---|---|
 | **Stuck twice** on the same defect after a diagnostic step | Two failures at the same tier means the model of the problem is wrong, not the attempt count. Detected mechanically: two `<task-id>:fail` entries in the `.fulcrum/JOURNAL.md` session index (`../fulcrum-loop-engine/SKILL.md`, heading "Oscillation detection - mechanical, not remembered") |
-| **Fix-turn cap exceeded** - more than 1 build + 2 fix turns for one step | Beyond that, Mentor is being asked to guess; each turn mutates the model |
+| **Fix-turn cap exceeded** - more than 1 build (a pass of up to 4 short turns counts as one) + 2 fix turns for one step | Beyond that, Mentor is being asked to guess; each turn mutates the model |
 | A mutating turn is about to run against a session whose **staleness guard did not pass** | This is the revert failure mode above |
 | The live app **regressed** - something previously verified now fails | Continuing builds on top of a corrupted state |
 | A step needs **the user's own action** - re-auth, a portal-only operation, an asset upload with no MCP path, **the user setting a secret in the Portal**, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** No amount of retrying creates a capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |

@@ -87,7 +87,8 @@ If the brief is wrong, say so - a correction beats agreement.
 
 ## Fix turns and stop rules
 
-- Per plan step: 1 build turn plus at most 2 fix turns. This is a ceiling.
+- Per plan step: 1 build turn (a build pass of up to 4 short turns counts as
+  one) plus at most 2 fix turns. This is a ceiling.
 - Before every fix turn, run a diagnostic read-back. Before the first publish,
   read back by asking Mentor (answer-back); published-state reads (`context_*`)
   show published state only and lag about 2 minutes after a publish.

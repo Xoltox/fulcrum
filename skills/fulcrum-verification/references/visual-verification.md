@@ -76,3 +76,7 @@ pattern that is wrong across several screens (a card layout, a badge style, a
 chip variant), fix the pattern once at its source and propagate the fix,
 rather than re-deriving and re-fixing it per screen. Re-deriving per screen
 both wastes turns and risks drifting the fix between screens.
+
+On the design loop the comparison has a fixed procedure - capture briefs, the diff
+vocabulary and severities per fidelity bar, pattern triage and the round cap:
+`../../fulcrum-design-loop/references/render-compare.md`.

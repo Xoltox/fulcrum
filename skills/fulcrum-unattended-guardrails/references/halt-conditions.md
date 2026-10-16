@@ -4,9 +4,16 @@
 
 **Per step: 1 build turn + at most 2 fix turns.** [VERIFIED]
 
+**What counts as the build turn.** A step's build is either one turn or a **build
+pass of up to 4 short granular turns** (one region or object per turn, in the same
+session, under the step's one objective); the pass counts as the one build turn.
+More than 4 build turns means the step is too big: split it into two steps, each
+ending in its Publish turn, rather than spending fix turns on build work. Consult,
+guard and Publish turns are not build turns. (Fulcrum rule)
+
 Mentor is not a batch processor - one objective per turn (see
-`../../fulcrum-mentor-turns/SKILL.md`). Past three turns on one step, the pattern
-observed is not convergence: it is Mentor guessing, and each guess mutates the
+`../../fulcrum-mentor-turns/SKILL.md`). Past the build pass plus 2 fix turns on one
+step, the pattern observed is not convergence: it is Mentor guessing, and each guess mutates the
 model. The cap exists because the cost of an extra turn is not a wasted turn, it
 is an unreviewed change to a live application.
 
@@ -71,7 +78,7 @@ open `sessionId` (`../../fulcrum-project-state/references/lease-and-concurrency.
 | Trigger | Detail |
 |---|---|
 | Stuck twice after a diagnostic step | The escalation ceiling is exhausted. Two `:fail` entries for one task id in the session index is this firing mechanically |
-| Turn cap exceeded on one step | 1 build + 2 fix |
+| Turn cap exceeded on one step | 1 build (a pass of <= 4 short turns counts as one) + 2 fix |
 | A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
 | A previously verified behaviour now fails | Regression. Continuing builds on a corrupted state |
 | A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |

@@ -18,9 +18,9 @@ A solution-sized ask - more than a handful of screens, or more than one app, or 
 plus agents plus workflows - with source material that is not yet a spec, and no repo
 that already has a plan and a tenant profile.
 
-**Not** for one app from one clean source with no decomposition: a single-app bootstrap
-(see **Routing**), or with no BRD and about five or fewer steps, the router's micro
-profile (`../fulcrum-project-state/references/micro-profile.md`), which asks the step-2
+**Not** for one app from one clean source with no decomposition: one app from one
+design source (`../fulcrum-design-loop/SKILL.md`), or with no BRD and about five or
+fewer steps, the router's micro profile (`../fulcrum-project-state/references/micro-profile.md`), which asks the step-2
 app-creation question itself. **Not** for a repo this skill scaffolded: edit the plan.
 
 ## Does not own
@@ -139,7 +139,8 @@ Decide and write into the plan:
   revisions; heavy screen steps ran ~14 Mentor turns and ~46 minutes each.
   `[SINGLE-OBSERVATION]` Budget from these, not from optimism.
 - **Right-sizing test.** A step is right-sized when a *fresh* agent with no history can
-  execute it against one written spec within a cap of **one build turn plus two fix
+  execute it against one written spec within a cap of **one build turn (a build pass
+  of up to 4 short turns counts as one) plus two fix
   turns**. If it cannot, split it.
 
 Worked sizing tables and slice ordering: `references/decomposition-and-sizing.md`.
@@ -176,15 +177,14 @@ Route each app's first build by the source type available **for that app**:
 
 | Source for that app | Route to |
 |---|---|
-| Structured front-end code - TSX/React/HTML | the design-source bootstrap skill (`outsystems-design-to-app`) - its highest-fidelity input |
-| Visual - Figma URL, screenshots, image mockups | the same design-source bootstrap skill |
-| Text only - derived brief, prose spec | the text-spec bootstrap skill (`outsystems-spec-driven-build`) |
-| Both | design-source skill for theme, chrome and screens; text-spec skill for entities |
+| Visual or code design - screenshots, concept images, Figma frames, HTML, TSX/React | `../fulcrum-design-loop/SKILL.md`, entered at its phase 1 (Capture) with this plan's app, shell decision and step ids; intake questions already answered here are not re-asked, and every unanswered batch B question is asked before capture. Per app: `.fulcrum/design/<app>/`, one `project.md` `design` entry, at most 6 screens |
+| Text only - derived brief, prose spec | `../fulcrum-mentor-turns/SKILL.md` per spec |
+| Both | design loop for theme, chrome and screens; this skill's specs for entities and logic |
 
-Both are single-app, single-source bootstraps producing draft scaffolds; neither
-decomposes a solution. Give each **one app, one shell, one spec** - shell from step 2,
-spec from step 6 - and never let either re-derive scope. Sessions after the bootstrap
-turn use `../fulcrum-mentor-turns/SKILL.md` directly.
+Fulcrum never runs an external bootstrap skill's procedure. Where `outsystems-design-to-app`
+is installed, the design loop may read its reference data as `[UNVERIFIED]` input; its
+batching, prompt, session and publish procedure conflicts with Fulcrum rules
+(`../fulcrum-design-loop/references/official-skill-interop.md`).
 
 ## Exit gate
 

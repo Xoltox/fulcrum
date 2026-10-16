@@ -25,9 +25,10 @@ already gone off cheap - stop and re-derive the answer from the index instead.
 
 | # | Found | Route | Notes |
 |---|---|---|---|
-| 0 | No `.fulcrum/`, no app, no BRD or source material to triage, and the ask names one app of about five or fewer steps | **Propose** the micro profile; the user confirms | Confirmed: `../../fulcrum-project-state/references/micro-profile.md`, then `../../fulcrum-loop-engine/SKILL.md` phase 1. Declined: rows 1-2. Signals and the proposal: "Proposing the micro profile" below. |
+| 0 | No `.fulcrum/`, no app, no BRD, no design source and nothing to triage, and the ask names one app of about five or fewer steps | **Propose** the micro profile; the user confirms | Confirmed: `../../fulcrum-project-state/references/micro-profile.md`, then `../../fulcrum-loop-engine/SKILL.md` phase 1. Declined: rows 1-2. Signals and the proposal: "Proposing the micro profile" below. |
+| 0b | No `.fulcrum/`, no app, one design source for one app (an image set, Figma frames, one HTML or TSX source) of about six or fewer screens, no BRD, nothing to triage | **Propose** the design loop; the user confirms | Confirmed: `../../fulcrum-design-loop/SKILL.md`. Declined: the next matching row. Signals and the proposal: "Proposing the design loop" below. |
 | 1 | No `.fulcrum/`, no app, no source material | `../../fulcrum-discovery/SKILL.md` | Nothing to ingest yet; interview first. |
-| 2 | No `.fulcrum/`, no app, source material present | `../../fulcrum-solution-init/SKILL.md` | Source material is the trigger, not the user's framing of it. |
+| 2 | No `.fulcrum/`, no app, source material present | `../../fulcrum-solution-init/SKILL.md` | Source material is the trigger, not the user's framing of it, unless row 0b matched and the user confirmed. |
 | 3 | No `.fulcrum/`, app exists | `../../fulcrum-gap-analysis/SKILL.md` | An app with no `.fulcrum/` was built by something other than a Fulcrum-tracked session (a generator, a prior manual build, another agent). Never re-run `fulcrum-solution-init` against it - that skill is pre-build only. |
 | 4 | `.fulcrum/` present, `HALT.md` present | Stop, report, ask a human | See `../SKILL.md`, heading "HALT.md is absolute - state the mechanism". Absolute - no exceptions below override this row. |
 | 5 | `.fulcrum/` present, last `JOURNAL.md` row `State: open` | Resume at `../../fulcrum-loop-engine/SKILL.md` phase 4 (poll to terminal) | Possible crash or a run still executing - not a halt. See `../../fulcrum-project-state/references/resume-and-halt.md`, "Crash recovery". |
@@ -62,6 +63,19 @@ grow, and a profile chosen for them is a scope decision taken without them.
 If the ask is too vague to write the micro plan's Acceptance section in observable
 terms, micro is still possible, but the holes are filled first with
 `../../fulcrum-discovery/SKILL.md` in its fill-one-hole use, not by guessing.
+
+## Proposing the design loop
+
+Signals, all required: one app; one design (images no more than the screens plus a
+few states, one Figma page, or one HTML or TSX entry point); about six or fewer
+distinct screens; no BRD. A single design source for one app that needs no
+deduplication is not source material to triage.
+
+Put it to the user in the first batch, alongside mode, as one question: design loop
+(recommended, with the one-clause reason) or the full path
+(`../../fulcrum-solution-init/SKILL.md`). **Never auto-pick the design loop**,
+including in `expert` mode. Intake from there: `../../fulcrum-design-loop/SKILL.md`,
+heading "Intake".
 
 ## Conflicting-signal cases
 

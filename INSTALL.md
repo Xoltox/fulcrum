@@ -6,14 +6,14 @@ do not treat it as background reading.
 
 ## The goal, stated plainly
 
-Fulcrum is twelve skill directories under `skills/` (`fulcrum`,
-`fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-gap-analysis`,
+Fulcrum is thirteen skill directories under `skills/` (`fulcrum`,
+`fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-design-loop`, `fulcrum-gap-analysis`,
 `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`,
 `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-render-check`,
 `fulcrum-seed-data`,
 `fulcrum-unattended-guardrails`). Each contains a `SKILL.md` plus a
 `references/` directory and sometimes `templates/`. Your job: find where your
-own harness looks for skills, and copy each of those twelve directories there
+own harness looks for skills, and copy each of those thirteen directories there
 **whole** - the directory, not just `SKILL.md`. A skill missing its
 `references/` is broken even though it looks installed.
 
@@ -22,8 +22,8 @@ directory. That is the entire mechanism. There is no per-harness script here
 and there should not be one - state the goal, find the path, copy the
 directories.
 
-Fulcrum also ships four agent roles under `agents/` (`fulcrum-poller`,
-`fulcrum-mentor-driver`, `fulcrum-verifier`, `fulcrum-renderer`). Install them too - see "Agent
+Fulcrum also ships five agent roles under `agents/` (`fulcrum-poller`,
+`fulcrum-mentor-driver`, `fulcrum-verifier`, `fulcrum-renderer`, `fulcrum-capturer`). Install them too - see "Agent
 roles" below. Skipping them leaves every orchestrator improvising
 heavyweight general-purpose agents for work these lean roles do.
 
@@ -38,7 +38,7 @@ heavyweight general-purpose agents for work these lean roles do.
 - **Report exactly what happened**: where you installed (the resolved path),
   what was newly added, what was updated in place, and what was skipped and
   why. A silent half-install is worse than a loud partial one - if you could
-  not resolve a skills directory, or copied four of twelve skills before
+  not resolve a skills directory, or copied four of thirteen skills before
   hitting a problem, say so explicitly rather than declaring success.
 
 ## Safety - read this even if you skim the rest
@@ -170,7 +170,7 @@ whether there's only an idea, and dispatches to the right skill itself.
 - The resolved skills directory path.
 - The resolved agents location, which agent definitions were added, updated
   or skipped (and why), and whether the user was told to restart.
-- Which of the twelve directories were added, which were updated, which were
+- Which of the thirteen directories were added, which were updated, which were
   skipped, and the reason for each skip.
 - The interview answers and where you recorded them
   (`MODEL-TIERS.local.md`'s path).

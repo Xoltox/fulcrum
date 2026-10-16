@@ -65,6 +65,11 @@ delegated role, or no sign-in mode can reach the screen, rungs 6-7 are
 `untested` unless the user performs the render and hands back the result.
 An `untested` rung is a stated gap, never a pass. (Fulcrum rule)
 
+**Rung 6, design variant.** When `project.md` carries `design` (the design loop),
+rung 6 on a screen also compares the render against the screen's reference design:
+`../fulcrum-design-loop/references/render-compare.md`. Capture is still the renderer's;
+the judgement is a blind `fulcrum-verifier` with image inspection.
+
 **Rung 4 is asymmetric and is never a pass.** `[SCHEMA]` An `Error` entry is
 proof of a real runtime failure - treat it as a hard fail and stop. An empty
 result is the absence of evidence, not evidence of correctness: a silent

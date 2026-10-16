@@ -27,6 +27,7 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | Running the task list once resumed | `../fulcrum-loop-engine/SKILL.md` |
 | Rendering a published screen in a browser (rungs 6-7, the render obligation, access checks) | `../fulcrum-render-check/SKILL.md` |
 | A small engagement run on the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
+| One design source for one app -> a published app | `../fulcrum-design-loop/SKILL.md` |
 | **Out of family:** external systems and integration targets (an integration target or external system (another vendor's server, a workflow engine, a third-party API)) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
 | What `mode` and `posture` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
 
@@ -37,7 +38,8 @@ including every conflicting-signal case: `references/detection-procedure.md`.
 
 | Found | Route |
 |---|---|
-| No `.fulcrum/`, no app, no BRD or source material to triage, and the ask is one app of about five or fewer steps | **Propose the micro profile; the user confirms.** Confirmed: `../fulcrum-project-state/references/micro-profile.md`, then the loop engine. Declined: the next matching row |
+| No `.fulcrum/`, no app, no BRD, no design source and nothing to triage, and the ask is one app of about five or fewer steps | **Propose the micro profile; the user confirms.** Confirmed: `../fulcrum-project-state/references/micro-profile.md`, then the loop engine. Declined: the next matching row |
+| No `.fulcrum/`, no app, one design source for one app (an image set, Figma frames, one HTML or TSX source) of about six or fewer screens, no BRD, nothing to triage | **Propose the design loop; the user confirms.** Confirmed: `../fulcrum-design-loop/SKILL.md`. Declined: the next matching row |
 | No `.fulcrum/`, no app, no source material | `../fulcrum-discovery/SKILL.md` |
 | No `.fulcrum/`, no app, source material present (BRD, Figma/Stitch export, mockups, screenshots) | `../fulcrum-solution-init/SKILL.md` |
 | No `.fulcrum/`, an app already exists | `../fulcrum-gap-analysis/SKILL.md` |
@@ -156,5 +158,6 @@ the others.
 |---|---|
 | Any ladder row, or a conflicting-signal case (mismatched tenant, app with no state, `TASKS.md` rows but no plan) | `references/detection-procedure.md` |
 | Proposing or running the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
+| Proposing the design loop | `../fulcrum-design-loop/SKILL.md`, heading "Intake" |
 | Composing a guided-mode question batch | `references/guided-mode-interaction.md` |
 | Before dispatching, confirming the ops the next phase needs are callable | `references/tool-preflight.md` |

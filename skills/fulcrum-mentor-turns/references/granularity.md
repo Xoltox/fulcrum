@@ -32,7 +32,10 @@ abandoned - one twice - before the same scope landed cleanly as batched turns
 ## Turn economics
 
 Nominal budget per step: **1 build turn + up to 2 fix turns**, plus the
-Publish turn. Disclose overages, never absorb them. Heavy steps have run 14
+Publish turn. Granular building does not break the cap: a build pass of up to 4
+short turns in one step counts as the one build turn; past 4, split the step
+(`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading "The
+turn cap"). Disclose overages, never absorb them. Heavy steps have run 14
 turns and ~46 minutes including publishes - a ceiling, not a problem signal.
 Granular turns ran ~5-7 minutes; flag past **~7 minutes** as split-further.
 A long answer costs thousands of tokens to drain; ask for short answers.

@@ -44,6 +44,7 @@ source:
 | **Deprecated - `mentor_publish`:** the call returned a deprecation error (text under "Error texts") even though its schema description still described it as working. Not listed at all on 2026-10-16. Publish through a prompt instead ("Publishing"). | `[VERIFIED]` (error); absence `[SCHEMA]` 2026-10-16 | 2026-10-08, 2026-10-09 | probe plus two field reports |
 | **Deprecated - `deploy_logs`:** alias of `env_deploy_history`, slated for removal. Use `env_deploy_history` or `deploy_messages`. | `[SCHEMA]` | 2026-10-09 | schema |
 | **Server descriptions can be stale.** `mentor_publish` described itself as working; `build_list` still tells callers to wait on `publish_start`, which no longer exists; on 2026-10-16 the `publish_status` description still names `mentor_publish` as the source of the key although that tool no longer lists. Trust call behaviour over description text. | `[VERIFIED]` (2026-10-09); `publish_status` text `[SCHEMA]` | 2026-10-09, 2026-10-16 | probe vs schema |
+| **`mentor_request_upload` is not an image path.** Params `sessionId`, `fileName`, `sizeBytes` (1 byte to 10 MB); it mints a presigned PUT URL whose `attachmentId` a `mentor_prompt` then references. Allowed extensions: `.txt .pdf .json .xml .docx .md` - no image format. Whether an uploaded attachment can become an image resource in the app is not stated and not tested. | `[SCHEMA]` | 2026-10-16 | schema |
 | `deploy_start` and `deploy_rollback` state that shipping to Production needs explicit user confirmation first; `deploy_impact` may inform that confirmation. | `[SCHEMA]` | 2026-10-09 | schema |
 
 ## Creating and loading an asset
@@ -152,6 +153,7 @@ Verbatim, for matching. Tag and source as noted.
 | `asset_type_not_listable_by_env_app` | `env_app` on a deployed `Workflow` | `[SCHEMA]` |
 | `invalid_env_key` | `env_key` is not one of this tenant's environments; pick one from `env_list` and retry | `[SCHEMA]` (server instructions, 2026-10-16) |
 | `data.category: "ThrottledError"`, `data.code: "repeated_failure_throttled"` | that exact call failed upstream the same way several times in a short window and was throttled; do not repeat it unchanged (rest of the instruction text was truncated when read on 2026-10-16) | `[SCHEMA]` (server instructions, 2026-10-16) |
+| `tenant_not_allowed` | an allowlist gate, not a lapsed sign-in: re-auth and re-registering fail the same way. Confirm the configured host is the tenant meant (a wrong tenant host returns this too); if it is, stop and say the tenant needs enabling | `[UNVERIFIED]` (vendor skill text, 2026-10-16; not observed) |
 
 ## Re-probing the surface
 

@@ -213,5 +213,5 @@ heading "Publishing".
 
 Auth expiry, lost sessions, the capacity throttle, failed publishes, abandoned
 prompts: `references/recovery.md` - read before treating an interrupted turn as
-failed. Budget per step: 1 build turn + up to 2 fix turns, plus the Publish turn;
-disclose overages (`references/granularity.md`, "Turn economics").
+failed. Budget per step: 1 build turn (or a build pass of up to 4 short turns,
+which counts as one) + up to 2 fix turns, plus the Publish turn; disclose overages (`references/granularity.md`, "Turn economics").

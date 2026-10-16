@@ -137,6 +137,8 @@ back green.
   created an app or added screens is not done until the render obligation is
   met (`../../fulcrum-verification/SKILL.md`, heading "Render obligation");
   a sign-in the harness cannot perform is a user-action hand-off.
+- With `design` set in `project.md` (the design loop), rung 6 on a screen row runs
+  the design variant: `../../fulcrum-design-loop/references/render-compare.md`.
 - Rung 4 fails a change on its own and can never pass one. An empty log is the
   absence of evidence. `[SCHEMA]`
 - A subagent's report of success is not proof. Require it to state what it could

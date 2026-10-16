@@ -134,7 +134,8 @@ past its size, it is promoted here with its micro `plan.md` as source material.
 ### The right-sizing test
 
 A step is right-sized when **a fresh agent with no history can execute it against one
-written spec within a cap of one build turn plus two fix turns.**
+written spec within a cap of one build turn (a build pass of up to 4 short turns
+counts as one) plus two fix turns.**
 
 Every clause carries weight:
 

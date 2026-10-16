@@ -8,7 +8,7 @@ different evidence and must not be collapsed into one counter.
 |---|---|---|
 | Scope | One task, one session | One task id, whole project history |
 | Evidence | Turns issued in this iteration | `:fail` entries in `.fulcrum/JOURNAL.md` |
-| Ceiling | 1 build + 2 fix turns | 2 `:fail` entries |
+| Ceiling | 1 build (a pass of <= 4 short turns counts as one) + 2 fix turns | 2 `:fail` entries |
 | Owner of the number | `../../fulcrum-mentor-turns/SKILL.md`, "Turn economics" | `../../../AGENTS.md`, "stuck twice" |
 | On breach | Stop the inner loop, record `fail` | Hand to the halt path |
 

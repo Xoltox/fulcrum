@@ -187,7 +187,14 @@ app, requirements should be summarised as text in the prompt instead. So this
 does **not** enable a design-to-app path. It attaches a BRD, PDF or JSON spec at
 session start - useful to `fulcrum-solution-init`, which today ingests source material
 entirely into agent context. Figma/screenshot ingestion stays the agent's own
-image-inspection job, as that skill already routes it.
+image-inspection job (`fulcrum-design-loop`'s capturer for one design and one app).
+
+**Attachment experiment - deferred to the design loop's live evaluation.** `.md` is
+an allowed extension, so a region's anatomy file could ride as an attachment instead
+of inline prompt text, possibly raising per-turn structure past the prompt ceiling.
+Untested: one throwaway turn in the live evaluation (Development only, throwaway app)
+decides it; no tenant call before then. Until it is observed, region turns carry
+their subtree inline (`fulcrum-design-loop`).
 
 ## `context_graph` vs the rest of `context_*`
 
@@ -272,9 +279,14 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   and parameters against the latest `mcp-snapshots/*.md` and emits only the delta,
   so the orchestrator never loads schemas itself. Until then the preflight drift
   check is names-only (`skills/fulcrum/references/tool-preflight.md`).
-- **Design-compare skill.** Pixel or structural comparison of
-  `fulcrum-render-check` screenshots against a reference design. The render
-  skill deliberately stops at capture; this would consume its evidence folder.
+- **Design-compare - shipped as `fulcrum-design-loop`.** One design source for
+  one app captured into a per-screen spec, built step by step, and each published
+  screen render-compared against its reference by a blind verifier with image
+  inspection (structural or visual bar; pixel-exact is not offered). The render
+  skill still stops at capture; the design loop consumes its evidence folder. Open:
+  the live evaluation on a throwaway app, including the attachment experiment
+  above; until it runs, the loop's render-compare and capture are `[UNVERIFIED]`
+  end to end.
 - **Probe the renderer end to end** on one generated app in Dev: confirm the
   sample-persona flow, sign-out, and what console/network signal the browser
   tool really returns; then promote the `[SINGLE-OBSERVATION]` / `[UNVERIFIED]`

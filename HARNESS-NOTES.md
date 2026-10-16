@@ -136,6 +136,13 @@ harness live in `agents/<harness>/`; the Claude Code adapters ship in
   Credential entry is not tool-blocked: the no-credential rule is prose.
   Untested: whether a subagent inheriting a browser MCP can drive a session the
   user signed into. `[UNVERIFIED]`
+- **Claude Code CLI - `fulcrum-capturer` inherits tools** (recorded 2026-10-16,
+  not yet observed). No `tools:` line, so a design-tool MCP the user has serves
+  `design-source-read`; `disallowedTools:` removes every `mcp__outsystems__`
+  tool, Bash, PowerShell, Monitor, web tools, Edit, NotebookEdit, Skill and
+  Agent. Browser tools are inherited and not denied (names vary per user): the
+  no-browser rule is prose. Untested: whether Read's image view at subagent depth
+  is enough for capture and comparison. `[UNVERIFIED]`
 
 A useful addition names: the harness, exactly what was observed, how it was
 noticed (what tipped you off that something was different from the

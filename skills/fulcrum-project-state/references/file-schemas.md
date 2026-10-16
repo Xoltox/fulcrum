@@ -43,6 +43,7 @@ writer per shared file removes the race and makes staleness one agent's job to f
 | `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
 | `checkpoints/<agent-label>.md` | that agent | - |
 | `evidence/render/<task-id>/<UTC-stamp>/*` | `fulcrum-renderer`, only the folder its brief names | The orchestrator links the folder from the session journal line; nobody edits evidence after the run |
+| `design/*` | `fulcrum-capturer` in the design loop's capture and gate phases (only the paths its brief names: a shared dispatch the app-wide `tokens.md`, `theme.css`, `data.md`; a screen dispatch only its `screens/<SID>.md`); the orchestrator after. `design/reference/*` and `design/user-shots/*` are the orchestrator's only: it copies the image source, or a renderer capture out of `evidence/render/`, into `reference/`, and files a user's tier-B screenshot under `user-shots/` | Drivers, renderer and verifier never write it |
 
 A **driver** (a delegated agent running turns) writes nothing outside appended rows in
 the session journal file its brief names, its `RUN-IDS.md` lines and, if it stops the
@@ -70,9 +71,10 @@ is fine, but its durable content moves into those files at wave close.
 
 ## project.md
 
-`<!-- fulcrum-schema: project v2 -->`
+`<!-- fulcrum-schema: project v3 -->`
 
-v2 adds `profile`. A v1 file is read as `profile: full`.
+v2 adds `profile`. A v1 file is read as `profile: full`. v3 adds the optional
+`design` field; a v2 file is read as v3 without it.
 
 Rewritten. Identity and settings only - no history, no task state.
 
@@ -84,6 +86,7 @@ Rewritten. Identity and settings only - no history, no task state.
 | `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
 | `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
+| `design` | Optional. `.fulcrum/design/manifest.md` when the engagement runs the design loop (`../../fulcrum-design-loop/SKILL.md`); on the full profile a list, one `.fulcrum/design/<app>/manifest.md` per app the loop runs for. Present -> the loop engine runs rung 6 on screen rows as the design variant (render-compare). Omit otherwise. |
 | `browser` | Optional. The render preflight result for this project: state (`callable` \| `unavailable` \| `unknown`), the browser tool set found (e.g. the MCP server prefix), the capabilities it covers, and the date. Per project, because the harness and its browser can differ between projects. Written per `../../fulcrum-render-check/SKILL.md`, heading "Preflight - once per project". |
 | `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` -> a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution - how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override - an empty section reads as a decision and pins nothing. |
 
@@ -468,6 +471,20 @@ before the first render and recorded in `DECISIONS.md`. Until it is recorded a
 render writes no screenshot file (page text and DOM snapshot only); Fulcrum
 never adds an ignore entry or leaves files untracked on its own. Never a
 secret, token or cookie.
+
+## design/
+
+Present only on the design loop (`project.md` field `design`); on the full profile one
+`design/<app>/` per app, same layout. Layout: `manifest.md`,
+`source/` (verbatim copies of the user's design, write-once), `reference/<SID>.<ext>`
+(the image source copied unchanged, or a copied HTML render; orchestrator only),
+`tokens.md`, `theme.css`, `data.md`, `screens/<SID>.md`, `gate.md`,
+`fidelity/<SID>-r<n>.md`, `user-shots/<SID>-r<n>.<ext>` (tier B, orchestrator only),
+`backlog.md`, `report.md`. Markers, `<!-- fulcrum-schema: <marker> -->`:
+`design-manifest v1`, `design-screen v1`, `design-gate v1`, `design-fidelity v1`,
+`design-report v1`; the other files carry none. The schemas live in `../../fulcrum-design-loop/references/design-spec-format.md`,
+not here. Whether `source/` copies and render screenshots are committed is the user's
+choice, recorded in `DECISIONS.md`. Ownership: "Write ownership" above.
 
 ## checkpoints/<agent-label>.md
 

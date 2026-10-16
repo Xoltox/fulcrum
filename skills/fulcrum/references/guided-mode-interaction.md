@@ -15,6 +15,8 @@ The router's questions are scoped to **routing and mode** only:
 - Micro profile or full path, when detection row 0's signals match - proposed with
   a recommendation, never picked for the user (`detection-procedure.md`, heading
   "Proposing the micro profile").
+- Design loop or full path, when detection row 0b's signals match - proposed the
+  same way (`detection-procedure.md`, heading "Proposing the design loop").
 - Which of two equally-plausible ladder rows applies, when a
   conflicting-signal case in `detection-procedure.md` has no mechanical
   answer.
@@ -64,6 +66,17 @@ choices and, where one exists, a one-clause recommendation.
 >   triage.*
 > - **full** - an interview to a written brief, then a planned, specced build.
 >   Better if this is likely to grow past one app or about five steps.
+>
+> Which do you want?
+
+**Example - one design for one app, design loop:**
+
+> No `.fulcrum/` and no app; you handed over one design for one app with N screens.
+> - **design loop** - I capture the design into a per-screen spec, build it through
+>   Mentor one step at a time and compare each published screen against it.
+>   *Recommended: one app, N screens, one design.*
+> - **full** - a planned, specced build from the design as source material. Better
+>   if it will grow past one app or about six screens.
 >
 > Which do you want?
 
