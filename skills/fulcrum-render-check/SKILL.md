@@ -33,9 +33,11 @@ work. (Fulcrum rule)
   serve the new revision after the gate passes is a separate question and
   `[UNVERIFIED]`, which is why the procedure retries. A render of the
   previous revision proves nothing about this one.
-- **Every step that adds or changes a screen**: rung 6 for that screen.
-- **Every step that creates an app or adds screens**: the render obligation -
-  the default screen signed out, plus one authenticated screen.
+- **Where a gate owes a render** (`../fulcrum-verification/references/gates-and-rigor.md`):
+  rung 6 for the screens that G1 names, at demo only at the join.
+- **The render obligation** (default screen signed out, plus one authenticated
+  screen): once per app, at its first G1 (at demo, the join), not every step.
+  Per-screen design comparison is the design loop's.
 - **Every access claim**, anonymous and signed-in. `context_screens` access
   flags on template screens have disagreed with Mentor `[VERIFIED]`; only a
   render proves who can reach a screen.
@@ -46,9 +48,10 @@ work. (Fulcrum rule)
 **Data-changing interactions** - submitting a form that creates, updates or
 deletes a record, an upload - only when an assertion requires it, only in the
 Development environment, never on a Test or Production URL, and each one
-recorded in `report.md` (what was created or changed) so the test data can be
-cleaned up. Typing into an ordinary field (a search box, a form under test) is
-not itself a data change. (Fulcrum rule)
+recorded in `report.md` so the test data can be cleaned up. Typing into an
+ordinary field is not itself a data change. Act only on a record created for
+the test under the brief's prefix, never a seeded row: an approve or delete
+cannot be undone, and the demo data then needs a re-seed. (Fulcrum rule)
 
 ## Preflight - once per project
 
@@ -92,11 +95,9 @@ real identity-provider user and grants it a role `[SINGLE-OBSERVATION]`
 records the answer in `DECISIONS.md`. Absent a recorded yes, mode b is off.
 (Fulcrum rule)
 
-**Choosing a persona.** Read the target screen's roles (`context_screens`),
-then pick the least-privileged persona whose role is on that list, so a
-pass is not an admin bypass. For a negative access check pick a persona
-whose role is not on it and expect InvalidPermissions. Role flags on
-template screens are unreliable, so the render, not the flag, is the proof.
+**Choosing a persona.** Pick the least-privileged persona whose role is on the
+screen's role list (`context_screens`), so a pass is not an admin bypass; for a
+negative check, one whose role is not. The render, not the flag, is the proof.
 
 **No credential is ever typed** - never a password, token, API key,
 one-time code or other secret, into any field, by any mechanism, and never
@@ -125,7 +126,9 @@ rule)
 3. **Lag and retry.** A 404, the previous revision's content, or a
    generic error page right after a publish is not a FAIL. Wait (a real
    blocking wait) 60 s and reload; at most 3 tries after the first load;
-   then record the observation and stop that assertion.
+   then record the observation and stop that assertion. Cold start, a stale
+   client bundle and a leaked prior session look like defects:
+   `references/harness-limits.md`.
 4. **One page per run.** List pages first; never touch a page the renderer did
    not open (in mode c it belongs to the user). Close every page it opened.
 5. **Order the modes**: all anonymous assertions first, then one persona at a
@@ -144,11 +147,10 @@ rule)
 The design loop's HTML reference render runs in its capture phase, before any app
 exists. Its brief names the local file, the viewport(s), the evidence folder
 (`.fulcrum/evidence/render/design-ref/<UTC-stamp>/` while no `TASKS.md` row exists)
-and whether screenshots are allowed. Steps 2 and 3 above do not apply - there is no
-publish, no revision and no lag - and there is no sign-in; steps 4, 6 and 8 do. Whether
-the harness's browser opens a `file://` URL is `[UNVERIFIED]`: on a refusal the
-renderer reports it and the source falls to capture from code (the design loop's
-tier B or C). The renderer writes only the evidence folder; copying the capture into
+and whether screenshots are allowed. Steps 2 and 3 above do not apply (no publish,
+revision, lag or sign-in); steps 4, 6 and 8 do. Whether the browser opens a
+`file://` URL is `[UNVERIFIED]`: on a refusal the renderer reports it and the source
+falls to capture from code (the design loop's tier B or C). Copying the capture into
 `design/reference/` is the orchestrator's
 (`../fulcrum-design-loop/references/capture-recipes.md`, heading "Reference images").
 
@@ -176,14 +178,10 @@ persona label, viewport, screenshot path, page-text excerpt, console errors,
 failed network calls, observation. Layout and report format:
 `references/evidence-and-report.md`.
 
-**Screenshots: ask first.** They can contain real data, and some projects
-want them committed, so it is the user's choice. Ask before the first render
-in a project; the orchestrator records the answer in `DECISIONS.md` and, if
-the user wants them kept out of the repository, makes the change the user
-asked for. Fulcrum never adds an ignore entry or leaves files untracked on its
-own. Until the answer is recorded, a render captures page text and the DOM
-snapshot only and writes no screenshot file; the report says visibility was
-not captured. (Fulcrum rule)
+**Screenshots: ask first** (Preflight, step 5): they can contain real data.
+Fulcrum never adds an ignore entry on its own. Until the answer is recorded, a
+render captures page text and the DOM snapshot only, writes no screenshot file,
+and the report says visibility was not captured. (Fulcrum rule)
 
 ## Security observations - surface, never fix silently
 
@@ -195,18 +193,17 @@ not captured. (Fulcrum rule)
   one literal password from button handlers, so it likely ships in the client
   bundle `[UNVERIFIED]` (inferred from client-side actions; not inspected).
   Never read, quote or log the literal.
-- Recommend the user decide (remove the picker, gate it differently, or
-  accept for Dev). **Never promote a screen carrying these buttons without the
-  user's recorded decision.** (Fulcrum rule)
+- The user decides (remove, gate differently, or accept for Dev). **Never
+  promote a screen carrying these buttons without the recorded decision.**
+  (Fulcrum rule)
 
 ## What this skill does not do
 
 - Comparison against a design, pixel or otherwise. The design loop's
   render-compare consumes this skill's captures:
   `../fulcrum-design-loop/references/render-compare.md`.
-- Load or performance testing.
+- Load or performance testing; diagnosis or repair of what it sees.
 - Credential entry, account creation outside mode b, or role grants.
-- Diagnosis or repair of what it sees.
 
 ## Where the depth lives
 
@@ -214,5 +211,8 @@ not captured. (Fulcrum rule)
   pattern from published state, persona choice, the registration side effect,
   sign-out, and the user hand-off script.
 - `references/evidence-and-report.md` - evidence folder layout, the
-  per-assertion record, retries, console and network capture limits, and the
-  report the orchestrator reads.
+  per-assertion record, retries, capture limits, the report, and what to do
+  when the renderer cannot write it.
+- `references/harness-limits.md` - cold start, stale bundle, session reuse,
+  inputs and uploads the browser cannot drive, viewport floor, shared-asset
+  and role-grant cases.

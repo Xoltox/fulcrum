@@ -42,6 +42,18 @@ applicable):
 | `data changes` | Each record created, updated or deleted and each upload, with its identifying value, for clean-up; `none` otherwise |
 | `observation` | What the page showed, in the renderer's own words. No verdict |
 
+## When the renderer cannot write the report
+
+A delegated renderer's file write is sometimes refused `[VERIFIED]`. Then it
+returns the full report body in its hand-back, and the orchestrator saves it
+as `report.md` unchanged, with a first line "Transcribed by the orchestrator
+from the renderer hand-back". The orchestrator adds no observation and no
+verdict. A screenshot save path may be accepted only relative to the project
+root, not absolute `[SINGLE-OBSERVATION]`; fall back to the relative form
+rather than skipping the capture. A control missing from a snapshot is found by
+DOM query (`harness-limits.md`, heading "Inputs the browser cannot drive
+reliably").
+
 ## Capture rules
 
 - Capture the real scroll container, not only the document (the capture trap

@@ -6,14 +6,16 @@ description: >
   errors and a clean deploy while being functionally broken. Use before and
   during any turn that builds or edits a screen, aggregate, repeater, link,
   icon, date expression, REST integration, setting, screen access, static
-  entity, chart, or overlay in ODC. Trigger phrases: "building a screen in ODC", "add an aggregate",
+  entity, chart, overlay, agent, workflow or sample sign-in in ODC. Trigger
+  phrases: "building a screen in ODC", "add an aggregate",
   "my aggregate returns one row", "the gallery only shows one card", "the
   icon isn't rendering", "the link is overflowing its box", "Mentor built it
   but it looks wrong", "why did this render empty", "REST is dropping a
   field", "the API rejects our request body", "JSON keys are the wrong
   case", "the REST call fails with no status code", "users can't log in to
   the new app", "where do I put the API password", "wire up a
-  wizard/chart/action sheet/dropdown".
+  wizard/chart/action sheet/dropdown", "publish refused, Standalone Agent",
+  "build a workflow", "add sample login buttons".
 version: "1.0.0"
 requires: >
   A construct to check against this registry; tenant-profile.md present or
@@ -25,13 +27,12 @@ requires: >
 # ODC engine traps
 
 A lookup table, not a procedure. Every entry here is a construct that Mentor
-can build, validate, and publish cleanly while it is **functionally wrong**.
-That is the defining shape of every trap in this registry: **validation and
-publish are not proof of correctness.** For the instrument that actually
+can build, validate, and publish cleanly while it is **functionally wrong**:
+**validation and publish are not proof of correctness.** For the instrument that actually
 proves correctness, see `../fulcrum-verification/SKILL.md`. For turn sizing and
 prompt-length limits, see `../fulcrum-mentor-turns/SKILL.md`. For loading seed
-rows, see `../fulcrum-seed-data/SKILL.md`. This skill owns none of those - it
-owns "does this construct have a known failure mode, and what is it."
+rows, see `../fulcrum-seed-data/SKILL.md`. This skill owns only "does this
+construct have a known failure mode, and what is it."
 
 ## How to use this file
 
@@ -47,8 +48,7 @@ owns "does this construct have a known failure mode, and what is it."
 
 ## Front-loaded: the four traps that cost the most
 
-Ranked by how many build steps each cost in the reference build. An agent
-that internalizes only this table already avoids most fix-turn overruns.
+Ranked by build steps each cost in the reference build.
 
 | Trap | Failure mode | Visible to validation/publish? |
 |---|---|---|
@@ -57,15 +57,14 @@ that internalizes only this table already avoids most fix-turn overruns.
 | **REST silently drops falsey values** (9 steps) | An Integer `0` or Boolean `False` output vanishes from the JSON response body entirely. "Zero" becomes indistinguishable from "field never set." | No - clean publish; only inspecting the actual response body shows it. |
 | **No model-layer path to live row data** `[SCHEMA]` (9 steps) | No tenant has a model-layer path to live rows. Asking Mentor to inspect live data still returns a plausible, possibly fabricated answer with no error. | No - Mentor reports success/an answer either way. |
 
-Two more, just below that threshold, worth knowing before any build session:
+Two more:
 
 | Trap | Failure mode | Visible? |
 |---|---|---|
 | **On-demand aggregate refresh wiring** (7 steps) | A dependent aggregate defaults to `Fetch = AtStart`: it runs once against a null filter at load and never re-fires inside an accordion/modal/sheet. Permanently empty panel. | No. |
 | **Default placeholder children shipped on new widgets** (7 steps) | Every new widget/block ships default children Mentor never mentions unless asked. Some are decorative (delete them); some - a `Gallery`'s `List` - are the repeater itself (deleting is the collapse trap above). | No. |
 
-Integration and access traps - newer evidence, fewer sightings, but each one
-blocks the whole app rather than one screen:
+Integration and access traps each block the whole app, not one screen:
 
 | Trap | Failure mode | Visible? |
 |---|---|---|
@@ -113,20 +112,20 @@ Each is predictable, so each is preventable with the phrasing shown.
 
 | Construct / symptom | Open |
 |---|---|
-| Aggregate returns one row; Gallery/List collapse; on-demand refresh; join direction/type; OR-filters; `Div()`; list child-count assertions | `references/aggregates-and-repeaters.md` |
+| Aggregate returns one row; Gallery/List collapse; on-demand refresh; join direction/type; OR-filters; `Div()`; list child-count assertions; success that did not persist | `references/aggregates-and-repeaters.md` |
 | Link wrapping a card overflows; link restyles wrapped text; container has no click event; wizard step wiring | `references/links-and-navigation.md` |
-| Icon renders empty/wrong; icon bound per-row; glyph naming; CSS class order fights a utility class; `Style` vs `CustomStyle`; theme CSS vars | `references/icons-and-theming.md` |
+| Icon renders empty/wrong; icon bound per-row; glyph naming; CSS class order fights a utility class; `Style` vs `CustomStyle`; theme CSS vars; adjacent text run together | `references/icons-and-theming.md` |
 | DateTime vs date comparisons; `CurrDate()`/`CurrDateTime()`; meridiem formatting; inline `If()` not short-circuiting | `references/dates-and-expressions.md` |
-| REST output silently dropped; JSON key case; non-JSON error body (`OS-BERT-60600`); transport error with no status; route probe; Boolean wired as a header; constructs with no read path (settings, consumed structures); no live-row-data path; Server Action can't be Public; reused structures; REST deletes; library references | `references/rest-and-integration.md` |
-| Screen access/login/default screen; unasked screen role; secrets and Settings; client-side entity actions; action names colliding with entity actions | `references/access-security-and-settings.md` |
+| REST output silently dropped; JSON key case; non-JSON error body (`OS-BERT-60600`); transport error with no status; route probe; Boolean wired as a header; constructs with no read path (settings, consumed structures); no live-row-data path; Server Action can't be Public; reused structures; REST deletes; library references and limits; exposed status codes; list truncation; client call timeout | `references/rest-and-integration.md` |
+| Screen access/login/default screen; unasked screen role; secrets and Settings; client-side entity actions; action names colliding with entity actions; swapped conditional branches | `references/access-security-and-settings.md` |
 | Static entity referenced by label vs identifier; sequential Ids; dual FKs to the same entity | `references/static-entities.md` |
 | Action sheet / modal / bottom sheet / sidebar existence; wizard mechanics; dropdown shape; chart per-bar styling; donut center label | `references/overlays-wizards-charts.md` |
+| Agent publish refused; agent shell; `CallAgentCore`; `OS-ABRS-FM-40001`; agent reference or index delay; Binary input | `references/agents.md` |
+| Workflow creation, foreign bindings, timing, System entities | `references/workflows.md` |
+| Building a sample sign-in | `references/sample-signin.md` |
 | Bulk delete / reset action fails to publish | Not a construct trap here: `../fulcrum-seed-data/SKILL.md`, "The reset path, and its absence" |
 
 ## Evidence tags
 
-Per `CONVENTIONS.md`, Hard rule 4: `[VERIFIED]` repeat-observed.
-`[SINGLE-OBSERVATION]` seen once. `[UNVERIFIED]` inferred, or reported only by
-another source (including the vendor's own skill set), never confirmed here.
-`[TENANT]` belongs in `tenant-profile.md` - probe it, do not hardcode it.
-`[SCHEMA]` asserted by the vendor's MCP tool documentation.
+Per `CONVENTIONS.md`, Hard rule 4. `[TENANT]`: check `tenant-profile.md`, never
+hardcode. `[UNVERIFIED]` includes vendor skill-set reports.

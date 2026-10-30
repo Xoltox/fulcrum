@@ -95,3 +95,18 @@ same way (e.g. a custom `CreateOrder` beside entity `Order`) invites Mentor to
 reuse the generated action or rename yours unasked. Name custom actions with
 a distinct verb (`SubmitOrder`, `RegisterOrder`). Reported by the vendor's
 skill set as a plan-gate rule, not observed in the Fulcrum corpus.
+
+## 5. Mentor's read-back of a conditional can swap its branches `[SINGLE-OBSERVATION]`
+
+**Failure mode.** A Setting-driven gate had its True and False connectors swapped on the
+`If` in five methods, while Mentor's read-back called them correct. Every gated endpoint
+answered with the Setting off. It took about six dispatches, ended by a turn that exposed
+the raw value and the gate's result.
+
+**Visible?** No: clean publish, and the read-back agrees with the intent.
+
+**Brief:** "Quote the `If`'s condition and the target of each branch by name."
+Quoted branch targets have read correctly, but that is still belief.
+
+**Proof:** exercise every gate on the wire in both states. One state proves nothing:
+an inverted gate looks right in whichever state you happened to test.

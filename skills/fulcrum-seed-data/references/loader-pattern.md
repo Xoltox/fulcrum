@@ -34,6 +34,45 @@ For each `LoadSampleDataFor<Entity>`:
    written; assign the final total to the action's output via an `Assign`
    node before `End`. Never a literal.
 
+## Foreign keys and counts
+
+- Resolve a parent by lookup on its full natural key, never by slicing a code
+  string with `Substr`: a wrong offset matched nothing, every row skipped, and the
+  timer still ended "Ok, 0 errors". A first "fix" that moved the offset made it
+  worse `[VERIFIED]`.
+- Each loader logs `Created` and `Skipped` per entity and returns them; the
+  verification path fails when `Skipped` exceeds what the guard predicts. A
+  diagnosis from Mentor is belief: read the actual stored format (one read or
+  trace) before patching.
+- Derive expected counts by script from the seed source. A hand count in a
+  seed spec produced wrong expectations in two steps `[SINGLE-OBSERVATION]`.
+
+## Anchor and create-only
+
+Loaders that read the current date on every publish re-date their rows each
+time, and a background loader then silently undoes decisions made in the app
+`[VERIFIED]`. So:
+
+- Write one anchor date (a settings row) only when absent; compute every
+  day-offset from it.
+- Loaders are create-only. An update path is allowed only to fill a missing
+  link, never to overwrite a field a user may have changed.
+- Aged seed shows nonsense in time-based figures (negative durations, ratios
+  over 100%) until re-seeded; schedule a documented re-seed before any KPI
+  check, and treat such a figure as aging before treating it as a formula bug.
+
+## Seeding from a file
+
+An uploaded attachment (CSV or JSON) is read by Mentor but is not a seed path:
+in one probe Mentor typed the values into assignment steps of an action that
+nothing called, with no runtime resource behind it `[SINGLE-OBSERVATION]`
+(2026-10-30). Binary spreadsheet and image carriers were rejected earlier
+`[SINGLE-OBSERVATION]`. What worked: give Mentor about ten inline example rows
+and have it extrapolate them into a JSON resource copied into the app
+directory, loaded by a guarded loader on a timer; each prompt stayed under 600
+characters `[SINGLE-OBSERVATION]`. Whether the attachment path is reachable by
+another route is `[UNVERIFIED]`.
+
 ## Orchestrator
 
 `LoadSampleData`: calls every `LoadSampleDataFor<Entity>` in FK-safe

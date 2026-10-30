@@ -145,3 +145,18 @@ empty on first run. Anchors that already hold rows from an earlier step
 short-circuit the loader permanently and silently on every call. Name the
 anchor explicitly and say why any more "obvious" candidate is wrong for
 this run.
+
+## 11. A build turn can report success and not persist `[VERIFIED]`
+
+**Failure mode.** Loader turns reported success while the row count did not move. Two
+causes: Mentor's script hit its memory ceiling on a large action (about 500 MB, "nothing
+added" or partial), and earlier turns had landed in an orphan action the main loader
+never called.
+
+**Visible?** No: the turn succeeds, publish is clean, and the orphan looks like work done.
+
+**Fix:** split large loaders from the start, a helper plus batches of about 10 rows per
+action. When a success changes nothing, search for an orphan before re-sending; wire it
+in rather than rebuild it. Name helpers without a leading underscore, which the platform
+strips. **Proof:** row counts on the live app, never the turn's report. Loader shape:
+`../../fulcrum-seed-data/SKILL.md`.

@@ -30,9 +30,8 @@ it). Seed before building any screen that reads the data - an empty table
 hides its own screen bugs.
 
 Budget seed work at **three or more turns minimum**, as its own phase, not a
-chore folded into a screen turn. On the reference build this was the single
-most expensive step: ~18 revisions, 4+ hours, 14 turns, two abandoned
-monolithic attempts, and one wedged session. `[VERIFIED]`
+chore folded into a screen turn: on the reference build it was the most
+expensive step (~18 revisions, 14 turns, two abandoned monolithic attempts). `[VERIFIED]`
 
 ## The loader pattern
 
@@ -51,11 +50,12 @@ from a published-time trigger:
    harmless. See "What context tools don't show you" below - this trigger
    is invisible to model inspection, which is expected, not evidence it is
    missing.
-4. Assign every output count (rows created, skipped flag) via an explicit
-   `Assign` node from a real running total before the action ends - never a
-   literal. A literal `RowsCreated = 0` in the output path is indistinguishable
-   from a genuine zero once read back over REST (REST silently omits falsey
-   values - see `../fulcrum-engine-traps/SKILL.md`).
+4. Count and print: every loader assigns `Created` and `Skipped` per entity
+   via an explicit `Assign` from a real running total (never a literal; REST
+   omits falsey values, see `../fulcrum-engine-traps/SKILL.md`), logs them and
+   returns them. A loader that skips every row silently reads the same as one
+   that worked: a timer ended "Ok, 0 errors" while creating nothing, through
+   two wrong diagnoses. `[VERIFIED]`
 
 Worked structure and JSON-resource layout: `references/loader-pattern.md`.
 
@@ -111,8 +111,14 @@ against it breaks as the wall clock moves past the date. `[VERIFIED]`
 a time of day (text, e.g. `"09:30"`) in the seed source, and build the
 actual timestamp at load time relative to the current date/time. Downstream,
 assert any time-dependent figure as an **invariant** (e.g. "the count of
-rows dated in the last 7 days"), never as a fixed expected value, for the
-same reason.
+rows dated in the last 7 days"), never as a fixed expected value.
+
+**Anchor once.** A loader that reads the current date on every publish re-dates
+its rows each time, and a background loader then undoes decisions made in the
+app. Write one anchor date (a settings row) the first time, compute offsets from
+it, make loaders create-only, and allow null-fill only for missing links.
+Seeded figures still age: re-seed before any time-based KPI check
+(`references/loader-pattern.md`, heading "Anchor and create-only"). `[VERIFIED]`
 
 ## Static entities
 
@@ -141,11 +147,9 @@ shared-structure edit doesn't silently change both.
 
 ## Aggregate limits
 
-Any aggregate expected to return **all** rows - action aggregate or screen
-aggregate alike - needs an explicit high maximum-records value. The
-platform default silently truncates, and a truncated aggregate inside a
-loader or a verification action produces a plausible-looking wrong count
-with no error.
+Any aggregate expected to return **all** rows needs an explicit high
+maximum-records value: the platform default silently truncates, giving a
+plausible wrong count in a loader or verification action with no error.
 
 ## Verifying a seed
 
@@ -168,18 +172,15 @@ turn's budget; plan for it inside the three-turn minimum, not on top of it.
 
 ## The reset path, and its absence
 
-A reset/teardown action is genuinely valuable, and may not be buildable. On
-the reference build, bulk-delete reset actions built with zero validation
-errors but publish failed twice with a non-transient internal build error
-that was never diagnosed; the feature was abandoned. `[SINGLE-OBSERVATION]`
+A reset/teardown action is valuable and may not be buildable: on the
+reference build, bulk-delete resets validated clean but publish failed twice
+with an undiagnosed internal build error. `[SINGLE-OBSERVATION]`
 
-If a reset path cannot be shipped, plan for the consequences rather than
-retrying indefinitely: every gate run that exercises a create flow leaves
-permanent rows behind; finite seed pools (a fixed list of natural keys to
-pick from) get exhausted by repeated runs; diagnostic endpoints stood up
-for verification accumulate with no removal path. Design gates to detect
-and report exhaustion (an empty candidate pool) rather than silently
-passing on an empty result.
+If none ships, plan for it instead of retrying: gate runs that exercise a
+create flow leave permanent rows; finite seed pools get exhausted; diagnostic
+endpoints accumulate. Design gates to report exhaustion (an empty candidate
+pool), not pass on an empty result. Tests of a state-changing action target a
+record created for the test, never a seeded row.
 
 If a reset action does get built, do not trust Mentor's report that the
 delete succeeded - verify against the live schema or a live-data read-back,
@@ -187,14 +188,13 @@ per `../fulcrum-verification/SKILL.md`.
 
 ## What the platform's context tools do not show you
 
-Context/model-inspection tools do not enumerate an app's Resources tree, and
-do not enumerate its Automations tree (Agents, Events, **Timers**). A
-loader wired to a published-time trigger is invisible to that kind of
-inspection. Do not conclude the trigger is missing from an inspection result
-alone - confirm via the design surface directly before reporting it absent.
+Context tools enumerate neither an app's Resources tree nor its Automations
+tree (Agents, Events, **Timers**), so a published-time trigger is invisible to
+them. Confirm via the design surface before reporting it absent.
 `[SINGLE-OBSERVATION]`
 
 ## Where the depth lives
 
 `references/loader-pattern.md` - worked loader/orchestrator structure,
-JSON-resource-per-entity layout, and reset-action ordering.
+JSON-resource-per-entity layout, the anchor and create-only split, seeding from
+a file (an attachment is not a seed path), and reset-action ordering.

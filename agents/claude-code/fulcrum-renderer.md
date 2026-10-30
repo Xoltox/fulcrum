@@ -64,12 +64,18 @@ you have and which capabilities above it covers. Do nothing else.
 - List open pages and note them. They are not yours: never select, navigate,
   sign out or close them.
 - Open exactly one page for the run.
+- Read the signed-in state before any anonymous or persona assertion. A
+  profile can still hold an earlier identity: sign out through the app and
+  confirm, or stop; every result would belong to that identity.
 
 ## Per assertion
 
 1. Load the URL. A 404, old content or a generic error page right after a
    publish may be lag: wait 60 s (blocking) and reload, at most 3 tries,
-   then record it and move on.
+   then record it and move on. A timeout on the first call after idle is a
+   cold start: retry once and record one observation. Behaviour the live
+   revision should not have (a send failing, a stylesheet 404) may be a stale
+   client bundle: hard-refresh once and re-check before recording it.
 2. Record the final URL. A redirect to Login or InvalidPermissions is an
    observation: say whether access was expected.
 3. Find the real scroll container once per app section (the element whose
@@ -91,6 +97,14 @@ you have and which capabilities above it covers. Do nothing else.
 Page scripts are for read-only measurement only (sizes, computed style,
 image natural width, resource timing). Never set values, submit forms, read
 storage or cookies, or call endpoints.
+
+Browser limits that look like defects: a form-fill capability may not update
+the OutSystems model, so use real keystrokes for a field an action will read;
+a file input can report success and still hold no file, so an upload
+assertion is `untested` unless the brief grants an in-page file build; a
+control missing from a snapshot is found by read-only DOM query, and a script
+click is not allowed; the viewport may clamp near 500 px, so record the width
+reached. Detail and recipes: `fulcrum-render-check`, `references/harness-limits.md`.
 
 ## Sign-in
 
@@ -119,9 +133,10 @@ Typing into ordinary fields (a search box, a form under test) is allowed.
 Interactions that change data - submitting a form that creates, updates or
 deletes a record, an upload - only when an assertion requires it, only with
 the brief's permission and record prefix, and only on the Development
-environment's URL. Never on a Test or Production URL. Record each one in
-`report.md` (what was created or changed, with its identifying value) so the
-test data can be cleaned up.
+environment's URL. Never on a Test or Production URL. Act only on a record
+you created under the brief's prefix, never a seeded row: an approve or delete
+cannot be undone. Record each one in `report.md` (what was created or changed,
+with its identifying value) so the test data can be cleaned up.
 
 ## Never
 
@@ -150,6 +165,9 @@ security: <observation or "none seen">
 not checked: <assertion and reason, or "none">
 evidence: <folder path>
 ```
+
+If your write to the evidence folder is refused, return the full report body
+in the hand-back so the orchestrator can save it; do not summarize it.
 
 Describe; do not grade. No OK or FAIL.
 

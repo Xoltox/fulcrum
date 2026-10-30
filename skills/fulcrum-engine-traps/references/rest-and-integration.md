@@ -2,7 +2,8 @@
 
 Entries 1-5: what goes over the wire, and how to diagnose it. Entries 6-7:
 what can and cannot be proven through the model. Entries 8-12: model-structure
-traps around REST methods and references.
+traps around REST methods and references. Entries 13-16: limits at runtime and
+across apps.
 
 ## 1. Falsey and empty values are omitted from a REST response body `[VERIFIED]`
 
@@ -23,6 +24,11 @@ Integer 0 or Boolean False vanishes entirely, so zero is indistinguishable
 from never-assigned." Explaining the why measurably stops Mentor substituting
 its own shape. Any client parsing the response must treat a missing key as a
 possible zero/false/empty, not as an error.
+
+**A value equal to the attribute's default is dropped too** `[SINGLE-OBSERVATION]`.
+A Boolean attribute with default `True` vanished from the response at `True`;
+clearing the default brought it back. Whether this is one mechanism with the
+falsey case is `[UNVERIFIED]`. Leave defaults empty on response attributes.
 
 **Proof:** read the raw response body for a case where the value is 0/false.
 
@@ -180,3 +186,53 @@ build step.
 The empty-record-literal defect for `CreateOrUpdate`-based loaders is in
 `aggregates-and-repeaters.md` entry 9 - a data-loading trap that commonly
 appears alongside REST-sourced batches.
+
+## 13. An exposed method's status code and mandatory inputs `[SINGLE-OBSERVATION]`
+
+- **5xx can hang.** `SetCurrentRequestStatusCode(503)` on an exposed method hung about
+  59 s and surfaced as a gateway 504, not the 503 body; 400 passed through. It may be
+  gateway-specific. Agree a contract fallback up front: 200 with a status field.
+- **A mandatory input the caller omits** gets a platform 400 before the action runs, so
+  your error shape never appears. Mark optional inputs not mandatory, with a default.
+
+## 14. A consumed list endpoint truncates at the target's default page size `[SINGLE-OBSERVATION]`
+
+**Failure mode.** The target returned its default page while more rows existed, and the
+screen showed a partial list with no error.
+
+**Visible?** No. The count is the only tell.
+
+**Brief:** read the contract's paging parameters and send an explicit limit on every
+list call. **Proof:** compare the displayed count with the source's count.
+
+## 15. A client-to-server call fails at about 10 s `[VERIFIED]`
+
+**Failure mode.** Client calls to the server fail at about 10 s by default, surfacing as
+a banner. Cold start trips it: sign-in took 12-13 s and an agent call 24-25 s, warm 6 s.
+Reads as a functional bug.
+
+**Fix:** raise the timeout on the calling `RunServerAction` (30 s cleared sign-in), or
+set it on a consumed REST method; Mentor can set both. Maximum 60 s: a 90 s request was
+rejected `[SINGLE-OBSERVATION]`. Beyond that, move the work server-side.
+
+**Long work runs in a Timer** woken on submit, with the screen polling state. Wake took
+18-22 s `[VERIFIED]`, so the screen must show a pending state. A Timer `Schedule` of
+`00:05` parsed as a daily cron, not every 5 minutes: give cron form, `*/5 * * * *`
+`[SINGLE-OBSERVATION]`.
+
+## 16. Libraries, and a consumer the index will not unblock
+
+- **A Mentor-created library cannot hold a layout** `[SINGLE-OBSERVATION]`: it has no
+  default layout and no OutSystems UI reference, so `LayoutSideMenu` is not referenceable
+  (`changeApplied` false). Theme CSS can live in a library. A shared layout cannot, so
+  layout changes repeat per app; plan that cost.
+- **A library has no `env_app` gate.** Confirm through `app_info` or a consumer:
+  `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Publishing".
+- **A published element can stay unreferenceable** `[VERIFIED]`: Mentor in the consumer
+  cannot add it while the index lags, and the whole index has frozen for 45 minutes
+  across apps. Waiting decides nothing. **The user adding the dependency in Studio and
+  publishing was the only unblock** `[SINGLE-OBSERVATION]`.
+- **Plan it:** publish producers early, and keep a `manual` row ready, batched per
+  consumer app. Studio work moves the consumer's revision, so re-read it before the next
+  Mentor change. Mentor has also hinted a library needs a version number before others
+  can reference it; untested `[UNVERIFIED]`, see entry 11.

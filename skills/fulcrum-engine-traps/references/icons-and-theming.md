@@ -36,6 +36,13 @@ seen this name used elsewhere"), not validation. Instead: set the name,
 then confirm it against a sibling icon already known to render, or check
 the render directly.
 
+OutSystems UI ships Phosphor (`ph-<name>`), so where the profile records
+that font, `docs-ai/osui.icons.json` in the library's repo answers a name
+at a pinned tag (v3.0.0 on). An older theme may use another font, so the
+profile decides `[TENANT]`. Mentor accepted PascalCase and `-fill` names
+with 0 errors while nav icons rendered as the literal word `link`: copy the
+name format of a template icon that renders, such as Logout `[VERIFIED]`.
+
 ## 3. Only real theme CSS variables exist `[TENANT]`
 
 Invented CSS variable names (a plausible-looking `--color-*`, `--space-*`,
@@ -44,6 +51,16 @@ back to its default with no error. Verify any theme variable via a
 computed-style read against the live render, not by pattern-matching the
 naming convention. The actual variable namespace and set is tenant/theme
 specific - check `tenant-profile.md`.
+
+**Vocabulary changed at OutSystems UI v3.0.0** (2026-10-27, token theme),
+read from the repo, no tenant queried `[UNVERIFIED]`. `--space-*` and neutral
+ramps are pre-3.0 vocabulary; `--color-neutral-0..10` survive as legacy
+aliases the library says to avoid. On 3.x the allowed list is
+`docs-ai/llms-tokens.txt` at the pinned tag (never `dev`; condensed in
+`../../fulcrum-design-loop/references/osui-v3.0.0-theme.md`), with the
+computed-style read as confirmation. Tell which you have by probing
+`--token-semantics-primary-base` in computed style: absent means pre-3.0,
+and those docs do not apply.
 
 ## 4. `Style` vs `CustomStyle` - the boundary is narrower than "always use CustomStyle" `[VERIFIED]`
 
@@ -145,3 +162,16 @@ on the chart block and its config struct has no raw CSS passthrough, do
 not invent new CSS to fake it - reuse whatever overlay-container
 convention the app already uses elsewhere for centering content over a
 graphic, rather than adding a new one-off mechanism.
+
+## 12. Adjacent text widgets run together `[VERIFIED]`
+
+**Failure mode.** Sibling Text or Expression widgets in one container get no
+separator or gap, so a number and an age read `ORD-104632 days ago`, a label
+and value read `StatusOpen`. Every binding is correct.
+
+**Visible?** No: validation, publish and Mentor's read-back all pass. Only the
+render shows it, and it has every time.
+
+**Fix:** ask for an explicit gap class or separator on every sibling text pair,
+in the turn that builds the row. **Proof:** an acceptance item that reads the
+row's concatenated text, not each widget's value.

@@ -37,6 +37,13 @@ read from the model:
 - The users are real built-in identity-provider end users, not app-entity
   rows and not impersonation.
 
+To build the pattern (prompt scaffold, Dev gate, registration path), see
+`../../fulcrum-engine-traps/references/sample-signin.md`. This file only
+detects and uses it. An app built from a plain prompt can carry two
+hardcoded buttons with no Dev gate and no registration
+`[SINGLE-OBSERVATION]`; seen outside Dev it is the same security
+observation, and the first click is the check that it works at all.
+
 ### Detecting it (published-state reads, after the lag)
 
 Look for, in this order:
@@ -87,8 +94,14 @@ call: ask once per project, and the orchestrator records the answer in
 
 ### Signing in and out
 
+- Before the first sign-in, read the signed-in state: a profile can still hold
+  an earlier identity, which would make every result that identity's
+  (`harness-limits.md`, heading "Session identity").
 - Sign in: click the persona button, wait for navigation, confirm the
   signed-in state from the page (a user name or menu), not from the URL alone.
+  A first-call timeout or a first click that only validated the form is a
+  cold-start or build observation, not a reason to try another route
+  (`harness-limits.md`).
 - Sign out: the app's own logout control. Confirm by loading a protected
   screen and seeing the Login redirect. Unconfirmed sign-out ends the run.
 
@@ -99,7 +112,9 @@ Use when mode b is absent, refused, or cannot reach the role needed.
 1. The orchestrator asks the user, in one message: which app URL, which
    account role is needed, and to sign in in the shared browser (or confirm
    the existing session is the right account). Never ask for the
-   credential itself.
+   credential itself. A role-gated app also needs the user to hold that role
+   in Development; ask for the grant at planning, not when the render is due,
+   or the first authenticated check waits `[SINGLE-OBSERVATION]`.
 2. The renderer opens its own page in that browser, confirms the signed-in
    state from the page, and continues.
 3. The renderer never signs the user out and never closes the user's pages.
