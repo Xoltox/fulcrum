@@ -7,11 +7,28 @@ image, the judge, the diff vocabulary and the triage to
 
 ## When
 
-After the step's Publish passes the publish gate (`env_app` revision equals the
-publication's `applicationRevision`; `../../fulcrum-mentor-turns/references/mcp-surface.md`,
-heading "Publishing"), timed per render-check's "When to run" (a render does not
-wait on the `context_*` index). A compare
-against the previous revision proves nothing about this one.
+Render-compare is rung 6, so it runs when the gates owe it. Read `Rigor` from
+`project.md`; the table itself lives in `../../fulcrum-verification/SKILL.md`, heading
+"Gates and rigor". (Fulcrum rule)
+
+| Rigor | Runs | Screens covered |
+|---|---|---|
+| `production` | After each screen row's publish, as its G3 | That screen |
+| `pilot` | At each batch's G1 | Every screen that batch published |
+| `demo` | At the join's G1 | Screens the happy path reaches. The rest stay at `G0`, which is expected, and the report lists them as not compared |
+
+Comparing per screen at `demo` spends a demo's budget on screens nobody will be shown;
+leaving it to the join at `production` buries a shared defect under every later screen.
+The render obligation (`../../fulcrum-verification/SKILL.md`, heading "Render
+obligation") is met by the same render, not a second one.
+
+Every compare runs after the publish gate passed on that revision
+(`../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Publishing"), timed
+per render-check's "When to run" (a render does not wait on the `context_*` index). A
+compare against the previous revision proves nothing about this one. A failure after a
+row closed takes the late failure rule: rows stay `done`, one new `fix` row
+(`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`, heading "Late
+failures").
 
 ## 1. Capture
 
@@ -23,7 +40,9 @@ Brief `fulcrum-renderer` per render-check's "The procedure", step 1, plus:
 - capture the full scroll container, not the window - an internal scroll container
   clips the screenshot (`visual-verification.md`, "The capture trap, generalised");
 - screenshots allowed only per the batch B Q5 answer;
-- evidence into `.fulcrum/evidence/render/<task-id>/<UTC-stamp>/`.
+- evidence into `.fulcrum/evidence/render/<task-id>/<UTC-stamp>/`;
+- if `tenant-profile.md` has no OutSystems UI version yet, read it on this render
+  (`block-map.md`, heading "OutSystems UI library reference").
 
 **Tier B:** the orchestrator adds a `manual` row, parked `Blocked on: the user`: "Send
 a screenshot of `<screen>` at `<viewport>`, signed in as `<role or public>`". It files
@@ -89,7 +108,8 @@ session closed at Publish.
    (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, "The diagnostic
    step is not optional").
 2. A fix turn led by the measured symptom ("the table renders one row; the capture
-   shows ..."), not by a restated spec.
+   shows ..."), not by a restated spec. `image` lane: target and current render
+   attached side by side (`build-lanes.md`, heading "Image lane").
 3. Publish, publish gate, re-render, re-judge with a fresh verifier: round r2.
 
 **At most 3 compare rounds per screen** (the initial judge plus one re-judge per fix
@@ -105,9 +125,27 @@ report fenced verbatim, then the triage table (`diff | class | severity | fix | 
 
 - `pass` - every F-item OK at the bar;
 - `fail` - a blocker or major diff after the last allowed round;
-- `unproven` - a rung untested, with the reason.
+- `unproven` - a rung untested, with the reason. Not terminal: the row stays `todo`,
+  the loop re-proves it, and a second `untested` parks it for the user
+  (`../../fulcrum-loop-engine/references/frontier-and-batching.md`, heading "Unproven
+  rows"). A re-prove renders and judges again; it runs no Mentor turn.
 
 The row's `TASKS.md` `Verdict` is the orchestrator's, from this file.
+
+## Studio lane
+
+After a Studio pass, on the user's "published", compare the observed revision per the
+rigor table above; no compare means a fidelity nobody measured, and a defect list from
+a look around the app is not one `[SINGLE-OBSERVATION]`. Same judge, same bar. Triage
+adds a bucket on each diff, because the fix has a different owner:
+
+| Bucket | Means | Goes to |
+|---|---|---|
+| `studio` | Layout or look best fixed by hand | The next `STUDIO-PASS.md` |
+| `mentor` | Expressions, wiring, data, logic | A `fix` row, after the re-inventory (`build-lanes.md`) |
+| `backlog` | Minor at the bar | `backlog.md` |
+
+Round caps hold. A `studio` diff surviving round 3 is `fail`, as any other.
 
 ## Tier C - no render instrument
 
@@ -118,8 +156,8 @@ a verbatim Mentor read-back per
 region (rung 1 - belief, not proof); `context_themes` content if it exposes CSS
 (`[UNVERIFIED]`: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading
 "Published-state inspection"; probe once and record the answer in `tenant-profile.md`); seed proof
-per `../../fulcrum-seed-data/SKILL.md`, "Verifying a seed". Every screen is
-`unproven`, reason "visual untested".
+per `../../fulcrum-seed-data/SKILL.md`, "Verifying a seed". Every screen the rigor owes
+a compare is `unproven`, reason "visual untested".
 
 Render-only defect classes lead the report, because nothing in tier C can see them:
 repeater collapse, collapsed overlay, dark-on-dark icon, empty chart, wrapped metric.

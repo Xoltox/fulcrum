@@ -18,21 +18,26 @@ dispatch only its `screens/<SID>.md`), the orchestrator after; `reference/` and
 | `source/` | - | write-once verbatim copies; committed per batch B Q5 | - |
 | `reference/<SID>.<ext>` | - | the image source file copied unchanged (no crop; a whole image names the screen in the manifest), or the renderer's HTML render copied by the orchestrator | - |
 | `screens/<SID>.md` | `design-screen v1` | <= 150 lines; anatomy <= 80; <= 6 top-level regions | `../templates/screen.md` |
-| `tokens.md` | - | <= 60 lines | below |
-| `theme.css` | - | <= 150 lines; groups <= 25 lines | below |
+| `tokens.md` | - | about 60 lines, advisory | below |
+| `theme.css` | - | about 150 lines, advisory; groups <= 25 lines | below |
 | `data.md` | - | <= 120 lines | below |
 | `gate.md` | `design-gate v1` | one row per check per screen | below |
 | `fidelity/<SID>-r<n>.md` | `design-fidelity v1` | one per compare round | `../templates/fidelity.md` |
 | `user-shots/<SID>-r<n>.<ext>` | - | tier B: the user's screenshot as received, one per screen per round | - |
-| `backlog.md` | - | one line per minor diff | below |
+| `backlog.md` | - | one line per minor diff or carried gate risk | below |
+| `STUDIO-PASS.md` | `design-studio-pass v1` | one pass, `studio` lane only | `../templates/studio-pass.md` |
 | `report.md` | `design-report v1` | - | `../templates/report.md` |
 
 Every marker is written `<!-- fulcrum-schema: <marker> -->`; the full set is
-`design-manifest v1`, `design-screen v1`, `design-gate v1`, `design-fidelity v1` and
-`design-report v1`. A `-` means the file carries none.
+`design-manifest v1`, `design-screen v1`, `design-gate v1`, `design-fidelity v1`,
+`design-report v1` and `design-studio-pass v1`. A `-` means the file carries none.
 
-A file over its limit is split, never trimmed of content: a screen over 6 regions
-becomes two screens or two steps.
+A screen file over its limit is split, never trimmed of content: a screen over 6
+regions becomes two screens or two steps, because a region must fit one turn. A theme
+group stays <= 25 lines for the same reason. The whole-file figures for `tokens.md` and
+`theme.css` bound no turn, so going over is noted in `gate.md`, not failed and not
+waived: as hard caps they cost a decision record per overrun and caught nothing
+`[SINGLE-OBSERVATION]`. (Fulcrum rule)
 
 ## screens/<SID>.md
 
@@ -62,6 +67,13 @@ overlay); a region's subtree must fit one turn (<= ~25 anatomy lines). Icons: lo
 -> semantic name -> tenant glyph, and `count = N`. Interactions: every interactive
 node; static nodes say `static`. Acceptance: `F-<SID>-01..10`, each observable, each
 naming its instrument (render, read-back, seed proof).
+
+### Short form
+
+`image` and `studio` lanes only (`build-lanes.md`): header, `Regions`, `Interactions`,
+`Acceptance`. No `Anatomy`, no `Icons`: the picture carries them, and Mentor picks the
+blocks. `Layout` in the header may read `from image`. A move to the `text` lane
+completes the file first.
 
 ### Worked neutral screen
 
@@ -101,15 +113,24 @@ F-S02-03 render: New shipment opens S03
 One row per token: `name | value (~ if uncertain) | maps to`, where "maps to" is an
 existing OS UI `:root` variable override or a `theme.css` class. A token mapped to an
 invented CSS variable is a no-op (`../../fulcrum-engine-traps/references/icons-and-theming.md`,
-"Only real theme CSS variables exist"). Groups: colour, type roles, spacing, radius,
-shadow. The page background is defined **and** applied by a class on every screen root.
+"Only real theme CSS variables exist"); the vocabulary at one library version is
+`osui-v3.0.0-theme.md`. Groups: colour, type roles, spacing, radius, shadow. The page
+background is defined **and** applied by a class on every screen root.
+
+Where sources disagree, code wins over prose: a config value is what was built. Mark an
+interpolated value `~`. A token mapping stays `[UNVERIFIED]` until the first render
+reads it back by computed style; the named `theme.css` class is the fallback when a
+variable does not take. `[UNVERIFIED]`, not yet render-proven: a web-font `@import` goes
+in the first theme group, since CSS ignores an `@import` after any other rule, and a
+content security policy may still block it.
 
 ## theme.css
 
 Every custom class the anatomies use, defined once, grouped (<= 25 lines per group;
 one group per theme turn). No reserved class names (list in `block-map.md`). A class
-is stock only once confirmed in the app's theme; otherwise it is defined here - utility
-names are project-local in Fulcrum.
+is stock only once confirmed in the app's theme; otherwise it is defined here. A
+utility class in `osui-v3.0.0-theme.md` counts as stock only when the tenant's version
+matches that tag (`block-map.md`, heading "OutSystems UI library reference").
 
 ## data.md
 
@@ -137,16 +158,25 @@ Header `<!-- fulcrum-schema: design-gate v1 -->`. Table:
 | 9 | Every data node bound; every chart series resolves to populated data; every KPI has a source decision; no literal dates |
 | 10 | Icon count source == anatomy; names resolved via `tenant-profile.md` section 3 or flagged for the chrome step's icon probe; per-row icons as N literal icons under Ifs |
 | 11 | One primary action; no interactive widget inside a Link |
-| 12 | Acceptance items observable with an instrument; the limits above hold |
+| 12 | Acceptance items observable with an instrument; the screen and region limits above hold |
 
 Mechanisms for checks 3, 6, 7, 10 and 11: `block-map.md` (vendor rows `[UNVERIFIED]`)
 and `../../fulcrum-engine-traps/` (Gallery/List collapse, overlay ExtendedClass, icon
-names). FAIL -> one re-capture, one re-gate; a second FAIL is an open risk at batch C.
+names). `image` and `studio` lanes run checks 1, 9 and 12 only; the others grade an
+anatomy that does not exist (`build-lanes.md`).
+
+FAIL -> one re-capture, one re-gate; a second FAIL is an open risk at batch C. The count
+is per check per screen: a new reason on the same check is still a second FAIL, or a
+re-gate that keeps finding something never ends. A carried risk gets a `backlog.md` line,
+because a risk named only at batch C is lost once the build moves on
+`[SINGLE-OBSERVATION]`. A block or widget the tenant lacks is never waived: it fails
+at build whatever the gate says.
 
 ## backlog.md
 
-`SID | diff | class | severity | round` - minor diffs not fixed at the bar, listed in
-the report. Never silently dropped.
+`SID | diff | class | severity | round` - minor diffs not fixed at the bar and gate risks
+carried from batch C (`class: gate`, `round: -`), listed in the report. Never silently
+dropped.
 
 ## Step decomposition
 
@@ -154,11 +184,17 @@ Design variant of the micro profile: same files, 5 + N steps, N <= 6, plus one p
 split screen step; ceiling N <= 6 and 5 + 2N steps with splits counted. Steps and
 `Verify` rungs: `../SKILL.md`, heading "Steps".
 
-`TASKS.md` rows (schema unchanged): per step a `build` and a `publish` row (P1.05 a
-`seed` row instead of `build`); `Traps` from the step's constructs (e.g. a table ->
+`TASKS.md` rows, schema TASKS v3 (`../../fulcrum-project-state/references/file-schemas.md`,
+heading "TASKS.md"): per step a `build` and a `publish` row (P1.05 a `seed` row instead
+of `build`); `App` the app identifier; `DependsOn` true data edges only (Theme on Shell,
+Chrome on Theme, Seed on Data, a screen on Chrome and on the entities it binds; a
+screen does not depend on an unrelated screen); `Batchable: yes` for identical-shape
+theme or screen rows, `no` otherwise; `Risk: high` for a sign-in screen, a role change
+and any row touching shared chrome or theme after a screen passed, else `std`; `Gate: -`
+until a gate runs; `Traps` from the step's constructs (e.g. a table ->
 `aggregates-and-repeaters`, an overlay -> `overlays-wizards-charts`, icons ->
-`icons-and-theming`); `manual` rows for asset upload and tier-B screenshots, parked
-`Blocked on: the user`. A screen step whose build pass needs more than 4 turns
+`icons-and-theming`); `manual` rows for asset upload, tier-B screenshots and a Studio
+pass, parked `Blocked on: the user`. A screen step whose build pass needs more than 4 turns
 (skeleton plus regions) is split into two steps before batch C, each ending in
 Publish; the split steps count in the allowance and in batch C's estimate.
 

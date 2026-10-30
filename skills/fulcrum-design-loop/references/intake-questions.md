@@ -1,4 +1,4 @@
-# Intake questions - batches B and C
+# Intake questions - design source, batches B and C
 
 Exact text for the design loop's up-front questions. Batch A (mode if `project.md`
 is absent; profile "design loop or full path") belongs to the router
@@ -7,6 +7,31 @@ is absent; profile "design loop or full path") belongs to the router
 Every question below is a **user-policy choice**: asked, never defaulted, recorded in
 `DECISIONS.md` with `Decider: user`. A guessed answer here is a scope, security or
 cost decision taken without the user. (Fulcrum rule)
+
+## Design source - first, before batch B
+
+Skip only when the user already handed the design over. "Do you have design files for
+this: screenshots, a mockup, Figma frames, HTML or TSX?"
+
+- **Yes:** take them; intake step 1 copies them into `source/`.
+- **No, and the harness has a design-generation capability:** "I can generate screens
+  with `<the capability's name in this harness>` for you to review, then build from
+  those. Or say what you would rather do: send files later, or build without a design."
+  Never start it unasked: generation spends the user's account and sets the look of
+  the app, so a default here is a product decision taken for them. (Fulcrum rule)
+  Generated screens are an image source: the user approves them before capture, since
+  every later compare grades against them, and they land in `source/` with manifest
+  `Kind: generated`.
+- **No, and no such capability, or generation declined:** leave the design loop: micro
+  profile via `../../fulcrum/SKILL.md`, or `fulcrum-discovery` if there are no
+  requirements either.
+
+## Rigor - with batch B, when `project.md` lacks it
+
+The router or `fulcrum-solution-init` normally asked. Otherwise add it to batch B, with
+its wording in `../../fulcrum/references/guided-mode-interaction.md`, example "rigor".
+No recommendation: a recommended rigor is a default by another name. Recorded in
+`project.md`; it sets when render-compare runs (`render-compare.md`, heading "When").
 
 ## Batch B - phase 0, one batch
 
@@ -47,6 +72,12 @@ still asked - nothing is defaulted. Never one question per turn.
    phone-width layout in a Reactive Web app? (Mobile type refused Mentor screens once
    `[SINGLE-OBSERVATION]`.)" Source of the caveat:
    `../../fulcrum-solution-init/SKILL.md`, step 2.
+8. **Build lane.** "How should the screens be built? (a) image - I upload your design
+   images to Mentor, a few per prompt; (b) Studio - you build them in ODC Studio from
+   the images with a work order I write, then I inspect and finish the logic; (c) text
+   spec - I describe each screen to Mentor region by region: most control over blocks,
+   slowest. Recommended: (a)." Offer (a) and (b) only if an image of each screen exists
+   or can be produced (`build-lanes.md`).
 
 ### Dependencies
 
@@ -58,9 +89,11 @@ still asked - nothing is defaulted. Never one question per turn.
 | Q3 | `manifest.md`, Policy line **Fidelity bar**; severity of `token` and `spacing` diffs (`render-compare.md`) |
 | Q4 (a) | Browser preflight runs at phase 0; a failed preflight re-asks Q4 with (a) removed |
 | Q4 (b) | Tier B: one `manual` row per screen per round, parked `Blocked on: the user` |
-| Q4 (c) | Tier C: every screen `unproven`; the report leads with render-only classes |
+| Q4 (c) | Tier C: rung 6 `untested`, so screen rows go `unproven` and park after the re-prove; the report leads with render-only classes |
 | Q5 | `manifest.md`, Policy line **Commit design source / render screenshots**; render briefs say whether screenshots may be written |
-| Q6 (a) | A `manual` upload row on P1.03 |
+| Q6 (a) | A `manual` upload row on P1.03 (`image`, `studio`: on the first screen step) |
+| Q8 | `manifest.md`, Policy line **Build lane**; capture depth, gate and steps per `build-lanes.md` |
+| Q8 (a) or (b) | Q4's sign-in question is asked unless every screen is public: image-built screens came out role-gated |
 
 ### Expert pre-answer form
 
@@ -68,7 +101,8 @@ still asked - nothing is defaulted. Never one question per turn.
 design-loop: create=<mentor|shell:<app key>> access=<all-signin|public:<S..>|roles:<role>=<S..>;...>
   bar=<structural|visual> render=<browser|user|skip> personas=<yes|no|n/a>
   commit-source=<yes|no> commit-screens=<yes|no> assets=<studio|placeholder|empty>
-  form=<desktop|phone|n/a> go=<preapproved|ask>
+  form=<desktop|phone|n/a> lane=<image|studio|text> rigor=<demo|pilot|production>
+  go=<preapproved|ask>
 ```
 
 Parse it, show what was read in one line, and ask only for what is missing or
@@ -78,7 +112,7 @@ unparseable.
 
 One `DECISIONS.md` record per answer, `Decider: user`, `Affects` naming the concrete
 artifacts (the app, the screens by `SID` and name, `design/source/`). Each D-id goes on
-its `manifest.md` Policy line (Q1-Q7; Q7 `-` when not asked) and all of them in
+its `manifest.md` Policy line (Q1-Q8; Q7 `-` when not asked) and all of them in
 the **Decisions** section. Block choices, data model, KPI sources, chart types, token
 values and turn decomposition are agent decisions (`Decider: agent`), recorded once
 the gate passes.
@@ -93,7 +127,7 @@ Summary, then one question:
 - estimated turns per step: guard 1 + consult 1 + build <= 4 + publish 1 + fix <= 2;
 - estimated wall clock from `../../fulcrum-mentor-turns/references/granularity.md`
   (about 5-7 min per granular turn) - an estimate, not a promise;
-- render tier (A/B/C), fidelity bar, open risks from `gate.md` (second FAILs,
+- rigor, build lane, render tier (A/B/C), fidelity bar, open risks from `gate.md` (second FAILs,
   `unresolved` blocks, icon names flagged for the probe).
 
 "Go, change something, or stop?"

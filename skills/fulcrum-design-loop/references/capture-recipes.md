@@ -4,16 +4,22 @@ Derived from outsystems-design-to-app v1.4.1 (MIT, Copyright (c) 2026 OutSystems
 modified; see THIRD-PARTY-NOTICE.md. Vendor-sourced rows are [UNVERIFIED].
 
 Run by `fulcrum-capturer` in capture mode. Output schemas: `design-spec-format.md`.
-Block lookup: `block-map.md`; archetype cues: `screen-archetypes.md`.
+Block lookup: `block-map.md`; archetype cues: `screen-archetypes.md`; build lanes:
+`build-lanes.md`.
 
 ## Why an anatomy, not prose
 
-Mentor never sees the image; it sees only prompt text. A prose description ("a
-stack of three compact cards") leaves the structure to Mentor, and it drifts -
-oversized cards, duplicated labels, empty values `[UNVERIFIED]` (vendor field
+On the `text` lane Mentor never sees the image; it sees only prompt text. A prose
+description ("a stack of three compact cards") leaves the structure to Mentor, and it
+drifts - oversized cards, duplicated labels, empty values `[UNVERIFIED]` (vendor field
 report). A widget tree pins nesting, block choice and classes per node. The anatomy
 is still only the VISUAL LAYOUT part of a step's description; Fulcrum sends it one
 region at a time, never whole.
+
+`image` and `studio` lanes: the picture carries the structure, so a screen dispatch
+writes the short form (`design-spec-format.md`, heading "Short form"): Recipe A or B
+below reduced to regions, interactions and acceptance items. Tokens, `data.md` and the
+KPI decision are still captured: the picture does not say what is real data.
 
 ## Order of work
 
@@ -23,7 +29,8 @@ Two kinds of capture dispatch, never mixed in one brief (Fulcrum rule):
   from the source (grouping rules under "Multi-image sources"), assign `SID`s S01..,
   and write the app-wide files `tokens.md`, `theme.css` and `data.md`. The screen list
   with `SID`, name and the source file (and, for a whole image, which part of it) goes
-  in the report; the orchestrator records it in `manifest.md`. A later serial shared
+  in the report; the orchestrator records it in `manifest.md`, and copies references
+  into `reference/` before the screen dispatches and the gate. A later serial shared
   dispatch adds what screen dispatches reported missing.
 - **Screen** - after the shared dispatch, one per <= 3 screens, parallel allowed:
   steps 1-6 below, writing only `screens/<SID>.md` for its own `SID`s. A class, token
@@ -62,6 +69,9 @@ The source already is an anatomy.
 | Hooks, props, fetch results | `bind=` entity/attribute and `source=` in words |
 | Literal arrays | Chart `series=` ids and seed rows in `data.md` |
 | Routes and handlers | `onClick="navigate:<SID>"` or `action:<plain words>` |
+
+Where prose and code disagree (a design document against a Tailwind config), code wins:
+it is what was built.
 
 ## Figma
 

@@ -10,13 +10,13 @@ description: One-shot design-to-app for a single ODC app. Takes one design sourc
   "build this HTML/TSX as an OutSystems app", or hands over one design for one app. Not
   for multi-app solutions or piles of exports needing triage (fulcrum-solution-init), not
   for an app that already exists (fulcrum-gap-analysis), not for an app with no design
-  (fulcrum micro profile or fulcrum-discovery).
+  once generating one is declined (fulcrum micro profile or fulcrum-discovery).
 version: "1.0.0"
 requires: ODC MCP server authenticated; Mentor enabled on the tenant; an image-inspection
   capability for visual sources; a subagent mechanism with per-dispatch tier selection;
   a browser automation capability for a delegated role (optional - degrades to user
   screenshots, then structure-only); a design-tool read capability for Figma (optional -
-  else the user exports frames as images).
+  else the user exports frames as images); a design-generation capability (optional).
 ---
 
 # fulcrum-design-loop
@@ -48,7 +48,7 @@ applies per app. (Fulcrum rule)
 |---|---|
 | More than about 6 screens, a second app, agents/workflows, a BRD alongside, or exports needing dedupe/asset triage | `../fulcrum-solution-init/SKILL.md` |
 | The app exists with content beyond the template screen set | `../fulcrum-gap-analysis/SKILL.md` |
-| No design, small ask | micro profile via `../fulcrum/SKILL.md` |
+| No design, generation declined, small ask | micro profile via `../fulcrum/SKILL.md` |
 | `.fulcrum/` already has a plan | `../fulcrum-loop-engine/SKILL.md` (resume); never re-capture |
 
 The router proposes this skill; the user confirms. Never auto-picked, `expert`
@@ -58,45 +58,40 @@ included. (Fulcrum rule)
 
 | # | Phase | Exit | Who (tier) |
 |---|---|---|---|
-| 0 | Intake | Batch B recorded; preflight done | orchestrator (`workhorse`) |
+| 0 | Intake | Design in hand; `Rigor` and batch B recorded; preflight done | orchestrator (`workhorse`) |
 | 1 | Capture | Screen list with SIDs, tokens, theme, data, then screen files drafted | `fulcrum-capturer` (`deep-reasoning`): one shared dispatch first, then one dispatch per <= 3 screens, parallel |
 | 2 | Gate | `design/gate.md` all PASS, or one re-capture per failing screen done | fresh `fulcrum-capturer` in gate mode (`workhorse`), blind to capture reasoning |
 | 3 | Plan, go/no-go | User says go (batch C) | orchestrator |
 | 4 | Build | Step's Publish passes the `env_app` revision gate | `fulcrum-mentor-driver` + `fulcrum-poller` |
 | 5 | Verify | Rungs in the row's `Verify` have evidence | `fulcrum-renderer`, `fulcrum-verifier` |
-| 6 | Render-compare | Verdict per screen at the bar | verifier judges; orchestrator triages |
+| 6 | Render-compare | Verdict per screen at the bar, when the rigor owes it | verifier judges; orchestrator triages |
 | 7 | Fix | Re-compare done, or cap -> lane stop | driver, new dispatch on a `fix` row of the same `Step` |
-| 8 | Report | All screen rows terminal; promotion offered, never done | orchestrator |
+| 8 | Report | Every screen row closed or parked; promotion offered, never done | orchestrator |
 
 Phases 4-7 are the loop engine's iteration unchanged; this skill supplies the rows,
-the brief content and the phase-6 procedure. The orchestrator reads only
-`manifest.md`, `gate.md` and fidelity summaries - images stay in capturer and
-verifier contexts. The one exception: it reads a screen's `screens/<SID>.md` when
-composing that screen step's driver brief - that file only, and only then. (Fulcrum
-rule)
+the brief content and the phase-6 procedure. The orchestrator reads only `manifest.md`,
+`gate.md`, fidelity summaries and, only while composing a screen step's driver brief,
+that screen's `screens/<SID>.md`. Images stay out of its context. (Fulcrum rule)
 
 ## Intake
 
 Entered from the router (batch A: mode; "design loop or full path"), or from
-`fulcrum-solution-init`. Entry from `fulcrum-solution-init` is at Intake, with Q1 (app
-creation) and Q7 (form factor, if applicable) pre-answered there, not re-asked. Of the
-intake steps below, these still run: step 1 (copy into `source/`), step 2 for every
-batch B question still unanswered (bar, access, instrument, personas, evidence,
-assets), in one batch before capture - never defaulted; step 3 (`manifest.md` and
-the per-app `design` entry); step 4's browser preflight and official-skill detection.
-Step ids come from the solution plan; P1.04 Data and P1.05 Seed are omitted when that
-plan already has the entity and seed steps. Paths below then sit under
-`.fulcrum/design/<app>/`.
+`fulcrum-solution-init`, which pre-answers Q1 (app creation) and Q7 (form factor, if
+applicable). Every other step below still runs, in one batch before capture. Step ids
+then come from the solution plan; P1.04 Data and P1.05 Seed are omitted when that plan
+already has the entity and seed steps; paths sit under `.fulcrum/design/<app>/`.
 
-1. Copy the design verbatim into `.fulcrum/design/source/` (write-once).
-2. Ask **batch B in one batch** (exact text, conditions, recording:
-   `references/intake-questions.md`). Every answer is a user-policy choice: asked,
-   never defaulted, recorded `Decider: user`; `expert` may answer in the invocation,
-   and a missing answer is still asked. (Fulcrum rule)
-3. Write `project.md` (`profile: micro`, field `design` = `.fulcrum/design/manifest.md`;
-   on the full profile `design` lists one manifest per app,
-   `.fulcrum/design/<app>/manifest.md`) and `design/manifest.md` from
-   `templates/manifest.md`.
+1. **Ask for design files first.** None: offer generation through a design-generation
+   capability if the harness has one; the user's choice, never defaulted. Copy the
+   design verbatim into `.fulcrum/design/source/` (write-once).
+2. Ask **batch B in one batch** (exact text, conditions, recording, and step 1's
+   question: `references/intake-questions.md`). Every answer is a user-policy choice:
+   asked, never defaulted, recorded `Decider: user`; `expert` may answer in the
+   invocation, and a missing answer is still asked. (Fulcrum rule)
+3. Write `project.md` (`profile: micro`; `Rigor`, asked with batch B when the router
+   has not; field `design` = `.fulcrum/design/manifest.md`; on the full profile `design`
+   lists one manifest per app, `.fulcrum/design/<app>/manifest.md`) and
+   `design/manifest.md` from `templates/manifest.md`.
 4. Preflight: session-start tool preflight (`../fulcrum/references/tool-preflight.md`);
    `env_list` keys into `tenant-profile.md` per the micro profile procedure; the
    browser preflight in `../fulcrum-render-check/SKILL.md`, heading "Preflight - once
@@ -105,20 +100,22 @@ plan already has the entity and seed steps. Paths below then sit under
    check, run before batch B is sent so a frame-export ask joins it
    (`references/capture-recipes.md`, heading "Figma").
 
+## Build lanes
+
+Batch B Q8 picks the lane: `image` (recommended; uploaded images, at most 3 per prompt),
+`studio` (the user builds in Studio from a work order, then re-inventory before any
+Mentor change) or `text` (region-by-region anatomy, the fallback, and the path the rest
+of this file describes). `image` and `studio` shorten capture and the gate and change
+steps P1.02, P1.03 and P1.06+: `references/build-lanes.md`. (Fulcrum rule)
+
 ## Capture and the design spec
 
-First one **shared** `fulcrum-capturer` dispatch: it enumerates the screens and
-assigns `SID`s (reported; the orchestrator records them in `manifest.md`) and writes
-the app-wide files `tokens.md`, `theme.css` and `data.md`. Then one dispatch per <= 3
-screens, in parallel, each writing only its `screens/<SID>.md`; a class, token or
-entity a screen needs that the shared files lack is reported, and one serial shared
-dispatch adds it before the gate. The orchestrator copies references into
-`reference/` after the shared dispatch reports SIDs, before the screen dispatches and
-the gate. Every brief names the exact `design/` paths it may
-write; `reference/` is the orchestrator's (`references/capture-recipes.md`, heading
-"Reference images"). Recipes (images, HTML/TSX, Figma, reference images):
-`references/capture-recipes.md`. Region-to-block lookup: `references/block-map.md`;
-archetype cues: `references/screen-archetypes.md`.
+First one **shared** `fulcrum-capturer` dispatch enumerates the screens, assigns `SID`s
+and writes `tokens.md`, `theme.css` and `data.md`. Then one dispatch per <= 3 screens, in
+parallel, each writing only its `screens/<SID>.md`. Every brief names the exact `design/`
+paths it may write; `reference/` is the orchestrator's. Recipes and dispatch rules:
+`references/capture-recipes.md`. Lookup: `references/block-map.md`,
+`references/screen-archetypes.md`.
 
 Outputs (schemas and limits: `references/design-spec-format.md`): `screens/<SID>.md`
 (anatomy, regions, icons, interactions, F-items; <= 6 top-level regions, else two
@@ -172,31 +169,31 @@ contents: `references/design-spec-format.md`, "Step decomposition". (Fulcrum rul
 ## Render-compare and fix
 
 When `project.md` has `design`, rung 6 on a screen row runs
-`references/render-compare.md` after the publish gate (a render does not wait on the
-`context_*` index):
+`references/render-compare.md` after the publish gate. **When follows the gates; read
+`Rigor` from `project.md`:** per screen at `production`, per batch at `pilot`, at the
+join at `demo` (that file, heading "When").
 
 1. **Capture** - `fulcrum-renderer` at the manifest viewport(s) (tier A); the user's
-   screenshot via a parked `manual` row (tier B); tier C has no capture and every
-   screen is `unproven`. Curl is never a render.
-2. **Judge** - a fresh blind `fulcrum-verifier` with image inspection, given only the
-   reference, capture(s), render `report.md`, F-items, bar and diff vocabulary.
-3. **Triage** - blocker/major -> fix, minor -> `backlog.md`; a diff on 2+ screens or
-   from a theme class, token or chrome element is a **pattern**: one `fix` row on the
-   owning step, then re-compare every affected screen.
+   screenshot via a parked `manual` row (tier B); tier C has no capture. Curl is never
+   a render.
+2. **Judge** - a fresh blind `fulcrum-verifier` with image inspection.
+3. **Triage** - blocker/major -> fix, minor -> `backlog.md`; a shared cause is a
+   **pattern**: one `fix` row on the owning step, then re-compare every affected screen.
 4. **Fix** - diagnostic first, a fix turn led by the measured symptom, Publish,
-   re-judge. At most 3 compare rounds per screen (the initial judge plus one re-judge
-   per fix turn; fix turns stay <= 2); then `fail`, guardrails lane stop.
+   re-judge. At most 3 compare rounds per screen; then `fail`, guardrails lane stop.
 5. **Record** `design/fidelity/<SID>-r<n>.md` from `templates/fidelity.md`.
 
 ## Stop and report
 
-- **Done:** every screen row terminal (`pass`, `fail` parked, `unproven` with reason)
-  and `design/report.md` written from `templates/report.md`.
+- **Done:** every screen row `pass`, `fail` parked, or `unproven` and parked after its
+  re-prove (`unproven` is not terminal: the row stays `todo` and the loop re-proves it,
+  `../fulcrum-loop-engine/references/frontier-and-batching.md`, "Unproven rows"), and
+  `design/report.md` written from `templates/report.md`.
 - **Halt:** owned by `../fulcrum-unattended-guardrails/SKILL.md`; the design-specific
   trigger is a pattern fix regressing a passed screen.
 - **Caps:** build pass <= 4, fix <= 2, compare rounds <= 3 (initial judge plus one
-  re-judge per fix turn), renders <= 1 per form
-  factor per round, one re-capture and re-gate per screen.
+  re-judge per fix turn), renders <= 1 per form factor per round, one re-capture and
+  re-gate per screen.
 - **Promotion beyond Development is never done**; the report offers it. (Fulcrum rule)
 
 ## Official skill present
@@ -212,9 +209,11 @@ session and publish rules conflict with Fulcrum's. `references/official-skill-in
 | `references/intake-questions.md` | Asking batch B or C; recording answers |
 | `references/capture-recipes.md` | Briefing or running capture |
 | `references/design-spec-format.md` | Writing or checking any `design/` file; the gate; step rows |
-| `references/block-map.md` | Mapping a region to an OS UI block |
+| `references/build-lanes.md` | Batch B Q8; any image turn; a Studio hand-off |
+| `references/block-map.md` | Mapping a region to an OS UI block; the library version check |
+| `references/osui-v3.0.0-blocks.md`, `references/osui-v3.0.0-theme.md` | A block's parameters and slots; theme roles, utility classes, icon names |
 | `references/screen-archetypes.md` | Classifying a screen; common misses per archetype |
 | `references/render-compare.md` | Rung 6 on a screen row; triage; fix rounds |
 | `references/official-skill-interop.md` | The official skill is installed |
 | `references/THIRD-PARTY-NOTICE.md` | Licence of the derived files |
-| `templates/` | `manifest.md`, `screen.md`, `fidelity.md`, `report.md` |
+| `templates/` | `manifest.md`, `screen.md`, `fidelity.md`, `report.md`, `studio-pass.md` |

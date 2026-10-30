@@ -1,7 +1,7 @@
 # Template - `.fulcrum/design/report.md`
 
-Written by the orchestrator once every screen row is terminal. The user reads this
-first. State what is untested before what passed when the render tier is C.
+Written by the orchestrator once every screen row is closed or parked. The user reads
+this first. State what is untested before what passed when the render tier is C.
 
 ---
 
@@ -12,12 +12,13 @@ first. State what is untested before what passed when the render tier is C.
 - **App:** [Open \<app name\>](\<runtime URL from env_app\>) - Development
 - **Revision:** \<live revision\>   **Date:** \<ISO-8601 UTC\>
 - **Bar:** \<structural | visual\>   **Tier:** \<A | B | C\>
+- **Rigor:** \<demo | pilot | production\>   **Lane:** \<image | studio | text\>
 
 ## Untested
 
 \<Rungs and screens not proven, with the reason. In tier C, the render-only defect
 classes first: repeater collapse, collapsed overlay, dark-on-dark icon, empty chart,
-wrapped metric.\>
+wrapped metric. At `demo`, the screens the happy path did not reach.\>
 
 ## Per-screen fidelity
 

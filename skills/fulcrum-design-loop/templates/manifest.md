@@ -15,7 +15,7 @@ screen rows filled from the shared capture dispatch's report. On the full profil
 
 ## Source
 
-- **Kind:** \<image | figma | html | tsx\>
+- **Kind:** \<image | figma | html | tsx | generated\>
 - **Paths / URL:** \<`source/<file>` ... or the design-tool URL\>
 - **Received:** \<ISO-8601 UTC date\>
 
@@ -46,6 +46,7 @@ verify rungs 1 and 3 only.
 - **App creation:** \<Mentor-created | user's shell `<app key>`\> - \<D-NNN\>
 - **Screen access:** \<all sign-in | public: S.. | per role\> - \<D-NNN\>
 - **Fidelity bar:** \<structural | visual\> - \<D-NNN\>
+- **Build lane:** \<image | studio | text\> - \<D-NNN\>
 - **Render tier:** \<A browser | B user screenshots | C structure only\> - \<D-NNN\>
 - **Personas in Development:** \<yes | no | n/a\> - \<D-NNN\>
 - **Commit design source / render screenshots:** \<yes|no\> / \<yes|no\> - \<D-NNN\>

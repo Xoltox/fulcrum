@@ -24,7 +24,7 @@ the diff list, and what it could not judge>
 
 ## Triage
 
-| Diff | Class | Severity | Disposition (fix / pattern / backlog) | Task id |
+| Diff | Class | Severity | Disposition (fix / pattern / backlog; Studio lane: studio / mentor / backlog) | Task id |
 |---|---|---|---|---|
 | \<observed vs expected\> | \<structure / data / icon / size / token / spacing / copy\> | \<blocker / major / minor\> | \<...\> | \<T-NNN or -\> |
 

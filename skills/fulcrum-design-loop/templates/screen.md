@@ -4,6 +4,8 @@ One file per screen, written by `fulcrum-capturer`. Limits: <= 150 lines, anatom
 80 lines, <= 6 top-level regions. Attribute vocabulary, the four-part mapping and a
 worked example: `../references/design-spec-format.md`, heading "screens/<SID>.md".
 Never sent to Mentor whole: a driver brief carries one region's subtree per turn.
+`image` and `studio` lanes write the short form: drop Anatomy and Icons (heading "Short
+form" there).
 
 ---
 
