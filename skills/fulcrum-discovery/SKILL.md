@@ -1,8 +1,14 @@
 ---
 name: fulcrum-discovery
 description: Use when the user says "I have an idea for an OutSystems app", "help me write requirements", "I don't have a BRD", "I want to build something but nothing is written down", "can you spec this out for me", "turn this into requirements", "interview me about my app", or hands over a one-paragraph idea for an ODC app and asks what to build, even when the user does not mention Fulcrum. Also in expert mode, to fill one named hole in an existing document. Interviews a user who has an idea but no written requirements and produces the brief that fulcrum-solution-init ingests, through a bounded, batched interview targeted at exactly what ODC and Mentor need - roles and per-screen access, entity relationships, integrations, seed data, read-only versus transactional screens - marking every answer as held, elicited, assumed or undecided and converting vague answers into observable ones. Stops at the brief; planning is fulcrum-solution-init's.
-version: "1.0.0"
-requires: a capability to put structured questions to the user and receive answers in-session (a native elicitation primitive where the harness has one, otherwise ordinary conversational turn-taking); filesystem write access for the brief and `.fulcrum/DECISIONS.md`. No ODC MCP surface and no Mentor session are needed - this skill runs before either exists.
+metadata:
+  version: "1.0.0"
+  requires: >
+    a capability to put structured questions to the user and receive answers in-session (a
+    native elicitation primitive where the harness has one, otherwise ordinary
+    conversational turn-taking); filesystem write access for the brief and
+    `.fulcrum/DECISIONS.md`. No ODC MCP surface and no Mentor session are needed - this
+    skill runs before either exists.
 ---
 
 # fulcrum-discovery

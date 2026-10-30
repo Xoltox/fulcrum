@@ -1,12 +1,13 @@
 ---
 name: fulcrum-engine-traps
-description: Use before and during any turn that builds or edits a screen, aggregate, repeater, link, icon, date expression, REST integration, setting, screen access, static entity, chart, overlay, agent, workflow or sample sign-in in ODC, including any "use Mentor to add ..." or "ask Mentor to build ..." request, even when the user does not mention Fulcrum. Trigger phrases include "building a screen in ODC", "add an aggregate", "my aggregate returns one row", "the gallery only shows one card", "the icon isn't rendering", "the link is overflowing its box", "Mentor built it but it looks wrong", "why did this render empty", "REST is dropping a field", "the API rejects our request body", "JSON keys are the wrong case", "the REST call fails with no status code", "users can't log in to the new app", "where do I put the API password", "wire up a wizard/chart/action sheet/dropdown", "publish refused, Standalone Agent", "build a workflow", "add sample login buttons". Construct-indexed registry of known OutSystems ODC / Mentor engine traps - ways a screen, aggregate, widget or integration publishes with 0 validation errors and a clean deploy while being functionally broken.
-version: "1.0.0"
-requires: >
-  A construct to check against this registry; tenant-profile.md present or
-  in progress for tenant-varying facts (icon font, UI-block availability,
-  meridiem tokens). For integration traps, access to the external
-  contract (spec or sample payloads) and, ideally, the target's log.
+description: Use before and during any turn that builds or edits a screen, aggregate, repeater, link, icon, date expression, REST integration, setting, screen access, static entity, chart, overlay, agent, workflow or sample sign-in in ODC, including any "use Mentor to add ..." or "ask Mentor to build ..." request, even when the user does not mention Fulcrum. Trigger phrases include "building a screen in ODC", "add an aggregate", "my aggregate returns one row", "the gallery only shows one card", "why did this render empty", "REST is dropping a field", "the API rejects our request body", "users can't log in to the new app", "publish refused, Standalone Agent", "build a workflow", "add sample login buttons". Construct-indexed registry of known OutSystems ODC / Mentor engine traps - ways a screen, aggregate, widget or integration publishes with 0 validation errors and a clean deploy while being functionally broken.
+metadata:
+  version: "1.0.0"
+  requires: >
+    A construct to check against this registry; tenant-profile.md present or in progress for
+    tenant-varying facts (icon font, UI-block availability, meridiem tokens). For
+    integration traps, access to the external contract (spec or sample payloads) and,
+    ideally, the target's log.
 ---
 
 # ODC engine traps

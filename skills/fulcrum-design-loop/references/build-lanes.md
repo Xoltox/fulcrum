@@ -81,7 +81,8 @@ access outside the batch B Q2 answer, and nothing later reverts it. A sign-in pa
 **Fix turn.** Attach the target and the current render side by side, and lead with the
 measured symptom (`render-compare.md`, heading "5. Fix rounds"). Fidelity improved in
 the one run tried, but that prompt also listed the fixes in text, so the gain is not
-attributable to the images alone `[SINGLE-OBSERVATION]`.
+attributable to the images alone `[SINGLE-OBSERVATION]`. With screenshots declined, the fix
+turn is text-led from the verifier's diff list.
 
 ## Studio lane
 

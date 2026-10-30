@@ -1,5 +1,22 @@
 # Halt conditions, fix-turn caps, escalation
 
+## Contents
+
+- The turn cap
+- The escalation ceiling
+- Hard stops
+- Lane stops
+- Halts with parallel lanes
+- Stall and no-op decisions
+- User-action stops
+- Mentor capacity stop
+- The runtime-shaped stop
+- Halt on an unavailable op with no fallback
+- Never report an untouched app as healthy
+- Not reasons to continue
+- The revert failure mode - why halting early is cheap
+- Honest reporting on halt
+
 ## The turn cap
 
 **Per step: 1 build turn + at most 2 fix turns.** [VERIFIED]
@@ -314,7 +331,7 @@ unattended to avoid supervising *progress*, not to authorise damage.
 
 ## The revert failure mode - why halting early is cheap
 
-[VERIFIED] An agent resumed a **stale Mentor session** and published from it.
+[SINGLE-OBSERVATION] An agent resumed a **stale Mentor session** and published from it.
 The publish silently reverted the live application past six completed steps of
 verified work. The revision number advanced normally, so every platform success
 signal read green.

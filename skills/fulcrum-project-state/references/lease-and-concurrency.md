@@ -1,5 +1,17 @@
 # The lease, and what it can and cannot protect
 
+## Contents
+
+- What it enforces
+- Why it is the one uncommitted file
+- Shape
+- Protocol
+- Several apps in one session
+- Studio hand-off - `holder: user`
+- Breaking an expired lease
+- Resuming after a dead session
+- What the lease does not protect against
+
 ## What it enforces
 
 **One Mentor session at a time per app.** `[VERIFIED]` The rule and its operational
@@ -12,7 +24,7 @@ knows about. A second session started by a different person, a different termina
 a resumed crashed run knows nothing about the first. Two concurrent Mentor sessions on
 one app is a model-corruption path, not a queueing inconvenience: the loser's turns
 land against a model the winner has already moved, and publishing from that stale
-model advances the revision while silently reverting completed work. `[VERIFIED]`
+model advances the revision while silently reverting completed work. `[SINGLE-OBSERVATION]`
 
 ## Why it is the one uncommitted file
 
@@ -50,7 +62,7 @@ identifier yet: key the lease by the intended app name from `plan.md` and
 call returns a `runId`, not a key: record the `runId` in `RUN-IDS.md` before the wait.
 The key arrives in the first run as `assetKey` (`../../fulcrum-mentor-turns/references/mcp-surface.md`,
 heading "Creating and loading an asset"); once read, record it (`RUN-IDS.md` outcome
-line, then `project.md` at wave close) and keep the same lease file until release. In
+line, then `project.md` at a reconcile point) and keep the same lease file until release. In
 the field the first journal line and the lease came after creation, so a crash at that
 moment would have left an app nobody knew existed. `[SINGLE-OBSERVATION]` The crash
 window is now between the prompt and the `runId` record: after that, the run can be

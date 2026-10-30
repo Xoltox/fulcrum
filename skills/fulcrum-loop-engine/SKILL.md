@@ -1,12 +1,13 @@
 ---
 name: fulcrum-loop-engine
 description: Use when the user says "work through the task list", "run the next task", "keep building until the phase is done", "resume the loop", "what should I do next", "the same task keeps failing", "have we tried this before", "how many fix turns do I get", or "pick up the build where it stopped" on an OutSystems build with a `.fulcrum/` task graph, even when the user does not mention Fulcrum. The iteration mechanism for a Fulcrum build - how the runnable frontier of the task graph becomes parallel, recorded, proven dispatches, one lane per app. Owns frontier selection and batching, the precondition and staleness gate, dispatch, polling, verification, recording and advance; the bounded fix-loop; mechanical oscillation and stall detection; crash-idempotency of an iteration; and per-iteration budget accounting.
-version: "1.0.0"
-requires: >
-  A `.fulcrum/` project-state directory already scaffolded and readable/writable;
-  ODC MCP server authenticated with Mentor enabled on the tenant; a subagent
-  dispatch capability with per-dispatch model tier selection; a wait capability
-  that suspends without spinning or accumulating context.
+metadata:
+  version: "1.0.0"
+  requires: >
+    A `.fulcrum/` project-state directory already scaffolded and readable/writable;
+    ODC MCP server authenticated with Mentor enabled on the tenant; a subagent
+    dispatch capability with per-dispatch model tier selection; a wait capability
+    that suspends without spinning or accumulating context.
 ---
 
 # The build loop
@@ -38,12 +39,12 @@ time pressure, so each carries what breaks without it.
 | # | Phase | What it does | What breaks if skipped |
 |---|---|---|---|
 | 1 | **Select** | Compute the frontier of `.fulcrum/TASKS.md`: all `todo` rows whose `DependsOn` are done, grouped by `App`; form one dispatch per lane, one batch or one solo row; `Verdict: unproven` is a proof-only re-prove dispatch (`references/frontier-and-batching.md`) | Agent invents a task. Nothing joins it back to a plan step, so `Step` traceability is lost and gap analysis later reads the work as an undocumented addition |
-| 2 | **Precondition** | Gate each dispatch: `HALT.md` absent; oscillation scan clean; budget covers a whole iteration; for Mentor turns only, lease acquired by the orchestrator for every app the dispatch holds, TTL sized to the dispatch budget, and the staleness guard run as the first turn of the dispatch (`verify`/`code`/`infra`/`external`/`manual` rows skip both); a row consuming an external system needs `.fulcrum/external/<system>.md` | Each gate has its own loss. No halt check resumes a run that was stopped as unsafe. No lease (Mentor turns) means two Mentor sessions on one app. No oscillation scan repeats a known-failing attempt. No staleness guard publishes from a stale model, which advances the revision while silently reverting completed work `[VERIFIED]` |
+| 2 | **Precondition** | Gate each dispatch: `HALT.md` absent; oscillation scan clean; budget covers a whole iteration; for Mentor turns only, lease acquired by the orchestrator for every app the dispatch holds, TTL sized to the dispatch budget, and the staleness guard run as the first turn of the dispatch (`verify`/`code`/`infra`/`external`/`manual` rows skip both); a row consuming an external system needs `.fulcrum/external/<system>.md` | Each gate has its own loss. No halt check resumes a run that was stopped as unsafe. No lease (Mentor turns) means two Mentor sessions on one app. No oscillation scan repeats a known-failing attempt. No staleness guard publishes from a stale model, which advances the revision while silently reverting completed work `[SINGLE-OBSERVATION]` |
 | 3 | **Dispatch** | Write state first, then brief and dispatch: one driver per lane, sibling depth 1 agents, up to the in-flight cap. One dispatch is one batch or one solo row, running guard, consult, build, fix and Publish in one Mentor session | The orchestrator executes instead of supervising and spends the window it needs to supervise with. Writing state after dispatch leaves a run mutating the app with no record of it |
 | 4 | **Poll** | Poll the run to a terminal state at the cadence for who is paying | Polling in the orchestrator's own context at a delegated rate grows it cumulatively and unrecoverably. Not polling at all loses the run id, and an evicted run is permanently unreadable `[VERIFIED]` |
 | 5 | **Verify** | Run the gates the project's `Rigor` owes this dispatch (`../fulcrum-verification/SKILL.md`, heading "Gates and rigor"). G0 always; G3, where owed, is exactly the rungs in the row's `Verify` column | A clean publish and zero validation errors prove nothing about rendering or logic `[VERIFIED]`. Skipping produces `done` rows that were never shown to work, and the next iteration builds on them |
 | 6 | **Record** | The orchestrator writes each row's verdict (a driver only returns it) and the `Gate` it actually ran: `TASKS.md` row, session-file line, `JOURNAL.md` `Tasks` entry, `DECISIONS.md` if a decision was made | Oscillation detection reads the journal. An unrecorded failure is a failure the loop will repeat forever, because the mechanism that catches repeats has nothing to scan |
-| 7 | **Advance** | Release the lease (the orchestrator, when the dispatch returns `session_state: closed`; on `session_state: open` keep it, record the open `sessionId`, and resume that dispatch or stop for the user), re-scan for oscillation, run the stall check, reconcile state at a wave close (`references/iteration-contract.md`), then select again for that lane once its G1 has reported - or hand to guardrails | A leaked lease blocks the app for its whole TTL; a lease released over a still-open session invites a second session on the app. Advancing without re-scanning defers a detected repeat by one whole iteration, which is one more mutating turn against a live app |
+| 7 | **Advance** | Release the lease (the orchestrator, when the dispatch returns `session_state: closed`; on `session_state: open` keep it, record the open `sessionId`, and resume that dispatch or stop for the user), re-scan for oscillation, run the stall check, reconcile state at a reconcile point (`references/iteration-contract.md`), then select again for that lane once its G1 has reported - or hand to guardrails | A leaked lease blocks the app for its whole TTL; a lease released over a still-open session invites a second session on the app. Advancing without re-scanning defers a detected repeat by one whole iteration, which is one more mutating turn against a live app |
 
 **Phases 1-2 and 6-7 are the orchestrator's. Phases 3-5 are dispatched** - the
 orchestrator never calls Mentor, publish or a gate script itself

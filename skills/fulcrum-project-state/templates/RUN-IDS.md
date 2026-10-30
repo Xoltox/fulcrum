@@ -17,8 +17,8 @@ run id; never edit a line. On a batch `<task-id>` is a comma-separated list, no 
 
 ```
 <timestamp> | <session-id> | <task-id> | <app> | <op> | <run-id> | <publication-key> | <revision> | <outcome>
-2026-10-08T10:41:07Z | s-4c1e9a | T-001 | claims_web | create-asset | 9b02d7f1 | - | - | started
-2026-10-08T10:41:30Z | s-4c1e9a | T-001 | claims_web | create-asset | 9b02d7f1 | - | - | ok: applicationKey 5e7c...
+2026-10-08T10:41:07Z | s-4c1e9a | T-001 | claims_web | create | 9b02d7f1 | - | - | started
+2026-10-08T10:41:30Z | s-4c1e9a | T-001 | claims_web | create | 9b02d7f1 | - | - | ok: assetKey 5e7c...
 2026-10-08T10:52:12Z | s-4c1e9a | T-002 | claims_web | prompt | 71aa03c2 | - | - | started
 2026-10-08T10:55:48Z | s-4c1e9a | T-002 | claims_web | prompt | 71aa03c2 | - | - | succeeded
 2026-10-08T11:02:10Z | s-4c1e9a | T-006 | claims_web | publish | 3ec0aa82 | - | - | started

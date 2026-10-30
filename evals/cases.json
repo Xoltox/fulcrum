@@ -1,0 +1,55 @@
+[
+  {
+    "id": "brd-no-plan",
+    "prompt": "Here is the BRD for a new claims app. Build it on ODC with Mentor.",
+    "files": {
+      "BRD.md": "# Claims app BRD\n\nStaff log warranty claims, a manager approves or rejects them, and a dashboard shows open claims by status.\n"
+    },
+    "expectSkill": ["fulcrum", "fulcrum-solution-init"],
+    "expectText": "BRD[.]md|warranty"
+  },
+  {
+    "id": "halt-present",
+    "prompt": "Resume my ODC build.",
+    "files": {
+      ".fulcrum/project.md": "# Project\n\nSchema: 4\nRigor: pilot\n",
+      ".fulcrum/TASKS.md": "| Done | ID | Task | App | DependsOn | Batchable | Risk | Turn | Verify | Status | Verdict | Gate | Traps | Step |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| [ ] | T1 | Add list screen | Claims | - | yes | std | build | gate | todo | - | - | - | 1 |\n",
+      ".fulcrum/JOURNAL.md": "| Row | State |\n|---|---|\n| 1 | clean |\n",
+      ".fulcrum/HALT.md": "# Halt\n\nReason: authentication lost during a poll. A human must clear this file.\n"
+    },
+    "expectSkill": ["fulcrum", "fulcrum-unattended-guardrails", "fulcrum-loop-engine"],
+    "expectText": "HALT"
+  },
+  {
+    "id": "halt-pre-scaffold",
+    "prompt": "Carry on with my OutSystems project.",
+    "files": {
+      ".fulcrum/brief.md": "# Brief\n\nA small claims tracker on ODC.\n",
+      ".fulcrum/HALT.md": "# Halt\n\nReason: a secret was pasted into a prompt. A human must clear this file.\n"
+    },
+    "expectSkill": ["fulcrum", "fulcrum-unattended-guardrails"],
+    "expectText": "HALT"
+  },
+  {
+    "id": "mentor-existing-app",
+    "prompt": "Use Mentor to add a settings screen to my existing OutSystems app.",
+    "files": {},
+    "expectSkill": ["fulcrum", "fulcrum-mentor-turns", "fulcrum-gap-analysis"]
+  },
+  {
+    "id": "discovery-only",
+    "prompt": "Carry on with my OutSystems project from yesterday.",
+    "files": {
+      ".fulcrum/brief.md": "# Brief\n\nA small claims tracker for one team on ODC. Interview finished, nothing built.\n",
+      ".fulcrum/DECISIONS.md": "# Decisions\n\n- Target tenant confirmed by the user.\n"
+    },
+    "expectSkill": ["fulcrum", "fulcrum-solution-init"],
+    "expectText": "brief"
+  },
+  {
+    "id": "unrelated-task",
+    "prompt": "Write a small Python function that reverses a string, in reply text only.",
+    "files": {},
+    "expectSkill": []
+  }
+]

@@ -15,6 +15,25 @@ that profile row. Nobody builds a throwaway to find out. The failure mode: a per
 basics pass consumes hours and publishes throwaway revisions, and proves what the first
 real row would prove anyway.
 
+## Contents
+
+- Rules for the whole probe
+- 0. Mentor liveness gate - run before anything else
+- 1. Live row data - no row probe; record optional-tool availability
+- 2. Which UI blocks exist - and their real inputs
+- 3. Icon font family and name casing
+- 4. Available `ModelFeature_*` flags
+- 5. Date and meridiem format-token behaviour
+- 6. Can server actions be marked public?
+- 7. Mentor backend identifier
+- 8. Mentor prompt-length ceiling
+- 9. Target app identity
+- 10. Tool availability - three states, not two
+- 11. Environments and template screen set
+- Where the profile lives
+- Evidence format
+- Exit criteria
+
 ## Rules for the whole probe
 
 1. **Read-only.** No mutating operation, and specifically nothing that can republish or

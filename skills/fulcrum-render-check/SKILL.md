@@ -1,8 +1,16 @@
 ---
 name: fulcrum-render-check
 description: Use when asked to "render the screen", "check the page actually shows", "does the new screen load", "is this screen public", "prove access for this role", "take a screenshot of the app", "run the render obligation", "click it and check it persisted", or after any publish that added or changed a screen in an ODC app, even when the user does not mention Fulcrum. Renders a published ODC screen in a real browser and captures what a user actually sees, signed out or signed in, so proof rungs 6-7 and the render obligation stop being reported untested. Owns the browser preflight, the sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after a publish, evidence capture, and the security observations a render surfaces.
-version: "1.0.0"
-requires: A browser automation capability that can open a page, read page text and a DOM or accessibility snapshot, take a screenshot, click, and read console output where available (whatever browser MCP the harness has - e.g. firefox-devtools, Claude in Chrome, Claude's built-in browser, Playwright or Chrome DevTools MCP - or a headless driver otherwise); ODC MCP published-state reads (env_app, context_screens, context_search, context_roles); a wait that actually blocks; write access to the project's .fulcrum/ evidence folder.
+metadata:
+  version: "1.0.0"
+  requires: >
+    A browser automation capability that can open a page, read page text and a DOM or
+    accessibility snapshot, take a screenshot, click, and read console output where
+    available (whatever browser MCP the harness has - e.g. firefox-devtools, Claude in
+    Chrome, Claude's built-in browser, Playwright or Chrome DevTools MCP - or a headless
+    driver otherwise); ODC MCP published-state reads (env_app, context_screens,
+    context_search, context_roles); a wait that actually blocks; write access to the
+    project's .fulcrum/ evidence folder.
 ---
 
 # fulcrum-render-check

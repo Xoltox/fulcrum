@@ -12,8 +12,10 @@ Three checks, in order, each answerable without opening a session file:
 2. **Does an app already exist?** `env_apps` / `app_list`-shaped inventory
    check against the tenant, or a repo convention that already names the
    target app. Read-only, no Mentor session.
-3. **Is there source material?** A file glob for anything that looks like a
-   BRD, a Figma/Stitch export, HTML mockups, or screenshots, in the locations
+3. **Is there source material?** A file search by name and type (`*BRD*`, `*.pdf`,
+   `*.docx`, image types), never an unfiltered listing: a project-scoped install puts
+   over 100 files in `.claude/`, and a capped listing can hide the source. Look for
+   anything that looks like a BRD, a Figma/Stitch export, HTML mockups, or screenshots, in the locations
    `../../fulcrum-solution-init/references/source-triage.md` already enumerates.
    Do not re-derive that list here - cite it.
 
@@ -31,6 +33,7 @@ already gone off cheap - stop and re-derive the answer from the index instead.
 | 1 | No `.fulcrum/`, no app, no source material | `../../fulcrum-discovery/SKILL.md` | Nothing to ingest yet; interview first. |
 | 2 | No `.fulcrum/`, no app, source material present | `../../fulcrum-solution-init/SKILL.md` | Source material is the trigger, not the user's framing of it, unless row 0b matched and the user confirmed. |
 | 3 | No `.fulcrum/`, app exists | `../../fulcrum-gap-analysis/SKILL.md` | An app with no `.fulcrum/` was built by something other than a Fulcrum-tracked session (a generator, a prior manual build, another agent). Never re-run `fulcrum-solution-init` against it - that skill is pre-build only. |
+| 3b | `.fulcrum/` present, no `project.md`, no `HALT.md` | Pre-scaffold: route by rows 0-3 as if `.fulcrum/` were absent | `brief.md` is source material if present. A discovery-only session leaves `brief.md` and `DECISIONS.md` and no scaffold. |
 | 4 | `.fulcrum/` present, `HALT.md` present | Stop, report, ask a human | See `../SKILL.md`, heading "HALT.md is absolute - state the mechanism". Absolute - no exceptions below override this row. |
 | 5 | `.fulcrum/` present, last `JOURNAL.md` row `State: open` | Resume at `../../fulcrum-loop-engine/SKILL.md` phase 4 (poll to terminal) | Possible crash or a run still executing - not a halt. See `../../fulcrum-project-state/references/resume-and-halt.md`, "Crash recovery - the five signals of interrupted work". |
 | 6 | `.fulcrum/` present, last row `State: clean`, `aborted`, or `halted` with `HALT.md` cleared, open task in `TASKS.md` | Resume -> `../../fulcrum-loop-engine/SKILL.md` phase 1 | Nothing in flight: a crash was recovered, or a human resolved the halt. Select the runnable frontier. |
@@ -169,6 +172,7 @@ whether `plan.md` was lost and needs to be regenerated from source material.
 
 ### `.fulcrum/` present, no `JOURNAL.md`, or an empty one
 
+Requires `project.md` and `TASKS.md` to exist; with no `project.md` this is row 3b.
 Cannot be a resume - there is no prior session to resume. Treat as if this
 were the first session against an already-scaffolded repo: read
 `project.md` and `TASKS.md` directly, and hand off to

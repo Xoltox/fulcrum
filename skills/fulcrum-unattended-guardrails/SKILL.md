@@ -1,11 +1,12 @@
 ---
 name: fulcrum-unattended-guardrails
 description: Use when the user says "run the build unattended", "let it run overnight", "keep going while I'm away", "work through the remaining steps on your own", "don't stop and ask me every time", "delegate this to subagents", "long-running Mentor session", "how do I stop it breaking the app while I'm not watching", or when starting any ODC session expected to run many steps without a human reading each one, even when the user does not mention Fulcrum. Safety rails for long, largely unattended ODC Mentor build sessions - stop conditions, fix-turn caps as a ceiling, halt-and-report rules, escalation rules, subagent depth and delegation boundaries, tool-call budgeting, checkpoint discipline, Mentor concurrency locks and model tier policy. It does not own the iteration mechanism - that is `fulcrum-loop-engine`.
-version: "1.0.0"
-requires: >
-  ODC MCP server authenticated; Mentor enabled on the tenant; a subagent
-  dispatch capability with per-dispatch model tier selection; a writable
-  project repo for checkpoint and handoff files.
+metadata:
+  version: "1.0.0"
+  requires: >
+    ODC MCP server authenticated; Mentor enabled on the tenant; a subagent
+    dispatch capability with per-dispatch model tier selection; a writable
+    project repo for checkpoint and handoff files.
 ---
 
 # Unattended build guardrails
@@ -34,7 +35,7 @@ work and absorb poll traffic; tiers are set per dispatch. Run undelegated only w
 Unattended does not mean autonomous. It means: **the agent is trusted to stop safely, not trusted
 to recover from anything.** The worst outcome of an unwatched hour must be lost time, never lost work.
 
-The failure mode this is built against [VERIFIED]: an agent resumed a **stale Mentor session** and
+The failure mode this is built against [SINGLE-OBSERVATION]: an agent resumed a **stale Mentor session** and
 published from it, silently reverting the live app past six completed steps while the revision
 number advanced normally. Every platform success signal read green; a human noticed, and recovery
 was manual through the vendor portal. The only defences are a staleness guard before every mutating
@@ -133,7 +134,7 @@ agent the ability to dispatch.
 
 ## Concurrency lock - one Mentor session per app
 
-The lock is **per app, not per tenant**, so parallelism comes only from different apps. [VERIFIED] A `mentor_prompt` issued while a prior prompt is running is **silently ignored** - a
+The lock is **per app, not per tenant**, so parallelism comes only from different apps. [SCHEMA] A `mentor_prompt` issued while a prior prompt is running is **silently ignored** - a
 racing agent gets no signal; treat it as never sent.
 
 - **Never dispatch two agents concurrently if both may touch Mentor on the same app.** A poller watching

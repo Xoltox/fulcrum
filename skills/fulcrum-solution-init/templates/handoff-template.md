@@ -115,7 +115,7 @@ One line per lane, from `.fulcrum/TASKS.md`. A single-app project has one line.
 
 This BRIEF is the orchestrator's resume point. Do not keep a second one (a checkpoint
 file at the repo root, a long commit message): it gets updated instead of this file and
-the two diverge. Regenerate this part at every wave close.
+the two diverge. Regenerate this part at every reconcile point.
 
 ## Known-open items that do NOT block the frontier
 

@@ -1,12 +1,13 @@
 ---
 name: fulcrum-seed-data
 description: Use when the user says "seed sample data", "load demo data into my ODC app", "my seeded rows are blank", "set up test data for these screens", "add a reset/teardown for my seed data", or "the seed ran twice and duplicated rows", or when seeded rows come back blank, duplicated or stale, even when the user does not mention Fulcrum. Seeds sample or demo data into an ODC app so screens have real rows to read against. Owns idempotent loaders, natural keys, relative timestamps, static-entity identifiers, and reset paths (and their absence).
-version: "1.0.0"
-requires: >
-  ODC MCP surface for model edits and publish; tenant-profile.md present or
-  in progress for tenant-varying facts (server-action public exposure,
-  static-entity auto-numbering, live-row-read path); a scripted HTTP client
-  to call the exposed loader endpoint on demand.
+metadata:
+  version: "1.0.0"
+  requires: >
+    ODC MCP surface for model edits and publish; tenant-profile.md present or in progress
+    for tenant-varying facts (server-action public exposure, static-entity auto-numbering,
+    live-row-read path); a scripted HTTP client to call the exposed loader endpoint on
+    demand.
 ---
 
 # fulcrum-seed-data

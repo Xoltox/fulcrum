@@ -17,6 +17,22 @@ planned step it gates. An answer of "Mentor said X" is not an answer.
 
 ---
 
+## Contents
+
+- 0. Mentor liveness gate
+- 1. Live row data and optional MCP tools
+- 2. UI blocks
+- 3. Icon font
+- 4. `ModelFeature_*` flags
+- 5. Date / meridiem format tokens
+- 6. Public server actions
+- 7. Mentor backend identifier
+- 8. Mentor prompt-length ceiling
+- 9. Target app identity
+- 10. Tool availability
+- 11. Environments, template screen set
+- Unresolved rows
+
 ## 0. Mentor liveness gate
 
 | Field | Value |
@@ -46,9 +62,8 @@ assume from another tenant or an older snapshot.
 | `db_query` | \<yes/no\> | \<...\> | \<...\> |
 | `exec_in_app` | | | |
 | `test_setup_start` / `test_setup_status` | | | |
-| `mentor_publish` | | | |
 
-All four were absent on the 2026-10-16 listing (listed 2026-10-09); current record:
+All three were absent on the 2026-10-16 listing (listed 2026-10-09); current record:
 `../../fulcrum-mentor-turns/references/mcp-surface.md`. A tool that lists is still not an
 instrument until that file records what a call does.
 

@@ -3,6 +3,12 @@
 Verbatim-generalized templates from measured turns, plus the phrasings that
 measurably failed. Fill in the bracketed placeholders; keep the rest as-is - the exact wording is part of what made these work.
 
+## Contents
+
+- What worked
+- What failed - know these too
+- Forwarding untrusted log content to Mentor
+
 ## What worked
 
 **Consult turn** - opens a `collaborative`-posture step (`posture.md`).

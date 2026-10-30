@@ -12,6 +12,15 @@ different evidence and must not be collapsed into one counter.
 | Owner of the number | `../../fulcrum-mentor-turns/references/granularity.md`, "Turn economics" | `../../fulcrum-unattended-guardrails/SKILL.md`, heading "Hard stops - halt and report to the user", row "Stuck twice" |
 | On breach | Stop the inner loop, record `fail` | Hand to guardrails: a lane stop |
 
+## Contents
+
+- The fix-loop
+- A failed batch
+- Late failures
+- Stall detection
+- The oscillation scan
+- On detection - the loop stops, guardrails rules
+
 ## The fix-loop
 
 A failed verify keeps the iteration open. The inner loop runs between phases 5

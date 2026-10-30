@@ -110,10 +110,10 @@ source, and treat any hand-edit of a spec's rules block as a defect.
 
 ### 3. Every section-anchored cross-reference dangling
 
-Every `§`-numbered reference in the corpus pointed at nothing, because the target files
+Every section-number reference in the corpus pointed at nothing, because the target files
 had no numbered headings.
 
-**Rule.** Link by relative path, and quote the target heading verbatim. Never `§`. Never
+**Rule.** Link by relative path, and quote the target heading verbatim. Never a section-number anchor. Never
 a line number - line numbers rot on the first edit.
 
 ### 4. A plausible inference recorded as verified fact
@@ -159,7 +159,7 @@ stub explaining what belongs there:
 - [ ] Every stub states what belongs in it and who writes it.
 - [ ] No fact appears in two files at two strengths.
 - [ ] No rule list is duplicated by hand.
-- [ ] No `§` anchor and no line-number reference anywhere.
+- [ ] No section-number anchor and no line-number reference anywhere.
 - [ ] `.fulcrum/HANDOFF.md` has both parts, and the BRIEF lists the current frontier.
 - [ ] `.fulcrum/TASKS.md` carries the graph in schema v3, with no spike or probe row.
 - [ ] `.fulcrum/RUN-IDS.md` exists and is empty rather than absent.

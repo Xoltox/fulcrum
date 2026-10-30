@@ -7,6 +7,17 @@ specified mechanism, not an observed one.
 The phase list and the failure mode of skipping each are in `../SKILL.md`,
 heading "The canonical iteration". This file is the detail.
 
+## Contents
+
+- Phase 1 - Select
+- Phase 2 - Precondition
+- Phase 3 - Dispatch
+- Phase 4 - Poll
+- Phase 5 - Verify
+- Phase 6 - Record
+- Phase 7 - Advance
+- Worked walkthrough - one `collaborative` iteration
+
 ## Phase 1 - Select
 
 Read `.fulcrum/TASKS.md` and compute the frontier: all `todo` rows whose
@@ -230,13 +241,13 @@ A verdict recorded only in the orchestrator's context is not recorded.
    join, no hold is needed before the join (`frontier-and-batching.md`, heading
    "What runs alongside what").
 
-**At a wave close** - a join row is about to run, no dispatch is in flight, or the
+**At a reconcile point** - a join row is about to run, no dispatch is in flight, or the
 session is ending - reconcile. There is no barrier, so this is a checkpoint, not a
 gate; running lanes carry on.
 Read the index rows, session files and new `RUN-IDS.md` lines, then
 rewrite `TASKS.md`, `project.md` and `HANDOFF.md` PART 2 to match, using the
 checklist in `../../fulcrum-project-state/references/file-schemas.md`, heading
-"Write ownership - who writes which file" ("Reconcile at every wave close").
+"Write ownership - who writes which file" ("Reconcile at every reconcile point").
 
 A phase is a derived label, not a gate. When a phase's rows are all closed,
 additionally: remove its `Status: done` `Verdict: pass` rows from `TASKS.md`,

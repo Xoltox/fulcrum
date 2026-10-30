@@ -8,7 +8,7 @@ Written by exactly one session, so it never merge-conflicts. The append discipli
 what keeps a crashed file readable and correctly ordered. Parallel drivers append to
 lane files, never here (`../references/file-schemas.md`, heading "Lane files").
 
-Create this file **before** appending the session's row to `../JOURNAL.md`, and both
+Create this file **before** appending the session's row to `.fulcrum/JOURNAL.md`, and both
 before the first dispatch. Schema: `../references/file-schemas.md`, heading
 `journal/<session-id>.md`.
 

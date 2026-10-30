@@ -130,8 +130,8 @@ could not find it at about 13; it appeared next day. Overnight, not minutes
 `[SINGLE-OBSERVATION]`.
 
 **Do:** emit the consumer row `blocked` as for a library consumer
-(`../../fulcrum-solution-init/references/decomposition-and-sizing.md`, "Library consumers
-need the index"), and work the rest of that lane. No fixed wait is safe. Stuck past that:
+(`../../fulcrum-solution-init/references/decomposition-and-sizing.md`, the bullet "Library
+consumers need the index" under "Part 2 - The task graph"), and work the rest of that lane. No fixed wait is safe. Stuck past that:
 `rest-and-integration.md` entry 16.
 
 ## 10. "No published revision" against a deployed agent `[SINGLE-OBSERVATION]`

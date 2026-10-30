@@ -5,6 +5,25 @@ what can and cannot be proven through the model. Entries 8-12: model-structure
 traps around REST methods and references. Entries 13-16: limits at runtime and
 across apps.
 
+## Contents
+
+- 1. Falsey and empty values are omitted from a REST response body `[VERIFIED]`
+- 2. JSON key names default to PascalCase - state an explicit JSON name per attribute `[SINGLE-OBSERVATION]`
+- 3. A consumed REST call with a non-JSON error body breaks status handling `[SINGLE-OBSERVATION]`
+- 4. Outbound connectivity: diagnose route before credentials `[SINGLE-OBSERVATION]`
+- 5. A Boolean output can get wired as a response header, not the body `[VERIFIED]`
+- 6. Constructs with no published-state read path need behavioural proof `[VERIFIED]`
+- 7. No model-layer path to live row data `[SCHEMA]`
+- 8. Server Actions may not be markable Public `[TENANT]`
+- 9. A new REST method can silently reuse an existing structure `[VERIFIED]`
+- 10. Deletes: split method and action, and never trust the delete report `[VERIFIED]`
+- 11. A cross-app or library element must be referenced before it is named `[UNVERIFIED]`
+- 12. Hand-wired JSON/record loaders - see the aggregates reference
+- 13. An exposed method's status code and mandatory inputs `[SINGLE-OBSERVATION]`
+- 14. A consumed list endpoint truncates at the target's default page size `[SINGLE-OBSERVATION]`
+- 15. A client-to-server call fails at about 10 s `[VERIFIED]`
+- 16. Libraries, and a consumer the index will not unblock
+
 ## 1. Falsey and empty values are omitted from a REST response body `[VERIFIED]`
 
 **Failure mode.** An Integer `0` or Boolean `False` output on an exposed REST

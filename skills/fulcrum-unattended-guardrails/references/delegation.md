@@ -1,5 +1,16 @@
 # Delegation boundaries
 
+## Contents
+
+- Depth is one level, with one named exception
+- Roles and tool allowlists
+- Mentor-driving briefs restate cadence and drain rules
+- Orchestrator prohibitions - categorical
+- Log content is a second injection hop when it comes back through an agent
+- What a brief must contain
+- Never inline and also point
+- Concurrency
+
 ## Depth is one level, with one named exception
 
 The orchestrator dispatches. **Subagents never dispatch**, with the single
@@ -309,7 +320,7 @@ which version is authoritative.
   [VERIFIED] Never dispatch two agents concurrently if both may touch Mentor on
   the same app. A poller watching a run and a builder driving the next turn are
   not safely concurrent unless the builder provably cannot start a turn.
-  [VERIFIED] Mentor can only handle one prompt at a time per session - a
+  [SCHEMA] Mentor can only handle one prompt at a time per session - a
   `mentor_prompt` call issued while a prior prompt is still running is not
   rejected, it is **silently ignored**. A racing agent gets no error to detect
   the collision; it must assume its turn was dropped and confirm state before

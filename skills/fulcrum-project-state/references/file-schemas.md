@@ -23,6 +23,27 @@ Rules that hold for every file here:
   mechanism for change, so the first schema change breaks it silently and every later
   parser reads the wrong column. `[UNVERIFIED]`
 
+## Contents
+
+- Write ownership - who writes which file
+- project.md
+- brief.md
+- TASKS.md
+- JOURNAL.md - the session index
+- journal/<session-id>.md
+- DECISIONS.md
+- RUN-IDS.md
+- Lane files
+- HANDOFF.md
+- plan.md
+- external/<system>.md
+- runs/<run-id>.md
+- evidence/render/<task-id>/<UTC-stamp>/
+- design/
+- checkpoints/<agent-label>.md
+- HALT.md
+- lease.<app>.json
+
 ## Write ownership - who writes which file
 
 In the two projects that ran builds, `.fulcrum/` went stale within a day: `TASKS.md` still
@@ -52,7 +73,7 @@ its lane files, "Lane files" below). It never mints session ids, never edits the
 `TASKS.md`, and never writes the lease or `HALT.md`: a driver reports and stops. When
 there is no delegation, the orchestrator is its own driver and the table still holds.
 
-**Reconcile at every wave close.** There is no wave barrier, so a wave close is a
+**Reconcile at every reconcile point.** There is no wave barrier, so a reconcile point is a
 checkpoint: a join row is about to run, no dispatch is in flight, or the session is
 ending. The orchestrator reads the index rows, their session files where a
 row is not enough, and the new `RUN-IDS.md` lines, then rewrites `TASKS.md` (status,
@@ -69,7 +90,7 @@ ended a full revision ahead of it. `[VERIFIED]` Where we are lives in `TASKS.md`
 the last `JOURNAL.md` row; the frontier per lane and its preconditions in `HANDOFF.md`
 PART 2 (full profile); anything waiting on the user in the `TASKS.md` "Blocked and parked
 rows" table with `Blocked on: the user`. An ephemeral `checkpoints/<agent-label>.md`
-is fine, but its durable content moves into those files at wave close.
+is fine, but its durable content moves into those files at a reconcile point.
 
 ## project.md
 
@@ -429,10 +450,10 @@ One line per event, pipe-delimited, fixed field order:
 - `task-id` - the join key back to `TASKS.md`; on a batch a comma-separated list, no
   spaces. Without it a resuming session that finds an unpolled run cannot tell which
   row it belongs to.
-- `op` - `create-asset` | `prompt` | `publish` | `extlib` | `deploy` | another tool
+- `op` - `create` | `prompt` | `publish` | `extlib` | `deploy` | another tool
   name for any other long-running start.
-- `run-id` - the id the start call returned. For `create-asset`, the returned
-  application key goes in `outcome` once known.
+- `run-id` - the id the start call returned. For `create`, the key arrives as
+  `assetKey` in the run and goes in `outcome` once known.
 - `publication-key`, `revision` - `-` except on `publish` lines.
 - `outcome` - `started` first; later lines carry `accepted`, a terminal value, or
   `failed: <code>`.

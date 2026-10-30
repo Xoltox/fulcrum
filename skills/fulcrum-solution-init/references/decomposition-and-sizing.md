@@ -4,6 +4,12 @@ Read this for steps 4 and 5 of `../SKILL.md`. It covers how to split a solution 
 apps, agents and workflows, how to emit the task graph, and how to size steps against
 measured cost.
 
+## Contents
+
+- Part 1 - Decomposition
+- Part 2 - The task graph
+- Part 3 - Step sizing
+
 ## Part 1 - Decomposition
 
 ### Apps

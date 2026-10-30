@@ -120,18 +120,13 @@ agents read and write them at run time. Never restate them in a skill.
 
 ```
 skills/<skill-name>/
-  SKILL.md          # thin: when to use, the procedure, pointers. Target <200 lines.
+  SKILL.md          # thin: when to use, the procedure, pointers. Target <220 body lines.
   references/*.md   # depth, loaded on demand. One file per coherent topic.
 ```
 
 `SKILL.md` is what an agent reads first and may be all it reads. It must be
 self-sufficient for the common path and must say explicitly which reference file
 to open for which situation. Do not write a 600-line SKILL.md.
-
-**Reviewed exception:** `skills/fulcrum-unattended-guardrails/SKILL.md` ran
-~238 lines before being trimmed to about 200; the exception stands for growth. The repo owner reviewed and accepted this as a one-time exception
-specific to that file - do not "fix" it by gutting content, and do not cite it
-as licence to ignore the <200 target elsewhere.
 
 ### Agent role layout
 
@@ -156,17 +151,26 @@ by adapter path.
 ---
 name: <directory name, exactly>
 description: <"Use when ..." first, with concrete trigger phrases a user would
-  actually type, then what it does. Under 1,536 characters. This is the
+  actually type, then what it does. Under 1,024 characters. This is the
   auto-trigger surface - be specific.>
-version: "1.0.0"
-requires: <capabilities in prose, e.g. "ODC MCP server authenticated; Mentor
-  enabled on the tenant; a browser automation capability for visual proof">
+metadata:
+  version: "1.0.0"
+  requires: >
+    <capabilities in prose, e.g. "ODC MCP server authenticated; Mentor
+    enabled on the tenant; a browser automation capability for visual proof">
 ---
 ```
 
-No `allowed-tools`, no `license`, no `compatibility`, no `metadata:` block.
-Anything a specific harness requires is added at install time by the agent
-doing the installing, never carried in the source.
+Allowed keys: `name`, `description`, and `metadata` holding `version` and
+`requires`, string values only. Bare top-level `version` and `requires` are banned:
+the Agent Skills spec lists `metadata` as the extension container, and surfaces that
+validate against the spec alone (`skills-ref validate`, the Skills API, a claude.ai
+upload) reject any other top-level key, which would stop every skill loading there.
+Claude Code ignores unknown keys, so a bare key passes silently there and fails
+elsewhere. The 1,024 limit is the spec's; the 1,536 cut is only Claude Code's listing
+truncation, not a validation limit. No `allowed-tools`, no `license`, no
+`compatibility`. Anything a specific harness requires is added at install time by the
+agent doing the installing, never carried in the source.
 
 `name` must match the directory name exactly, and must be globally unique - the
 source corpus contains two skill directories declaring the same `name`, which
@@ -176,7 +180,7 @@ made one of them unresolvable.
 
 - Link by **relative path**: `see ../fulcrum-verification/SKILL.md`, or
   `references/aggregates.md`.
-- **Never use `§`-numbered anchors.** Every such reference in the source corpus
+- **Never use section-number anchors.** Every such reference in the source corpus
   was dangling because the target files had no numbered headings.
 - **Root documents are not installed.** `install.sh` and `INSTALL.md` copy `skills/`
   and agent adapters only, so a skill or role never links to a root document: the link
@@ -333,9 +337,8 @@ installed skill files. Precedent: `MODEL-TIERS.md`, heading "The install intervi
 must not edit installed files". Installed content carrying project state makes every
 update fight the user's edits and lets the deployed copy drift from source.
 
-**Mode is NOT a branch inside each skill.** Four of the seven original `SKILL.md`
-files are already at or over the 200-line target and a fifth sits one line under it,
-so a per-skill mode fork is unaffordable and would breach the skill file layout rule
+**Mode is NOT a branch inside each skill.** Several `SKILL.md`
+files already sit at or near the line target, so a per-skill mode fork is unaffordable and would breach the skill file layout rule
 above. Mode is an **interaction contract owned by the router** (`fulcrum`), not a
 second code path in every skill. A skill states its procedure once; the router decides
 what to ask before dispatching into it.

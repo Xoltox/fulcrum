@@ -27,6 +27,19 @@ source:
 - **server instructions** - the cross-tool invariants the server publishes
   with its tool list. Tagged `[SCHEMA]`.
 
+## Contents
+
+- Tool families
+- Creating and loading an asset
+- Sessions and context
+- Prompt length
+- Reading a run
+- Publishing
+- Published-state inspection (context_*)
+- Completion signals
+- Error texts
+- Re-probing the surface
+
 ## Tool families
 
 | Fact | Tag | Observed | Source |
@@ -247,7 +260,8 @@ app in a non-production environment, never on a real one:
 9. Update every row above that changed, with the new date, tag and source.
    Update the "Last full probe" line in the same change. Then tell the
    orchestrator which rows
-   changed, so files citing them can be checked.
+   changed, so files citing them can be checked. A new tool name also goes in
+   the `disallowedTools` of every adapter that denies by name.
 
 Do not drive Mentor against an unrecorded surface: a drift touching a tool
 the current plan depends on means halt and report until this file is

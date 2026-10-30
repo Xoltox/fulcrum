@@ -1,8 +1,10 @@
 ---
 name: fulcrum-project-state
 description: Use when asked to "set up project state", "where do I record what's been done", "create the task list", "what should I write before running this unattended", "resume the build", "pick up where we left off", "record this decision", "why is the project halted", "is another agent working on this app", when a `.fulcrum/` directory is present and its files are in question, or when any Fulcrum skill needs to read or write durable state, even when the user does not mention Fulcrum. Defines the `.fulcrum/` project-state directory - the committed, on-disk memory a Fulcrum engagement resumes from. Owns the file set, each file's schema, which files are append-only and which are rewritten, the runtime lease that enforces one Mentor session per app, the crash-idempotent write ordering, the decision record that gap analysis consumes, and the halt record.
-version: "1.0.0"
-requires: filesystem read/write access to the project repository; a git working tree for the project (state is committed); the ability to read a clock for timestamps. No ODC MCP surface is needed to read or write project state itself.
+metadata:
+  version: "1.0.0"
+  requires: >
+    filesystem read/write access to the project repository; a git working tree for the project (state is committed); the ability to read a clock for timestamps. No ODC MCP surface is needed to read or write project state itself.
 ---
 
 # Fulcrum project state
@@ -98,7 +100,7 @@ One writer per shared file. The orchestrator alone writes `project.md`, `plan.md
 `TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*`, the `JOURNAL.md` index (with
 `InFlight` and `Tasks`), the lease and `HALT.md`, and it alone mints session ids. A driver only
 appends rows to the journal and run-id files its brief names (parallel lanes: their own
-lane files); to stop, it reports and stops. At every wave close the orchestrator reconciles `TASKS.md`
+lane files); to stop, it reports and stops. At every reconcile point the orchestrator reconciles `TASKS.md`
 and `project.md` against the journal and run ids, then commits. In every field project
 inspected, `.fulcrum/` was stale within a day because nobody owned that step.
 `[VERIFIED]` No resume point lives outside `.fulcrum/`. Table and reconciliation
@@ -134,7 +136,7 @@ Only afterwards write the outcome, then the verdict.
 mutating the app with no record of it. The next session sees no active work, opens a
 second Mentor session on the same app - breaking the one-session-per-app
 non-negotiable `[VERIFIED]` - and can publish from a stale model, which advances the
-revision while silently reverting completed work. `[VERIFIED]`
+revision while silently reverting completed work. `[SINGLE-OBSERVATION]`
 
 Corollary: never write `[x]` with an empty verdict. Unproven work stays `todo` with
 `Verdict: unproven`, which tells a resuming session to re-prove it.

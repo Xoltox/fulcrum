@@ -1,8 +1,12 @@
 ---
 name: fulcrum-solution-init
 description: Use when the user says "start a new OutSystems project", "build this BRD in ODC", "use Mentor to build this BRD", "I have a Figma and want an ODC solution", "plan an ODC build", "turn these designs into an OutSystems app", "scaffold an ODC engagement", or hands over source artifacts and asks what to build; also when an OutSystems BRD or requirements document is found in the folder and no `.fulcrum/` plan exists, even when the user does not mention Fulcrum. Turns raw source material (a BRD, product docs, a Figma or Stitch export, HTML mockups, screenshots, or any mix) into an ODC solution plan and a project repo that a cheaper orchestrator can build from across many unattended sessions. Decomposes the work into apps, agents and workflows, emits a task graph with parallel lanes per app, asks the rigor level, runs read-only tenant checks, and scaffolds the plan, specs and handoff. Run ONCE per project, before any Mentor build turn.
-version: "1.0.0"
-requires: ODC MCP server authenticated; Mentor enabled on the tenant; filesystem write access for the project repo; an image-inspection capability and an image-dimension scanner for visual source material; a subagent mechanism for parallel triage
+metadata:
+  version: "1.0.0"
+  requires: >
+    ODC MCP server authenticated; Mentor enabled on the tenant; filesystem write access for
+    the project repo; an image-inspection capability and an image-dimension scanner for
+    visual source material; a subagent mechanism for parallel triage
 ---
 
 # ODC solution init

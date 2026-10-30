@@ -1,11 +1,12 @@
 ---
 name: fulcrum-mentor-turns
 description: Use before any `mentor_start_session` or `mentor_prompt` call, and when the user says "use Mentor to ...", "ask Mentor to ...", "drive Mentor to build this", "my Mentor turn failed", "Mentor isn't applying changes", "Mentor stalled", "how should I chunk this spec", "how often should I poll Mentor", "reuse the session or start fresh", "how do I publish", or "did the MCP tools change", even when the user does not mention Fulcrum. How to drive ODC Mentor turn by turn so a turn lands first try and nothing silently reverts - turn granularity, prompt shape and length ceiling, posture, sessions and when to start fresh, the staleness guard, polling cadence and draining, run-id durability, the Publish turn, and the dated record of the live MCP surface.
-version: "1.1.0"
-requires: >
-  ODC MCP server authenticated; Mentor enabled on the tenant; a durable log
-  file for run identifiers; a wait capability that suspends without spinning
-  or accumulating context; a subagent dispatch capability where available.
+metadata:
+  version: "1.1.0"
+  requires: >
+    ODC MCP server authenticated; Mentor enabled on the tenant; a durable log
+    file for run identifiers; a wait capability that suspends without spinning
+    or accumulating context; a subagent dispatch capability where available.
 ---
 
 # Driving Mentor, turn by turn

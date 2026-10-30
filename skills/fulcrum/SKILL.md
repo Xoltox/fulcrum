@@ -1,8 +1,13 @@
 ---
 name: fulcrum
-description: Use first for any OutSystems, ODC or Mentor work, even when the user does not mention Fulcrum or name a skill. Use when the user says "build an OutSystems app", "build this in ODC", "use Mentor to add a screen", "use Mentor to change this app", "ask Mentor to fix this", "start a new ODC project", "resume my Fulcrum work", "continue where I left off", "pick up the build", "what should I build next", "is this app done", or "here is the BRD"; when a BRD or requirements document is handed over or found in the folder with no further instruction; when a `.fulcrum/` directory is present; or when a Figma export, mockup, screenshot or bare idea for an OutSystems app arrives with no plan yet ("I have an idea for an app" counts in an OutSystems context). The router and entry point for the whole Fulcrum skill family. Looks at the filesystem and the tenant, works out what state an engagement is in, and dispatches to the right skill - it never asks the user to self-classify. Also the right skill whenever it is unclear which other Fulcrum skill applies.
-version: "1.0.0"
-requires: filesystem read access to the project repository to detect `.fulcrum/` and any existing app source; a capability to put structured questions to the user in small batches when the filesystem cannot answer them; no ODC MCP surface of its own - it dispatches into skills that need one.
+description: Use first for any OutSystems, ODC or Mentor work, even when the user does not mention Fulcrum or name a skill. Use when the user says "build an OutSystems app", "build this in ODC", "use Mentor to add a screen", "use Mentor to change this app", "ask Mentor to fix this", "start a new ODC project", "resume my Fulcrum work", "continue where I left off", "is this app done", or "here is the BRD"; when a BRD or requirements document is handed over or found in the folder with no further instruction; when a `.fulcrum/` directory is present; or when a Figma export, mockup, screenshot or bare idea for an OutSystems app arrives with no plan yet ("I have an idea for an app" counts in an OutSystems context). The router and entry point for the whole Fulcrum skill family. Looks at the filesystem and the tenant, works out what state an engagement is in, and dispatches to the right skill - it never asks the user to self-classify. Also the right skill whenever it is unclear which other Fulcrum skill applies.
+metadata:
+  version: "1.0.0"
+  requires: >
+    filesystem read access to the project repository to detect `.fulcrum/` and any existing
+    app source; a capability to put structured questions to the user in small batches when
+    the filesystem cannot answer them; read-only ODC MCP calls for the app inventory and
+    the tool list; it dispatches into skills that need more.
 ---
 
 # fulcrum - router and entry point
@@ -35,6 +40,8 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 
 Run top to bottom; stop at the first row that matches. Full procedure,
 including every conflicting-signal case: `references/detection-procedure.md`.
+Search for source material by name and type (`*BRD*`, `*.pdf`, `*.docx`), never an
+unfiltered listing: skills installed in the project can fill a capped listing and hide it.
 
 | Found | Route |
 |---|---|
@@ -43,6 +50,7 @@ including every conflicting-signal case: `references/detection-procedure.md`.
 | No `.fulcrum/`, no app, no source material | `../fulcrum-discovery/SKILL.md` |
 | No `.fulcrum/`, no app, source material present (BRD, Figma/Stitch export, mockups, screenshots) | `../fulcrum-solution-init/SKILL.md` |
 | No `.fulcrum/`, an app already exists | `../fulcrum-gap-analysis/SKILL.md` |
+| `.fulcrum/` present, no `project.md`, no `HALT.md` | Pre-scaffold: route by the first five rows as if `.fulcrum/` were absent, with `brief.md` as source material if present |
 | `.fulcrum/` present, `HALT.md` present | **STOP. Report. Ask a human.** Never auto-resume - see below. |
 | `.fulcrum/` present, an open task in `TASKS.md` | resume -> `../fulcrum-loop-engine/SKILL.md` |
 | `.fulcrum/` present, all tasks closed, the final G2 row among them at `Verdict: pass` | Report status. Offer the next phase in `plan.md`, or gap analysis if none remains. |

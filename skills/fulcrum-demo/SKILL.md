@@ -1,10 +1,11 @@
 ---
 name: fulcrum-demo
 description: Use when the user says "write the demo script", "prepare the demo", "is this demoable", "make the app demo-ready", "rehearse the happy path", "add a guided tour", "add a walkthrough to the app" or "walk the audience through the app" for an OutSystems or ODC app, or when a `demo` rigor build reaches its demo script row, even when the user does not mention Fulcrum. Writes `.fulcrum/demo-script.md`, the short happy path derived from the brief and plan that the demo-rigor final blind pass walks; checks demo readiness; optionally plans a scripted in-app tour (no AI agent, no entitlement). Not for seed loaders (fulcrum-seed-data), gate definitions (fulcrum-verification) or building sample sign-in (fulcrum-engine-traps).
-version: "1.0.0"
-requires: >
-  Brief and plan in the project repo; a finished or near-finished build to read
-  step results against; a browser automation capability on the renderer.
+metadata:
+  version: "1.0.0"
+  requires: >
+    Brief and plan in the project repo; a finished or near-finished build to read step
+    results against; a browser automation capability on the renderer.
 ---
 
 # fulcrum-demo
@@ -21,13 +22,13 @@ state file.
 
 ## The demo script row
 
-Emitted by solution-init at `demo` rigor only: `Turn: code`, `App: solution`
+Emitted by solution-init at `demo` rigor (added or closed on a rigor change, `../fulcrum-verification/references/gates-and-rigor.md`, heading "Changing rigor"): `Turn: code`, `App: solution`
 (a literal: no lane, no lease), output `.fulcrum/demo-script.md`
 (`../fulcrum-solution-init/references/decomposition-and-sizing.md`, heading
 "Gate rows"). Final G2 at `demo` reads this file: each step is one claim
 (`../fulcrum-verification/references/gates-and-rigor.md`, heading "G2 - blind
-pass"). The writer needs only the brief, the plan and the published structure;
-it drives no Mentor and no browser.
+pass"). The row is a file-scoped builder dispatch with the brief and plan inline; it
+drives no Mentor and no browser.
 
 ## Format
 
@@ -38,7 +39,7 @@ Short: one persona block per role the path crosses, 5 to 10 steps total.
 Rigor: demo   Revision: <per app, filled at the final pass>
 
 ## Persona: <role name>
-Sign-in: <mode from tenant-profile.md / sign-in-modes.md; sample persona name>
+Sign-in: <mode from DECISIONS.md / sign-in-modes.md; sample persona name>
 
 | # | App | Screen | Persona | Action | Seed it reads | Changes data | Expected visible result |
 |---|---|---|---|---|---|---|---|

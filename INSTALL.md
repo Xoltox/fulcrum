@@ -126,6 +126,10 @@ harness. Install them as follows - again file copies only:
 - **A harness with no definition mechanism:** install nothing for agents.
   Tell the user that briefs will carry the role body inline instead.
 
+**Python.** The agent roles need `python` or `python3` on PATH for the blocking wait
+(`python -c "import time; ..."`). On Windows `python3` can be a Microsoft Store stub that
+runs nothing; check that the command actually executes.
+
 **Restart.** Some harnesses load agent definitions only at session start
 (Claude Code does). Tell the user to restart the session after installing or
 updating agent definitions; until then the agent types are not found.

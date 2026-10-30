@@ -1,8 +1,10 @@
 ---
 name: fulcrum-verification
 description: Use when asked to verify a change landed, "did the publish work", "check the screen renders correctly", "prove the data is right", "regression check my ODC app", "did anything error at runtime", "check the app's runtime logs", or before marking any build step done, even when the user does not mention Fulcrum. Proves that a change to an ODC app actually landed and actually works, rather than trusting that the platform said so. Owns proof obligations, the gates G0 to G3 and the rigor table (demo, pilot, production), which instrument catches which defect class, visual capture and comparison, the diagnostic REST endpoint pattern for live data, and what the platform's own success signals do and do not mean.
-version: "1.0.0"
-requires: ODC MCP surface for model read-back and revision queries (context_*, app_revisions) and for read-only runtime telemetry (app_logs, app_traces, app_health); a browser automation capability for visual and interaction proof (a browser MCP tool where the harness has one, a headless browser driver such as Playwright otherwise); a scripted HTTP client for API-level ground truth; ability to stand up a temporary diagnostic REST endpoint, since there is no model-layer path to live row data on any tenant (`db_query` and `exec_in_app` absent on the 2026-10-16 listing; see mentor-turns references/mcp-surface.md).
+metadata:
+  version: "1.0.0"
+  requires: >
+    ODC MCP surface for model read-back and revision queries (context_*, app_revisions) and for read-only runtime telemetry (app_logs, app_traces, app_health); a browser automation capability for visual and interaction proof (a browser MCP tool where the harness has one, a headless browser driver such as Playwright otherwise); a scripted HTTP client for API-level ground truth; ability to stand up a temporary diagnostic REST endpoint, since there is no model-layer path to live row data on any tenant (`db_query` and `exec_in_app` absent on the 2026-10-16 listing; see mentor-turns references/mcp-surface.md).
 ---
 
 # fulcrum-verification
@@ -36,7 +38,7 @@ model-layer checks are structurally blind to whole defect classes.
   truth for what is actually live. `[VERIFIED]`
 - A publish revision number advancing is **not** proof the intended change
   landed - publishing from a stale model advances the revision while silently
-  reverting completed work. `[VERIFIED]`
+  reverting completed work. `[SINGLE-OBSERVATION]`
 - The platform attributes every publish to the authenticated tenant user
   regardless of origin, so portal-made and agent-made publishes are
   indistinguishable after the fact. `[VERIFIED]`
@@ -102,8 +104,8 @@ scope, recording and failure paths: `references/gates-and-rigor.md`.
 | Rigor | G0 | G1 | G2 | G3 |
 |---|---|---|---|---|
 | demo | every publish | happy path per lane at join | one pass at end, scoped to the demo script | none |
-| pilot | every publish | once per batch | one pass at end | Risk high rows |
-| production | every publish | once per batch | per lane and at end | every mutating row |
+| pilot | every publish | once per dispatch | one pass at end | Risk high rows |
+| production | every publish | once per dispatch | per lane and at end | every mutating row |
 
 Gates are depth of evidence, not safety. Unchanged at every rigor: staleness
 guard, lease, record before wait, fix cap (1 build + 2 fix), two-fail stop,
@@ -191,6 +193,8 @@ heading "Published-state inspection (context_*)".
   data, the debt it creates, and the outbound route probe for integrations.
 - `references/verification-hygiene.md` - invariants, hand-classification, full-row
   arithmetic, programmatic diffing, fixture discipline, subagent proof.
+- `references/evidence-tags.md` - the evidence tags every Fulcrum file uses and when each applies;
+  agents read and write them at run time.
 
 ## Non-negotiables (full detail in references/verification-hygiene.md)
 

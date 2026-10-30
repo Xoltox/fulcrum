@@ -140,7 +140,7 @@ Details: `skills/fulcrum-engine-traps/references/agents.md`.
 Stated so you do not assume otherwise. `ROADMAP-capabilities.md`, heading "Open live evaluations", tracks each one.
 
 - **The v0.6 path has not run as a whole.** Its parts come from field builds and probes on throwaway apps; no build has gone end to end on the module graph and rigor dial, and the rigor table is unmeasured.
-- **Live evals were never run**, neither the design loop's render-compare and capture end to end, nor trigger evals on the skill descriptions.
+- **Live evals were never run** for the design loop's render-compare and capture end to end. Trigger evals exist (`evals/`): six routing cases passed on Haiku, Sonnet and Opus on 2026-10-30, with no tenant, so they show a prompt lands in the right skill and nothing about build quality.
 - **The sample sign-in recipe has not been run end to end.**
 - **The scripted tour has not been built by any run.**
 - **The agent replay work order has not been run.**
@@ -200,8 +200,8 @@ Two headline rules:
 - **Hard rule 2 - platform truth by default.** Strip all project nouns; keep the consequence, drop the anecdote. Tenant-varying facts live in `tenant-profile.md`, read, asked, or recorded on the first real row, and skills reference the profile rather than hardcoding the answer.
 - **Hard rule 3 - state the mechanism, not just the ban.** A rule that cannot state what breaks is not ready to write.
 - **Hard rule 4 - mark evidence strength** on any claim that is not directly observed: `[VERIFIED]`, `[SINGLE-OBSERVATION]`, `[UNVERIFIED]`, `[TENANT]`, `[SCHEMA]`.
-- **Skill file layout:** `SKILL.md` thin (target under 200 lines) plus `references/*.md` loaded on demand, and `templates/` where applicable.
-- **Frontmatter** is a portable subset only: `name`, `description`, `version`, `requires`. No `allowed-tools`, `license`, `compatibility`, or `metadata:` block.
+- **Skill file layout:** `SKILL.md` thin (target under 220 lines) plus `references/*.md` loaded on demand, and `templates/` where applicable.
+- **Frontmatter** is a portable subset only: `name`, `description`, and `metadata` holding `version` and `requires` (bare `version`/`requires` keys are rejected by spec-only surfaces). No `allowed-tools`, `license` or `compatibility`.
 - **Cross-references** are relative paths (`../fulcrum-verification/SKILL.md`), never section-number anchors.
 - **Tone:** terse, imperative, evidence-first. No hedging, no filler, no praise. A rule per line where possible. The reader is an agent mid-task with limited context - every line must earn its place.
 

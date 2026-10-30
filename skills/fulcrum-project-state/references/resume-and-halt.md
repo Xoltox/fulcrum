@@ -42,7 +42,7 @@ Then, and only then:
 - **Re-read the live app revision independently** before any mutating turn. A revision
   recorded anywhere in `.fulcrum/` is a baseline, not a current value - publishing
   from a stale model advances the revision while silently reverting completed work.
-  `[VERIFIED]`
+  `[SINGLE-OBSERVATION]`
 - **Re-prove anything carrying `Verdict: unproven`.** That value exists to be
   distrusted. A `todo` row with `unproven` is work that happened but was never shown
   to work: Select picks it as a re-prove dispatch, proof only, no Mentor turn.

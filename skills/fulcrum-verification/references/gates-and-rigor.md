@@ -140,6 +140,7 @@ that no regression sweep ran.
   row stays `todo` and is re-proven, not re-fixed
   (`../../fulcrum-loop-engine/references/frontier-and-batching.md`, heading "Unproven rows").
 - A dependent reads a row as done only at `Status: done` with `Verdict: pass`.
+- A `done`/`pass` row may be superseded by an open `fix` row carrying the same `Step`; the fix row, not the row, says whether the claim holds.
 - Report figures state the denominator per gate: `G2: 14 of 16 claims OK, 2 untested`.
 
 ## Failure at each gate
@@ -162,3 +163,5 @@ What rigor is and who changes it: `../../fulcrum/references/mode-and-posture.md`
 After a change, recorded `Gate` values stand: none is raised without evidence. On a
 raise, list the rows now below the required gate and run what they owe. On a lower
 setting, stop owing the difference and leave the record alone.
+
+To `demo`: add the demo script row and make the final G2 depend on it. From `demo`: close it `done`/`-`.

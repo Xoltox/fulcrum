@@ -10,6 +10,17 @@ dispatch only its `screens/<SID>.md`), the orchestrator after; `reference/` and
 `user-shots/` are always the orchestrator's; drivers, renderer and verifier never.
 (Fulcrum rule) On the full profile every path below sits under `.fulcrum/design/<app>/`.
 
+## Contents
+
+- Layout and limits
+- screens/<SID>.md
+- tokens.md
+- theme.css
+- data.md
+- gate.md
+- backlog.md
+- Step decomposition
+
 ## Layout and limits
 
 | Path | Schema marker | Limit | Template |
