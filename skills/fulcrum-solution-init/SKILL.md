@@ -76,9 +76,9 @@ application type; mobile-first vs desktop layout; existing app or fresh shell; w
   forcing a Reactive Web app with a phone-width mobile-first layout instead.
   `[SINGLE-OBSERVATION]` `[TENANT]` - confirm on the current tenant in step 3, don't assume.
 - **App creation is a user choice; neither option is the default.** Ask the user: have
-  Mentor create the app (`mentor_start_session` then `mentor_create_asset`), or will they
-  create a shell app from the standard template in Studio/Portal for Fulcrum to load
-  (`mentor_load_asset`). Record the answer. Either way, immediately after creation check
+  Mentor create the app (`mentor_start_session` then a `mentor_prompt` describing it), or will they
+  create a shell app from the standard template in Studio/Portal for Fulcrum to attach
+  (`assetRefs`). Record the answer. Either way, immediately after creation check
   screen access and the default screen:
   `../fulcrum-engine-traps/references/access-security-and-settings.md`. Mechanics:
   `../fulcrum-mentor-turns/references/mcp-surface.md#creating-and-loading-an-asset`.

@@ -101,6 +101,8 @@ Mentor driver rules (restated, binding):
   itself (cursor 0, drained).
 - Never answer a Mentor offer to publish. Publish only when briefed to.
 - Never put a secret value in a prompt.
+- Never journal, report or echo an upload's uploadUrl: it is a credential.
+  Record attachmentId only.
 ```
 
 ## After a poller reports terminal

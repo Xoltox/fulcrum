@@ -85,7 +85,7 @@ open `sessionId` in `HALT.md` (`../fulcrum-project-state/references/lease-and-co
 | A mutating turn is about to run against a session whose **staleness guard did not pass** | This is the revert failure mode above |
 | The live app **regressed** - something previously verified now fails | Continuing builds on top of a corrupted state |
 | A step needs **the user's own action** - re-auth, a portal-only operation, an asset upload with no MCP path, **the user setting a secret in the Portal**, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** No amount of retrying creates a capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |
-| **Mentor capacity stop** - the load of an asset still refused as "busy" after the bounded retry in `../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset" | Report it as capacity, not as a model, auth or trap failure. Retrying past the bound only burns the window |
+| **Mentor capacity stop** - the first turn of a Mentor session still refused as "busy" after the bounded retry in `../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset" | Report it as capacity, not as a model, auth or trap failure. Retrying past the bound only burns the window |
 | A **permission or policy denial** | Confirm it is genuine with one direct retry, then stop. Never iterate looking for a way around it |
 | The change required would **weaken validation, auth, or a business rule** to clear an error | Park it, disclose it, stop |
 | Two candidate actions would both **touch Mentor concurrently** | See the concurrency lock below |
@@ -113,7 +113,7 @@ about the live system. **Before any fix attempt after the first failure, run a d
 The orchestrator's job is exactly four things: **read state, write a
 self-contained brief, dispatch, read the terse report back.**
 
-It must **not itself** call `mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`,
+It must **not itself** call `mentor_start_session`, `mentor_request_upload`,
 `mentor_prompt` (of any kind, including "Publish") or `mentor_get_run`; poll `publish_status`; call
 a `context_*` inventory tool; curl a REST endpoint; or run browser automation or a verification gate
 script.

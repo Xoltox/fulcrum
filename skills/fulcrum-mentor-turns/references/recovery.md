@@ -37,23 +37,24 @@ A call on a closed session fails with the closed-session text. There is no
 token or resume call to recover it; the `sessionId` is finished.
 `[SINGLE-OBSERVATION]`
 
-Recovery: start a new session and load the asset again. Anything the old
-session held **unpublished is gone** - re-establish what the published
+Recovery: start a new session and attach the asset again (`assetRefs`). Anything
+the old session held **unpublished is gone** - re-establish what the published
 revision contains (`context_*` once indexed - the lag is variable - or a read-only turn)
 before re-issuing the lost work. A session that created its asset and never
-published leaves nothing to load `[UNVERIFIED]`; the create step starts
+published leaves nothing to attach `[UNVERIFIED]`; the create step starts
 over. This is why a created asset is published once early (`../SKILL.md`,
 section 7).
 
 ## 4. Mentor capacity throttle
 
-The load (or another Mentor call) fails with the capacity text ("A lot of
-people are currently using Mentor..."). `[VERIFIED]` This is load on the
-service, not a defect in your request, your auth, or the model - do not
+A session's first turn (or another Mentor call) fails with the capacity text
+("A lot of people are currently using Mentor..."). `[VERIFIED]` on the deprecated
+load call; which call carries it now is unknown `[UNVERIFIED]`. This is load on
+the service, not a defect in your request, your auth, or the model - do not
 record it as a trap and do not rewrite the prompt.
 
 Recovery: the bounded retry rule in `mcp-surface.md`, heading "Creating and
-loading an asset" - at most 3 retries with growing backoff, each wait
+loading an asset" - at most 3 retries of the turn with growing backoff, each wait
 verified to block. Still failing: close the session, halt, and report it as
 a capacity stop. A later fresh session has succeeded where the first was
 throttled.
@@ -100,7 +101,7 @@ Two distinct calls. `[SCHEMA]`
 
 **Why this matters, not just hygiene:** a `mentor_prompt` issued while a
 prior prompt is still running on that session is **silently ignored** - no
-error. `[VERIFIED]` An abandoned in-flight prompt is therefore not inert: a
+error. `[SCHEMA]` An abandoned in-flight prompt is therefore not inert: a
 later prompt on the same session can be dropped with no signal, and the
 agent cannot tell "ignored" from "landed" without re-reading state. Close or
 cancel before reusing a session you suspect is still mid-run.
@@ -120,6 +121,9 @@ caught it - a human noticed the app looked wrong. Rollback tooling could not
 reach the clean state; recovery was manual through the vendor portal. A
 `mentor_close_session` call the moment staleness was suspected would have
 made the stale session unusable before any publish could reach it.
+
+On the 2026-10-30 surface the staleness is confirmed but the revert is inferred
+`[UNVERIFIED]`: nothing was published from a stale session there.
 
 ## Cross-cutting rule for all seven
 

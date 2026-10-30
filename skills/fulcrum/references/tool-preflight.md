@@ -28,12 +28,13 @@ Run these before the procedure below. Tool facts live in
    an auth event, not a tool fault: see
    `../../fulcrum-mentor-turns/references/recovery.md`, heading "1. Transport-level
    auth expires mid-turn".
-3. **Surface drift check.** At session start compare the live tool **names** only
-   (the tool list, no schemas loaded) against the latest
+3. **Surface drift check.** At session start compare the live tool **names** (the
+   tool list, no schemas loaded) against the latest
    `../../fulcrum-mentor-turns/references/mcp-snapshots/*.md`. Do not load parameter
-   schemas into the orchestrator context for this. Diff parameters only when a name
-   changed or a tool call fails schema validation, and delegate that diff to a
-   read-only investigator that returns the delta. On any difference, stop and
+   schemas into the orchestrator context for this. The full check (parameter hash and
+   DEPRECATED markers) is delegated to a read-only investigator that returns the
+   delta; when it runs is in `mcp-surface.md`, heading "Re-probing the surface".
+   Names alone miss parameter and deprecation drift. On any difference, stop and
    run the re-probe in
    `../../fulcrum-mentor-turns/references/mcp-surface.md#re-probing-the-surface` before
    trusting skill text that names a tool or parameter. (An executable drift script is

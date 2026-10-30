@@ -43,13 +43,17 @@ One lease file per app when the solution has several: `lease.<app identifier>.js
 The lock is per app, so a single shared file would serialise apps that the platform
 permits to run concurrently.
 
-**App creation is a mutating call too.** Before `mentor_create_asset` there is no app
+**App creation is a mutating call too.** Before the prompt that creates the app there is no app
 identifier yet: key the lease by the intended app name from `plan.md` and
-`project.md`, write the journal `started` line, then create. Once the call returns the
-application key, record it (`RUN-IDS.md` outcome line, then `project.md` at wave
-close) and keep the same lease file until release. In the field the first journal
-line and the lease came after creation, so a crash at that moment would have left an
-app nobody knew existed. `[SINGLE-OBSERVATION]`
+`project.md`, write the journal `started` line, then send the creating prompt. The
+call returns a `runId`, not a key: record the `runId` in `RUN-IDS.md` before the wait.
+The key arrives in the first run as `assetKey` (`skills/fulcrum-mentor-turns/references/mcp-surface.md`,
+heading "Creating and loading an asset"); once read, record it (`RUN-IDS.md` outcome
+line, then `project.md` at wave close) and keep the same lease file until release. In
+the field the first journal line and the lease came after creation, so a crash at that
+moment would have left an app nobody knew existed. `[SINGLE-OBSERVATION]` The crash
+window is now between the prompt and the `runId` record: after that, the run can be
+re-read for the key; before it, the app may exist with no id on file.
 
 - `holder` must be stable across a crash and unique across concurrent agents. A
   hostname plus a session label is enough. An agent-generated random id is acceptable

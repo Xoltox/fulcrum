@@ -151,7 +151,7 @@ variant line), `TASKS.md`, `JOURNAL.md`, `RUN-IDS.md`, then ask batch C.
 
 | Step | Produces | Verify | Notes |
 |---|---|---|---|
-| P1.01 Shell | Create or load the user's shell (per batch B); access on template screens; default screen; first Publish | 1,3,6 | A created asset exists only in its session until the first publish |
+| P1.01 Shell | Create the app, or attach the user's shell (`assetRefs`) (per batch B); access on template screens; default screen; first Publish | 1,3,6 | A created asset exists only in its session until the first publish |
 | P1.02 Theme | `:root` overrides; `theme.css` groups, one turn each | 1,3,6 | Identical-shape groups may batch |
 | P1.03 Chrome | N empty screens with Layout and access; Menu links; title; user info; logo per batch B; icon probe if flagged | 1,3,6 | Navigation before content |
 | P1.04 Data | Entities, static entities (explicit Ids), KPI metric entity | 1,3 | Verify after the publish gate, lag-tolerant: `context_graph` first; empty `context_*` = not yet indexed; ceiling -> `untested` |

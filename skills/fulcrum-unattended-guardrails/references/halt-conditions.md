@@ -82,7 +82,7 @@ open `sessionId` (`../../fulcrum-project-state/references/lease-and-concurrency.
 | A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
 | A previously verified behaviour now fails | Regression. Continuing builds on a corrupted state |
 | A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
-| **Mentor capacity stop** | An asset load still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
+| **Mentor capacity stop** | The first turn of a session still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
 | The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause - if so, fix it and disclose prominently"* |
 | Two candidate actions would both touch Mentor concurrently | Serialise, or stop and ask |
@@ -113,8 +113,8 @@ simply not the agent's to take. Write the checkpoint, set the `TASKS.md` row to 
 
 ## Mentor capacity stop
 
-When loading an asset is refused with the capacity text after the bounded
-retry in `mcp-surface.md` (at most 3 attempts, growing backoff, each wait
+When the first turn of a session is refused with the capacity text after the bounded
+retry in `mcp-surface.md` (3 retries, growing backoff, each wait
 verified to block): close the session, halt, and report **"Mentor capacity
 stop"**. It is not a model failure, an auth failure or a trap. The session is
 not stale and no work was lost; the ask to the user is to retry later. Retrying

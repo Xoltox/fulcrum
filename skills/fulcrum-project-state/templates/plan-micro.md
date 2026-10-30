@@ -18,7 +18,7 @@ not micro - see "Leaving the micro profile" in the reference.
 
 **Profile:** micro - confirmed by the user on \<date\>, `DECISIONS.md` \<D-NNN\>
 **App:** \<app identifier, or the intended name until created\> - \<asset type\>
-**App creation:** \<Mentor creates it / user-made shell loaded\> - `DECISIONS.md` \<D-NNN\>
+**App creation:** \<Mentor creates it / user-made shell attached (`assetRefs`)\> - `DECISIONS.md` \<D-NNN\>
 **Design:** .fulcrum/design/manifest.md - design variant, 5 + N steps (N <= 6) plus split steps, at most 5 + 2N \<optional: this line only on the design variant; omit otherwise\>
 
 ## Goal

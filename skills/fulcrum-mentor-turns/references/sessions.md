@@ -6,14 +6,15 @@ staleness guard". Tool facts cited here are recorded, dated and tagged in
 
 ## What a session is now
 
-- A session holds one asset (created or loaded) and one conversation. Every
-  run in the session shares that conversation: Mentor remembers what earlier
-  turns asked and built. `[SINGLE-OBSERVATION]`
+- A session is one conversation and holds every asset created or attached in
+  it, several if needed (`mcp-surface.md`, "Sessions and context"). Every run
+  in the session shares that conversation: Mentor remembers what earlier
+  turns asked and built. `[VERIFIED]`
 - There is no token to carry, echo or refresh, and no "fresh context" switch
   on a prompt. The `sessionId` is the whole handle. `[SCHEMA]`
 - Fresh context therefore means: `mentor_close_session`, then
-  `mentor_start_session`, then `mentor_load_asset`. Nothing short of that
-  clears Mentor's memory of the conversation.
+  `mentor_start_session`, then a `mentor_prompt` attaching the asset (`assetRefs`).
+  Nothing short of that clears Mentor's memory of the conversation.
 - Close discards whatever the session holds unpublished. On a session that
   created its asset and has not yet published, close loses the asset
   `[UNVERIFIED]` - publish once early (`../SKILL.md`, heading "Publish
@@ -26,8 +27,8 @@ The tradeoff, stated so the choice is made rather than defaulted:
 | Keep the session | Start fresh |
 |---|---|
 | Mentor carries its own earlier proposals, names and corrections into the next turn - the consult and build turns of a step depend on this | Mentor re-reads the model with no remembered beliefs; nothing it got wrong earlier steers the next turn |
-| No new `mentor_load_asset`, so no fresh exposure to the capacity throttle | Each new session is a load, and loads have been refused under capacity (`mcp-surface.md`, "Creating and loading an asset") |
-| Risk: carried beliefs go stale - Mentor "remembers" a state the model no longer has, and the staleness guard is the only check | Risk: costs a load and loses useful context; a cross-step dependency must be restated in the prompt |
+| No new first turn, so no fresh exposure to the capacity throttle | Each new session has a first turn, and the first Mentor call of a session has been refused under capacity (`mcp-surface.md`, "Creating and loading an asset") |
+| Risk: carried beliefs go stale - Mentor "remembers" a state the model no longer has, and the staleness guard is the only check | Risk: costs a first turn and loses useful context; a cross-step dependency must be restated in the prompt |
 
 Rules that follow:
 
@@ -35,9 +36,9 @@ Rules that follow:
   share it. Splitting them makes Mentor re-derive an approach and silently
   drops the review's corrections (`posture.md`).
 - **Across steps: a fresh session per step** (Fulcrum rule). Each step is one
-  driver dispatch, and a fresh `mentor_load_asset` loads the latest published
-  revision, so the step's staleness guard proves the previous step landed.
-  Carrying a session into the next step trades that proof for remembered
+  driver dispatch, and a fresh session's `assetRefs` with no revision works on
+  the latest `[SCHEMA]`, so the step's staleness guard proves the previous step
+  landed. Carrying a session into the next step trades that proof for remembered
   context; restate any cross-step dependency in the prompt instead.
 - **Resume a session only within the same step**: the orchestrator passes the
   `sessionId` a previous dispatch of that step handed back with
@@ -49,8 +50,14 @@ Rules that follow:
 - **Never close a session holding unpublished changes**: publish or halt with
   it kept open (`../SKILL.md`, staleness guard).
 - **One session per app at a time**, held under the lease
-  (`../../fulcrum-project-state/SKILL.md`). Concurrent sessions on different
-  apps are allowed.
+  (`../../fulcrum-project-state/SKILL.md`). Two sessions never build one app at
+  once: user-confirmed, not to be tested. Concurrent sessions on different apps
+  are allowed.
+- **One session may hold several assets**, but Publish covers the held
+  assets with changes (inferred) and each publication is gated on its own key (`mcp-surface.md`, "Publishing").
+- **`assetRefs` does not refresh a held asset**, and `revision` on a held asset
+  breaks reads. A stale session is closed, not re-attached (`mcp-surface.md`,
+  "Sessions and context").
 - **Always close** a session you are done with and that holds no unpublished
   changes. Nothing states that idle release frees its workspace context or
   slot.

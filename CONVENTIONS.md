@@ -28,11 +28,13 @@ scripted agent loop. Therefore:
   (`deep-reasoning`, `workhorse`, `poller`). Only `MODEL-TIERS.md` maps tiers to
   concrete model names, and it does so for more than one vendor.
 - **MCP tool names are allowed** when referring to ODC MCP operations
-  (`mentor_start_session`, `mentor_create_asset`, `mentor_load_asset`,
+  (`mentor_start_session`, `mentor_request_upload`,
   `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`,
   `env_app`, `app_revisions`, `env_list`, `context_*`). Publishing is a
-  `mentor_prompt` "Publish" turn; do not name `mentor_publish` (deprecated; absent on the
-  2026-10-16 listing), `app_create`, `publish_start`, `mentor_start` or `mentor_cancel` (absent from the
+  `mentor_prompt` "Publish" turn; creating and editing an asset is a
+  `mentor_prompt` too. Do not name `mentor_create_asset` or `mentor_load_asset`
+  (deprecated, "do not call" on the 2026-10-30 listing), `mentor_publish`
+  (deprecated; absent on the 2026-10-16 listing), `app_create`, `publish_start`, `mentor_start` or `mentor_cancel` (absent from the
   live surface) as instruments. These are the ODC surface itself, not
   a harness feature. Write them bare - no `mcp__outsystems__` prefix, which is
   Claude-Code-specific wiring.
@@ -152,7 +154,7 @@ agents/
 
 `agents/roles/` follows the same rules as skills: no harness names, no model
 names, tool classes only (`run-read`, `mentor-drive`, `published-read`,
-`blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller`, `http-probe`,
+`attachment-upload`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller`, `http-probe`,
 `browser-automation`).
 `agents/<harness>/` adapters may use that harness's names, tools and models.
 Skills reference roles **by role name only** (`fulcrum-poller`,

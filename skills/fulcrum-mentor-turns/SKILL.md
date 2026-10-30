@@ -9,8 +9,8 @@ description: >
   build this", "my Mentor turn failed", "Mentor isn't applying changes", "how
   should I chunk this spec", "Mentor stalled", "how often should I poll
   Mentor", "reuse the session or start fresh", "how do I publish", "did the
-  MCP tools change", or before any `mentor_start_session` /
-  `mentor_create_asset` / `mentor_load_asset` / `mentor_prompt` call.
+  MCP tools change", or before any `mentor_start_session` / `mentor_prompt`
+  call.
 version: "1.1.0"
 requires: >
   ODC MCP server authenticated; Mentor enabled on the tenant; a durable log
@@ -35,15 +35,13 @@ surface disagrees with it, re-probe (its heading "Re-probing the surface").
 dispatches; subagents drive turns and absorb poll traffic. Poll undelegated
 only when the harness gives no subagent, at the slower cadence below.
 
-**The sequence.** `mentor_start_session` -> `mentor_create_asset` for a new
-asset **or** `mentor_load_asset` for an existing one -> `mentor_prompt` ->
-read `mentor_get_run` until drained. No mutation is possible before create
-or load `[SCHEMA]`; decide the branch before the first prompt. Create needs
-a `portfolioKey` in practice (from `env_list`; record it in
-`tenant-profile.md`). A created asset exists only inside its session until
-its first publish - **publish once early**, before that session can close
-(section 7). A load can be refused under capacity; the bounded retry rule is
-in `references/mcp-surface.md`, heading "Creating and loading an asset".
+**The sequence:** start a session, then prompt (describe a new asset, or
+attach one with `assetRefs`), then read the run until drained; call sequence,
+params and the deprecated create and load tools are in `references/mcp-surface.md`,
+heading "Creating and loading an asset". A new asset exists only inside its
+session until its first publish - **publish once early**, before that session
+can close (section 7). The first turn can be refused under capacity: bounded
+retry in the same heading.
 
 ## 1. Turn granularity - the headline rule
 
@@ -51,8 +49,7 @@ in `references/mcp-surface.md`, heading "Creating and loading an asset".
 [VERIFIED] A monolithic 8-element turn ran ~50 minutes, went event-silent and
 lost its run - **zero of the 8 had applied** on read-back. The same scope as
 **9 granular turns landed all 9**, faster overall, and surfaced a real spec
-defect the monolithic version would have absorbed. Numbers:
-`references/granularity.md`.
+defect. Numbers: `references/granularity.md`.
 
 **Corollary:** a step's spec is the *orchestrator's checklist*, not one
 prompt's text. Tell a subagent to decompose into turns and list them first.
@@ -62,12 +59,13 @@ date filter is not.
 
 ## 2. Prompt shape, the length ceiling, and secrets
 
-[VERIFIED] A ~1,400-character first turn was rejected twice by a
-web-application-firewall rule (a raw CDN 403 - not auth, not a permission
-classifier); a short prompt on the same session then succeeded. Keep prompts
-to a few sentences plus a terse numbered checklist; avoid long runs of
-backticks and nested quoting. **The ceiling is a [TENANT] fact** -
-check `tenant-profile.md`.
+A long first turn has been rejected by a firewall rule (a raw CDN 403, not
+auth); the evidence and what is untested are in `references/mcp-surface.md`,
+"Prompt length". Keep prompts to a few sentences
+plus a terse numbered checklist; avoid long runs of backticks and nested
+quoting. **The ceiling is a [TENANT] fact** - check `tenant-profile.md`. At most
+3 attachments per prompt; `uploadUrl` is a credential, record `attachmentId`
+only (same file, "Tool families").
 
 **Never put a secret value in a Mentor prompt** - a prompt is stored and
 replayed, so the value can leak into the model, history and logs (leak path
@@ -86,33 +84,35 @@ authoring any non-trivial turn.
 
 Defined in `../../CONVENTIONS.md`, heading "Mode and posture". `collaborative`
 (default): a read-only **consult turn**, a **review** against
-`../fulcrum-engine-traps/SKILL.md` correcting only the trap(s) tripped -
-never a rewrite of the whole proposal - then the **build turn** in the same
-session (section 4). `directive` drops the consult. An accepted Mentor
-proposal is a decision (`Decider: mentor`). Economics stay `[UNVERIFIED]`.
-Mechanics: `references/posture.md`.
+`../fulcrum-engine-traps/SKILL.md` correcting only the trap(s) tripped, then
+the **build turn** in the same session (section 4). `directive` drops the
+consult. An accepted Mentor proposal is a decision (`Decider: mentor`).
+Economics stay `[UNVERIFIED]`. Mechanics: `references/posture.md`.
 
 ## 4. Sessions, conversation and the staleness guard
 
 **A session is one conversation.** There is no session token and no
 fresh-context switch; runs in a session share Mentor's memory. Fresh context
-means close the session, start a new one, load again (`references/mcp-surface.md`,
-heading "Sessions and context").
+means close the session, start a new one, attach again
+(`references/mcp-surface.md`, heading "Sessions and context").
 
 - **One driver dispatch per plan step, one session per step** (Fulcrum rule).
   Inside that dispatch and session the driver runs the guard, the consult
   turn (if the step has one), build turn(s), fix turn(s) and the Publish
   turn. Consult and build never split across dispatches, or the review's
   corrections are silently discarded.
-- **A step's session ends with the step.** A fresh `mentor_load_asset` loads
-  the latest published revision, so the guard at the start of the next step
+- **A step's session ends with the step.** A fresh session's `assetRefs` with
+  no revision works on the latest `[SCHEMA]`, so the next step's guard
   proves the previous step landed (published), not session staleness. The
   only carry-over is a resume of the *same* step: a dispatch stopped on its
   budget hands back an open `sessionId` (`on_exit: keep-open`) and the next
   dispatch of that step resumes it. When to start fresh within a step:
   `references/sessions.md`.
-- **One session per app at a time**; close a finished session - but **never
-  close a session holding unpublished changes** (section 4, "The guard").
+- **One session per app at a time; two sessions never build one app**
+  (user-confirmed). One session may hold several assets. Close a finished
+  session - but **never close a session holding unpublished changes** ("The guard").
+- **Never pass `assetRefs` revision on a held asset:** reads then fail with
+  internal errors `[SINGLE-OBSERVATION]`.
 
 **Mentor's read-back is evidence of Mentor's belief, not of the model.** When
 it contradicts published-state inspection or wire evidence, trust the
@@ -121,9 +121,11 @@ instrument and journal the contradiction (`references/sessions.md`).
 ### The critical warning
 
 A session's model is **not guaranteed current.** [VERIFIED] Staleness has
-been seen one and two steps behind, unsignalled. Publishing from it
-**silently reverts completed work** while the revision still advances
-[SINGLE-OBSERVATION, worst case: six steps lost]. `references/recovery.md`.
+been seen one and two steps behind, unsignalled, and `assetRefs` does not
+refresh a held asset. Publishing from it **silently reverts completed work**
+while the revision still advances [SINGLE-OBSERVATION, worst case: six steps
+lost; `[UNVERIFIED]` on the 2026-10-30 surface, inferred, not tested].
+`references/recovery.md`.
 
 ### The guard
 
@@ -159,9 +161,8 @@ turn. **With no delegation:** the orchestrator polls in its own context at a
   paraphrases a page it did not read.**
 - **Verify the wait blocks** before the first poll - a wait that returns
   immediately hammers Mentor with no cadence (`../../HARNESS-NOTES.md`).
-- **A brief must restate these rules.** Pointing an agent at this skill is
-  not enough. Paste the block in `references/polling.md`, heading "Pointing
-  at this skill is not a brief".
+- **A brief must restate these rules:** paste the block in
+  `references/polling.md`, heading "Pointing at this skill is not a brief".
 - **Precedence:** if another catalog prescribes different cadences, this one
   governs; do not average or switch mid-session (`references/polling.md`).
 
@@ -181,9 +182,8 @@ its verdict on that read.
 
 **Publish is its own planned turn:** a `mentor_prompt` whose message is
 "Publish", polled at the mutating cadence. **Every mutating step ends with
-its Publish turn** - the plan's publish points are per step. `mentor_publish`
-is deprecated (absent on the 2026-10-16 listing). Events, keys and status fields: `references/mcp-surface.md`,
-heading "Publishing".
+its Publish turn** - the plan's publish points are per step. Events, keys and
+status fields: `references/mcp-surface.md`, heading "Publishing".
 
 - **Mentor's offers to publish are never accepted inline.** An unattended
   "yes" publishes outside the plan.
@@ -199,21 +199,19 @@ heading "Publishing".
   `outcome`), then `env_app` in the Development environment: its `revision`
   must equal the publication's `applicationRevision` (the gate; `Workflow`
   and library exceptions in `references/mcp-surface.md`, "Publishing").
+- **Several assets held: gate each key.** One Publish run made two
+  publications; Publish covers held assets with changes (inferred, tagged
+`[UNVERIFIED]`, `references/mcp-surface.md`, "Publishing").
 - **Never publish while the previous publish is non-terminal.** A failure
   with an `OS-*` build code is the build's result: surface it.
   `indeterminate: true` means re-poll or check the deployed inventory.
   Neither is a reason to re-publish.
 - Never trust Mentor's prose about a publish - confirm the revision, then
-  prove the change per `../fulcrum-verification/SKILL.md`; `context_*`
-  lags a publish by a variable time (about 2 minutes to more than 25
-  observed), so gates reading it are lag-tolerant
-  (`references/mcp-surface.md`, heading "Published-state inspection
+  prove the change per `../fulcrum-verification/SKILL.md`; `context_*` lags a
+  publish by about 2 minutes to more than 25, so gates reading it are
+  lag-tolerant (`references/mcp-surface.md`, "Published-state inspection
   (context_*)").
-- A promotion with `deploy_start` needs the `Release` build key from
-  `build_list`, not `env_app`'s `buildKey` (the Debug build):
-  `references/mcp-surface.md`, heading "Publishing".
-- Publishes serialize; freeze them before a demo; Production needs explicit
-  user confirmation (`references/granularity.md`, "Publish budgeting").
+- Promotion, serialization, demo freeze: `references/granularity.md`, "Publish budgeting".
 
 ## 8. Recovery and turn economics
 

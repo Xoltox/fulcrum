@@ -29,8 +29,8 @@ permitted action is to **wait and report**, and only when both hold:
   "Polling"), so an expensive parent polling for itself burns the window it
   needs for the actual work.
 
-The nested agent does not call `mentor_start_session`, `mentor_create_asset`,
-`mentor_load_asset`, or `mentor_prompt`, does not fix anything, does not
+The nested agent does not call `mentor_start_session`, `mentor_request_upload`,
+or `mentor_prompt`, does not fix anything, does not
 verify, and does not dispatch. It waits, reads run state, and reports terminal
 state upward.
 
@@ -142,8 +142,8 @@ the chain there, instead of funding five more hops.
 The orchestrator does four things: read state, write a self-contained brief,
 dispatch, read the terse report back.
 
-It must **not itself** call `mentor_start_session` / `mentor_create_asset` /
-`mentor_load_asset` / `mentor_prompt` (any Mentor turn, including the "Publish"
+It must **not itself** call `mentor_start_session` / `mentor_request_upload` /
+`mentor_prompt` (any Mentor turn, including the "Publish"
 turn) / `mentor_get_run`, poll `publish_status`, call a `context_*` inventory tool, curl a REST endpoint, or
 run browser automation or a verification gate script.
 

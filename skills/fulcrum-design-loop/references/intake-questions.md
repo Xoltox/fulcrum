@@ -15,7 +15,7 @@ questions, answerable in the invocation (form below); any question left unanswer
 still asked - nothing is defaulted. Never one question per turn.
 
 1. **App creation.** "Should Mentor create the app (`<name>`), or will you create a
-   shell from the standard template for me to load? No default: Mentor-created is
+   shell from the standard template for me to attach (`assetRefs`)? No default: Mentor-created is
    faster; your shell lets you choose name, template and portfolio."
 2. **Screen access.** "Who may open each screen? (a) all require sign-in, any role;
    (b) `<listed>` public, the rest sign-in; (c) per role - name roles and screens. No
@@ -37,10 +37,11 @@ still asked - nothing is defaulted. Never one question per turn.
    `.fulcrum/design/source/` and (b) render screenshots, or keep either out of the
    repository? They can hold real data." This also answers render-check's screenshot
    question; do not ask it twice. Fulcrum never adds an ignore entry on its own.
-6. **Assets.** "The design shows `<logo / N images>`; there is no MCP image upload.
-   (a) you upload them in Studio when the chrome step asks; (b) text wordmark and
-   neutral placeholders; (c) leave slots empty." The upload claim rests on the
-   `mentor_request_upload` row (allowed extensions, no image format) in
+6. **Assets.** "The design shows `<logo / N images>`. Images reach Mentor (an
+   attachment, at most 3 per prompt), but no attachment became an app resource, so
+   they will not appear in the app that way. (a) you upload them in Studio when the
+   chrome step asks; (b) text wordmark and neutral placeholders; (c) leave slots
+   empty." The claim rests on the `mentor_request_upload` and image rows in
    `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Tool families".
 7. **Form factor** - only if the source is ambiguous: "Desktop Reactive Web, or
    phone-width layout in a Reactive Web app? (Mobile type refused Mentor screens once
@@ -51,8 +52,8 @@ still asked - nothing is defaulted. Never one question per turn.
 
 | Answer | Consequence |
 |---|---|
-| Q1 shell | P1.01 is a `manual` row (user creates the shell) then a load; the app key comes from the user |
-| Q1 Mentor | P1.01 brief carries `portfolioKey` from `tenant-profile.md` section 11 |
+| Q1 shell | P1.01 is a `manual` row (user creates the shell) then an attach (`assetRefs`); the app key comes from the user |
+| Q1 Mentor | P1.01 brief carries the environment keys from `tenant-profile.md` section 11; no portfolio key is passed |
 | Q2 | Access lines in every `screens/<SID>.md` header; render sign-in modes per screen |
 | Q3 | `manifest.md`, Policy line **Fidelity bar**; severity of `token` and `spacing` diffs (`render-compare.md`) |
 | Q4 (a) | Browser preflight runs at phase 0; a failed preflight re-asks Q4 with (a) removed |

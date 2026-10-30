@@ -47,7 +47,8 @@ the end. Edit the role first, then mirror the body into each adapter.
 | Class | Means |
 |---|---|
 | `run-read` | Read a Mentor run (`mentor_get_run`) and single events (`mentor_get_event`) |
-| `mentor-drive` | `mentor_start_session`, `mentor_close_session`, `mentor_create_asset`, `mentor_load_asset`, `mentor_prompt`, `mentor_cancel_prompt` |
+| `mentor-drive` | `mentor_start_session`, `mentor_close_session`, `mentor_prompt`, `mentor_cancel_prompt` (`mentor_create_asset` and `mentor_load_asset` are deprecated: do not call) |
+| `attachment-upload` | `mentor_request_upload`, then PUT the bytes to the presigned URL it returns. The URL is a credential: never journal, report or echo it |
 | `published-read` | `context_*`, `app_info`, `app_revisions`, `app_logs`, `app_traces`, `app_health`, `env_list`, `env_app`, `publish_status`, `publish_logs`, `auth_status` |
 | `blocking-wait` | A wait that actually suspends for the requested time (verified, see `../HARNESS-NOTES.md`, "Waiting") |
 | `file-read` | Read and search files; includes image inspection (looking at an image file) where a role's job needs it (verifier, capturer) |

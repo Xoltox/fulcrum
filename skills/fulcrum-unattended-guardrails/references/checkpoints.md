@@ -68,7 +68,7 @@ so a resuming agent knows whether to wait or to investigate:
   (`halt-conditions.md`, heading "User-action stops"). Never a secret value.
 - **Mentor capacity stop** - the attempts made and the session that was closed
   (`halt-conditions.md`, heading "Mentor capacity stop"). Resume by retrying the
-  load later with a fresh session; do not treat it as a defect.
+  first turn later with a fresh session; do not treat it as a defect.
 - **Halt** - every other hard stop, with the last verified-good revision.
 
 ## Two-part handoff structure

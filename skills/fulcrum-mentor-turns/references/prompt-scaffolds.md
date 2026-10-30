@@ -28,7 +28,7 @@ name plus a count), phrased so a wrong answer stops the run:
 > answer anything else and do not make any change."
 
 If it reports the stale state: `mentor_close_session`, then open a fresh
-session and load again. A
+session and attach again (`assetRefs`). A
 revision-number check does not catch this - the revision still advances
 under a stale publish.
 

@@ -33,8 +33,8 @@ inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 | `deploy_impact` / `deploy_impact_status` | Blast radius before promotion | New: safe-promotion section | Read-only analysis |
 | `deploy_rollback` / `build_list` / `deploy_start` | Cross-environment promotion and an undo for a **deployed** asset | New: safe-promotion section | High - mutating, needs human confirm |
 | `mentor_get_event` | Recover a truncated run event (now on the live surface) | `fulcrum-mentor-turns` | Read-only |
-| `mentor_request_upload` | Attach **documents** (not images) to a Mentor prompt | `fulcrum-solution-init` | Low |
-| `mentor_create_asset` `templateAssetKey` | Clone an existing app as a template | `fulcrum-solution-init` | Mutating - creates an asset |
+| `mentor_request_upload` | Attach images and documents to a Mentor prompt (`attachmentRefs`; limits in `fulcrum-mentor-turns/references/mcp-surface.md`) | `fulcrum-solution-init` | Low; the presigned URL is a credential |
+| `mentor_create_asset` `templateAssetKey` | DEPRECATED, do not call (2026-10-30 listing). Template cloning has no replacement recorded; unprobed | `fulcrum-solution-init` | n/a |
 | `submit_feedback` | Agent-side telemetry on wrong-tool / empty-result events | `fulcrum-unattended-guardrails` | Read-only side channel |
 | `context_graph` | XRE / Graphviz whole-model export | `fulcrum-gap-analysis` (already cited) | Read-only, capacity-gated |
 | `extlib_*` | Upload/publish compiled C# libraries | Out of scope - see last section | Mutating, tenant-level asset |
@@ -181,26 +181,18 @@ returned as a truncation marker. This recovers **truncation** only, a different 
 from eviction. Cheap, read-only; the polling procedure should say "on a truncation
 marker, fetch the body".
 
-## `mentor_request_upload` - not an image path
+## `mentor_request_upload` - images reach Mentor, not the app
 
-`[SCHEMA]` Mints a presigned PUT URL for a file of 1 byte to 10 MB. Allowed
-extensions: `.txt .pdf .json .xml .docx .md` - **no image formats.**
-`mentor_prompt`'s `attachmentRefs` further advises that for refining an existing
-app, requirements should be summarised as text in the prompt instead. So this
-does **not** enable a design-to-app path. It attaches a BRD, PDF or JSON spec at
-session start - useful to `fulcrum-solution-init`, which today ingests source material
-entirely into agent context. Figma/screenshot ingestion stays the agent's own
-image-inspection job (`fulcrum-design-loop`'s capturer for one design and one app).
-
-**Attachment experiment - done at the schema and call level 2026-10-16; attaching
-still untested.** `.md` is an allowed extension, so a region's anatomy file could ride
-as an attachment instead of inline prompt text, possibly raising per-turn structure
-past the prompt ceiling. The full re-probe obtained an upload slot for a `.md` file and
-saw the extension and size limits enforced server-side `[SINGLE-OBSERVATION]`
-(`skills/fulcrum-mentor-turns/references/mcp-surface.md#tool-families`). Still untested:
-uploading to the slot and referencing it from a prompt - one throwaway turn in the
-design loop's live evaluation (Development only, throwaway app) decides it. Until it is
-observed, region turns carry their subtree inline (`fulcrum-design-loop`).
+Current state (probed 2026-10-30; rows in
+`skills/fulcrum-mentor-turns/references/mcp-surface.md`, heading "Tool families"):
+the tool mints a presigned PUT URL, `attachmentRefs` takes at most 3, and images
+(`.png .jpg .jpeg .webp .gif`) and documents (`.pdf .txt .md .docx .csv .json`)
+are accepted and worked with `assetRefs`. Mentor read images and built from them,
+but no attachment became an app resource in the render, and CSV and JSON were read,
+not imported. So an attachment is a way to show Mentor a design or spec, not a way
+to put a logo or file into the app. Images as a design-to-app path is therefore
+reading only; whether the design loop's region turns gain anything from attached
+files over inline text is open and belongs to the design loop's live evaluation.
 
 ## `context_graph` vs the rest of `context_*`
 
@@ -261,8 +253,9 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
    conditions are all model- and turn-shaped; none is runtime-shaped.
 6. **`context_graph`'s concurrency limit contradicts fan-out delegation.** Small,
    but a rule Fulcrum would otherwise violate by design.
-7. **`mentor_request_upload` accepts no images** - record it so no future
-   design-to-app work assumes a path that does not exist.
+7. **Attachments reach Mentor but did not become app resources** - record it so no
+   future design-to-app work assumes an image import path
+   (`mcp-surface.md`, "Tool families").
 
 ## Out of scope / not worth it
 
@@ -295,8 +288,7 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   screen render-compared against its reference by a blind verifier with image
   inspection (structural or visual bar; pixel-exact is not offered). The render
   skill still stops at capture; the design loop consumes its evidence folder. Open:
-  the live evaluation on a throwaway app, including the attachment experiment
-  above; until it runs, the loop's render-compare and capture are `[UNVERIFIED]`
+  the live evaluation on a throwaway app; until it runs, the loop's render-compare and capture are `[UNVERIFIED]`
   end to end.
 - **Full MCP re-probe - done 2026-10-16** (snapshot
   `skills/fulcrum-mentor-turns/references/mcp-snapshots/2026-10-16.md`; rows in

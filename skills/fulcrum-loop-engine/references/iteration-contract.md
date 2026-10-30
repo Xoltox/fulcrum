@@ -49,8 +49,8 @@ Gate 5 is a Mentor turn and is therefore **dispatched**, not run by the
 orchestrator - but not as a dispatch of its own. It is the first turn of the
 step's single driver dispatch (phase 3), in the same session that then builds,
 so the check tests the session that mutates. It is read-only, so it polls at
-the answer-back cadence. A fresh `mentor_load_asset` loads the latest
-published revision, so a passing guard proves the previous step landed
+the answer-back cadence. A fresh session attaching the asset with no revision works on the latest
+`[SCHEMA]`, so a passing guard proves the previous step landed
 (published); it is not a session-staleness test. Gate 5 is also the per-step
 Mentor liveness check (`../../fulcrum-solution-init/references/tenant-capability-probe.md`,
 heading "0. Mentor liveness gate"): a guard answer that names the app's real

@@ -210,8 +210,7 @@ project").
 
 ## 11. Portfolio, environments and template screen set
 
-Read-only, from `env_list`. Record: the **portfolioKey** (creation via
-`mentor_create_asset` needs it in practice, see
+Read-only, from `env_list`. Record: the **portfolioKey** (creation by prompt does not need it, see
 `../../fulcrum-mentor-turns/references/mcp-surface.md#creating-and-loading-an-asset`),
 the **environment keys** (name to key), and the **new-app template screen set**, meaning
 which screens a freshly created app from the standard template already contains
