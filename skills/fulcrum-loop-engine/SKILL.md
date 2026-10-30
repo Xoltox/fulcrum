@@ -1,16 +1,6 @@
 ---
 name: fulcrum-loop-engine
-description: >
-  The iteration mechanism for a Fulcrum build - how the runnable frontier of
-  the task graph becomes parallel, recorded, proven dispatches, one lane per
-  app. Owns frontier selection and batching, the precondition and staleness
-  gate, dispatch, polling, verification, recording and advance; the bounded
-  fix-loop; mechanical oscillation and stall detection; crash-idempotency of an
-  iteration; and per-iteration budget accounting. Use when the user says
-  "work through the task list", "run the next task", "keep building until the
-  phase is done", "resume the loop", "what should I do next", "the same task
-  keeps failing", "have we tried this before", "how many fix turns do I get", or
-  "pick up the build where it stopped".
+description: Use when the user says "work through the task list", "run the next task", "keep building until the phase is done", "resume the loop", "what should I do next", "the same task keeps failing", "have we tried this before", "how many fix turns do I get", or "pick up the build where it stopped" on an OutSystems build with a `.fulcrum/` task graph, even when the user does not mention Fulcrum. The iteration mechanism for a Fulcrum build - how the runnable frontier of the task graph becomes parallel, recorded, proven dispatches, one lane per app. Owns frontier selection and batching, the precondition and staleness gate, dispatch, polling, verification, recording and advance; the bounded fix-loop; mechanical oscillation and stall detection; crash-idempotency of an iteration; and per-iteration budget accounting.
 version: "1.0.0"
 requires: >
   A `.fulcrum/` project-state directory already scaffolded and readable/writable;

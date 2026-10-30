@@ -76,6 +76,19 @@ block**, never by asking whether it exists and never by a throwaway build.
 
 A Mentor denial with no attempted reference is **unresolved**, not "no".
 
+### OutSystems UI version
+
+| Field | Value |
+|---|---|
+| Version | \<tag, or `first-row`: read on the app's first render\> |
+| Probe | \<which read answered\> |
+| Observed | \<verbatim\> |
+| Date | \<date\> |
+
+Reads, in order, and what each answer does to the vendored block and theme rows:
+`../../fulcrum-design-loop/references/block-map.md`, heading "OutSystems UI library
+reference". A runtime read wins over Mentor's answer.
+
 ---
 
 ## 3. Icon font

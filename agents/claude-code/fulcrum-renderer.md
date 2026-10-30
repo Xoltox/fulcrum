@@ -39,6 +39,8 @@ If the brief is wrong, say so - a correction beats agreement.
 - Whether screenshots are allowed. They are only when the brief says the
   user's screenshot decision is recorded. Otherwise capture page text and the
   DOM snapshot only and save no image file.
+- Whether to read the OutSystems UI version: on an app's first render, while
+  `tenant-profile.md` has none.
 
 ## Browser capabilities
 
@@ -95,8 +97,14 @@ you have and which capabilities above it covers. Do nothing else.
    toast alone is not evidence.
 
 Page scripts are for read-only measurement only (sizes, computed style,
-image natural width, resource timing). Never set values, submit forms, read
-storage or cookies, or call endpoints.
+image natural width, resource timing, the OutSystems UI version). Never set
+values, submit forms, read storage or cookies, or call endpoints.
+
+**OutSystems UI version**, when the brief asks, on the first page that renders. Take
+the first that answers, and report the value and which source gave it:
+`OutSystems.OSUI.GetVersion()` in a read-only page script; the first comment of the
+compiled OutSystems UI stylesheet; `--token-semantics-primary-base` in computed style
+(present means 3.x, absent pre-3.0). None answers: say so.
 
 Browser limits that look like defects: a form-fill capability may not update
 the OutSystems model, so use real keystrokes for a field an action will read;
@@ -162,6 +170,7 @@ network, tries, observation), then return:
 render: <task-id> revision <n>; pages opened <n>, closed <n>
 <nn> <assertion short name>: <what the page showed> | <screenshot path or "no screenshot">
 security: <observation or "none seen">
+ui version: <value and source, or "not asked">
 not checked: <assertion and reason, or "none">
 evidence: <folder path>
 ```

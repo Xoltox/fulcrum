@@ -1,13 +1,15 @@
 #!/bin/sh
 # install.sh - copy Fulcrum's skills/* into a target skills directory, and
 # its Claude Code agent definitions (agents/claude-code/*.md) into an agents
-# directory.
+# directory. With --hooks, also copy the opt-in Claude Code hook
+# (agents/claude-code/hooks/) and print its settings snippet.
 #
 # POSIX sh only (no bashisms).
 #
 # Usage:
 #   ./install.sh [target-dir] [--agents-dir <dir>] [--no-agents]
-#                [--force-agents] [--force] [--dry-run]
+#                [--force-agents] [--force] [--hooks] [--hooks-dir <dir>]
+#                [--dry-run]
 #
 #   target-dir          Where to install skills. Defaults to ~/.claude/skills.
 #   --agents-dir <dir>  Where to install agent definitions.
@@ -21,6 +23,14 @@
 #                       Fulcrum version). Without this flag they are skipped
 #                       and listed. Upgrading an existing install needs it:
 #                       review the --dry-run list first.
+#   --hooks             Copy the hook file and print the settings snippet.
+#                       Off by default. This script never edits a settings
+#                       file and never runs the hook: a hook is a command the
+#                       harness runs every session, so wiring it stays a
+#                       deliberate step you take yourself. A hook file that
+#                       differs from the source is skipped unless --force.
+#   --hooks-dir <dir>   Where to copy the hook file (needs --hooks).
+#                       Defaults to ~/.claude/hooks.
 #   --dry-run           Show what would happen, change nothing.
 #
 # Non-destructive: only adds and updates files. Never deletes anything
@@ -47,9 +57,13 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 SRC="$SCRIPT_DIR/skills"
 AGENTS_SRC="$SCRIPT_DIR/agents/claude-code"
+HOOKS_SRC="$SCRIPT_DIR/agents/claude-code/hooks"
 
 DEST="$HOME/.claude/skills"
 AGENTS_DEST="$HOME/.claude/agents"
+HOOKS_DEST="$HOME/.claude/hooks"
+HOOKS=0
+HOOKS_DIR_SET=0
 DRY_RUN=0
 DEST_SET=0
 AGENTS=1
@@ -58,7 +72,7 @@ FORCE=0
 MARKER='Generated from agents/roles/'
 
 usage() {
-  echo "Usage: $0 [target-dir] [--agents-dir <dir>] [--no-agents] [--force-agents] [--force] [--dry-run]" >&2
+  echo "Usage: $0 [target-dir] [--agents-dir <dir>] [--no-agents] [--force-agents] [--force] [--hooks] [--hooks-dir <dir>] [--dry-run]" >&2
 }
 
 while [ "$#" -gt 0 ]; do
@@ -74,6 +88,37 @@ while [ "$#" -gt 0 ]; do
       ;;
     --force)
       FORCE=1
+      ;;
+    --hooks)
+      HOOKS=1
+      ;;
+    --hooks-dir)
+      if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+        echo "--hooks-dir needs a directory" >&2
+        usage
+        exit 2
+      fi
+      case "$2" in
+        -*)
+          echo "--hooks-dir needs a directory, got: $2" >&2
+          usage
+          exit 2
+          ;;
+      esac
+      HOOKS_DEST="$2"
+      HOOKS_DIR_SET=1
+      shift
+      ;;
+    --hooks-dir=*)
+      HOOKS_DEST="${1#--hooks-dir=}"
+      case "$HOOKS_DEST" in
+        ""|-*)
+          echo "--hooks-dir needs a directory, got: '$HOOKS_DEST'" >&2
+          usage
+          exit 2
+          ;;
+      esac
+      HOOKS_DIR_SET=1
       ;;
     --agents-dir)
       if [ "$#" -lt 2 ] || [ -z "$2" ]; then
@@ -129,6 +174,17 @@ if [ "$AGENTS" = "1" ] && [ ! -d "$AGENTS_SRC" ]; then
   AGENTS=0
 fi
 
+if [ "$HOOKS_DIR_SET" = "1" ] && [ "$HOOKS" = "0" ]; then
+  echo "--hooks-dir needs --hooks" >&2
+  usage
+  exit 2
+fi
+
+if [ "$HOOKS" = "1" ] && [ ! -d "$HOOKS_SRC" ]; then
+  echo "error: $HOOKS_SRC does not exist. Aborting." >&2
+  exit 1
+fi
+
 # classify <file-name>: print what would happen to the agent file of that name.
 #   new | current | same-file | skip-not-ours | update | overwrite-forced
 classify_agent() {
@@ -147,7 +203,79 @@ classify_agent() {
   fi
 }
 
-# Pre-check agents before writing anything (skills included).
+# classify_hook <file-name>: print what would happen to the hook file of that name.
+#   new | current | same-file | update-forced | skip-differs
+classify_hook() {
+  _src="$HOOKS_SRC/$1"
+  _dst="$HOOKS_DEST/$1"
+  if [ ! -e "$_dst" ] && [ ! -L "$_dst" ]; then
+    echo new
+  elif [ -e "$_dst" ] && [ "$_src" -ef "$_dst" ]; then
+    echo same-file
+  elif [ -f "$_dst" ] && cmp -s "$_src" "$_dst"; then
+    echo current
+  elif [ "$FORCE" = "1" ]; then
+    echo update-forced
+  else
+    echo skip-differs
+  fi
+}
+
+# print_hook_snippet: the settings entries for the hook, using forward slashes
+# because they work in both shells a Windows harness may run a hook through.
+print_hook_snippet() {
+  _dir=$HOOKS_DEST
+  case "$_dir" in
+    /*|[A-Za-z]:*) ;;
+    *) _dir="$(pwd)/$_dir" ;;
+  esac
+  if command -v cygpath >/dev/null 2>&1; then
+    _dir=$(cygpath -m "$_dir")
+  fi
+  _cmd="node \\\"$_dir/fulcrum-hint.cjs\\\""
+  cat <<EOF
+
+Hook file only: nothing is wired yet, and this script edits no settings file.
+The hook runs on every session start and every prompt once wired, needs node
+on PATH, and stays silent unless its gate opens. To wire it, merge this into
+the "hooks" of the settings file you choose (a project's .claude/settings.json
+for one project, ~/.claude/settings.json for every repo), then restart:
+
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "$_cmd", "timeout": 5 } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "$_cmd", "timeout": 5 } ] }
+    ]
+  }
+}
+EOF
+}
+
+# Pre-check hooks and agents before writing anything (skills included).
+if [ "$HOOKS" = "1" ]; then
+  if [ -e "$HOOKS_DEST" ] && [ ! -d "$HOOKS_DEST" ]; then
+    echo "error: $HOOKS_DEST exists and is not a directory. Aborting; nothing written." >&2
+    exit 1
+  fi
+  echo "Hooks -> $HOOKS_DEST"
+  for f in "$HOOKS_SRC"/*.cjs; do
+    [ -f "$f" ] || continue
+    name=$(basename "$f")
+    case $(classify_hook "$name") in
+      new) echo "  $name: new" ;;
+      current) echo "  $name: up to date" ;;
+      same-file) echo "  $name: skip (same file as source, already linked)" ;;
+      update-forced) echo "  $name: overwrite (--force; differs from source)" ;;
+      skip-differs) echo "  $name: skip: differs (re-run with --force to overwrite)" ;;
+    esac
+  done
+else
+  echo "Hooks: skipped (opt-in, see --hooks)."
+fi
+
 if [ "$AGENTS" = "1" ]; then
   if [ -e "$AGENTS_DEST" ] && [ ! -d "$AGENTS_DEST" ]; then
     echo "error: $AGENTS_DEST exists and is not a directory. Aborting; nothing written." >&2
@@ -227,6 +355,9 @@ done < "$PLAN"
 echo "  skills summary: $n_new new, $n_upd overwritten, $n_cur up to date, $n_conf skipped (differ), $n_link linked"
 
 if [ "$DRY_RUN" = "1" ]; then
+  if [ "$HOOKS" = "1" ]; then
+    print_hook_snippet
+  fi
   echo "[dry-run] no changes made."
   exit 0
 fi
@@ -273,6 +404,22 @@ if [ "$AGENTS" = "1" ]; then
     esac
   done
   echo "Agent definitions load at session start: restart your session to use them."
+fi
+
+if [ "$HOOKS" = "1" ]; then
+  mkdir -p "$HOOKS_DEST"
+  for f in "$HOOKS_SRC"/*.cjs; do
+    [ -f "$f" ] || continue
+    name=$(basename "$f")
+    case $(classify_hook "$name") in
+      new|update-forced)
+        cp "$f" "$HOOKS_DEST/$name"
+        echo "  hook written: $name"
+        ;;
+      skip-differs) echo "  warning: hook skipped, differs: $name" >&2 ;;
+    esac
+  done
+  print_hook_snippet
 fi
 
 if [ "$failed" -gt 0 ]; then

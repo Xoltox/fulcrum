@@ -15,15 +15,16 @@ one lane's dispatch ends, select again for that lane, plus any idle lane the
 newly closed rows made runnable. The slowest lane gates nobody. A barrier would
 leave every finished lane idle while the slowest one runs.
 
-1. **Re-check `blocked` library consumers** ("Library consumers" below).
+1. **Re-check `blocked` library and agent consumers** ("Library consumers" below).
 2. **Compute the frontier:** all `todo` rows whose `DependsOn` are done, grouped
    by `App`. Within a group, work in ID order.
 3. **Done means** the row has `Status: done` and `Verdict: pass`, or its id is no
    longer in the table (only those rows are ever removed). `unproven` and `fail`
    are not done: building on them is building on work nobody showed to work.
 4. **Skip a lane** with a driver in flight, whose lease carries `open_session`
-   (its next action is a resume of the same dispatch, or a stop for the user), or
-   under a gate hold ("G1 hold" below).
+   (its next action is a resume of the same dispatch, or a stop for the user) or
+   `holder: user` (at any age: the user is in Studio), or under a gate hold ("G1
+   hold" below).
 5. **Form one dispatch per lane** ("Dispatch shape" below). A row with
    `Verdict: unproven` is a re-prove dispatch ("Unproven rows" below).
 6. **Run the phase 2 gates per dispatch, then dispatch every group in parallel** as
@@ -125,7 +126,7 @@ dispatch, so it needs both apps idle.
 
 ## Library consumers
 
-A library consumer is never a pair: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Published-state inspection (context_*)".
+A library consumer is never a pair: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Published-state inspection (context_*)". An agent consumer takes the same path, and its wait has run overnight (`../../fulcrum-engine-traps/references/agents.md`, entry 9).
 
 - `fulcrum-solution-init` emits the row `blocked`, `Blocked on` naming the producer,
   `Unblocks when` "element shows in `context_actions`".

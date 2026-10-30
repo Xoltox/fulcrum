@@ -1,6 +1,6 @@
 ---
 name: fulcrum
-description: The router and entry point for the whole Fulcrum skill family. Looks at the filesystem and the tenant, works out what state an engagement is in, and dispatches to the right skill - it never asks the user to self-classify. Use when the user says "build an OutSystems app", "start a new ODC project", "I have an idea for an app", "resume my Fulcrum work", "continue where I left off", "what should I build next", "pick up the build", "is this app done", or hands over a BRD, Figma export, mockup, screenshot, or a bare idea with no plan yet. Also the right skill whenever it is unclear which other Fulcrum skill applies.
+description: Use first for any OutSystems, ODC or Mentor work, even when the user does not mention Fulcrum or name a skill. Use when the user says "build an OutSystems app", "build this in ODC", "use Mentor to add a screen", "use Mentor to change this app", "ask Mentor to fix this", "start a new ODC project", "resume my Fulcrum work", "continue where I left off", "pick up the build", "what should I build next", "is this app done", or "here is the BRD"; when a BRD or requirements document is handed over or found in the folder with no further instruction; when a `.fulcrum/` directory is present; or when a Figma export, mockup, screenshot or bare idea for an OutSystems app arrives with no plan yet ("I have an idea for an app" counts in an OutSystems context). The router and entry point for the whole Fulcrum skill family. Looks at the filesystem and the tenant, works out what state an engagement is in, and dispatches to the right skill - it never asks the user to self-classify. Also the right skill whenever it is unclear which other Fulcrum skill applies.
 version: "1.0.0"
 requires: filesystem read access to the project repository to detect `.fulcrum/` and any existing app source; a capability to put structured questions to the user in small batches when the filesystem cannot answer them; no ODC MCP surface of its own - it dispatches into skills that need one.
 ---
@@ -28,7 +28,8 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | Rendering a published screen in a browser (rungs 6-7, the render obligation, access checks) | `../fulcrum-render-check/SKILL.md` |
 | A small engagement run on the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
 | One design source for one app -> a published app | `../fulcrum-design-loop/SKILL.md` |
-| **Out of family:** external systems and integration targets (an integration target or external system (another vendor's server, a workflow engine, a third-party API)) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
+| Demo script, demo readiness, a scripted tour | `../fulcrum-demo/SKILL.md` |
+| **Out of family:** external systems (another vendor's server, a workflow engine, a third-party API) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
 | What `mode`, `posture` and `Rigor` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
 
 ## The detection ladder
@@ -157,7 +158,6 @@ the family lands here first. Do not narrow it to match the others.
 | Situation | Open |
 |---|---|
 | Any ladder row, or a conflicting-signal case (mismatched tenant, app with no state, `TASKS.md` rows but no plan) | `references/detection-procedure.md` |
-| Proposing or running the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
 | Proposing the design loop | `../fulcrum-design-loop/SKILL.md`, heading "Intake" |
 | Composing a guided-mode question batch | `references/guided-mode-interaction.md` |
 | Before dispatching, confirming the ops the next phase needs are callable | `references/tool-preflight.md` |

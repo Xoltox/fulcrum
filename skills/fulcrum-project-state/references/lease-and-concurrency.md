@@ -27,7 +27,7 @@ someone held a lock at push time, which is not a question anyone needs answered.
 ```json
 {
   "app": "<app identifier>",
-  "holder": "<stable identity: user or host plus session label>",
+  "holder": "<stable identity: user or host plus session label; the bare literal `user` only at a Studio hand-off>",
   "acquired": "<ISO-8601 UTC timestamp>",
   "ttl_seconds": 5400,
   "task": "T-014",
@@ -85,7 +85,8 @@ re-read for the key; before it, the app may exist with no id on file.
    session's lease: "Resuming after a dead session" below.
 4. Present, another holder, `acquired + ttl_seconds` **in the past** -> expired. It may
    be broken only if the holder's dispatch is also known dead (it never returned and
-   its budget is exceeded), under the rules below.
+   its budget is exceeded), under the rules below. Never a `holder: user` lease: "Studio
+   hand-off" below.
 
 **Release** (the orchestrator), when the dispatch returns `session_state: closed` -
 including on a failed turn, a halt, and a deliberate handoff: delete the file and append a
@@ -124,6 +125,28 @@ still a session on that app, and a second session there is the same corruption p
   thing, so its lock must not end app by app.
 - **A break covers the set.** Check `held_with`, and confirm no run is in flight on any
   held app before overwriting any of the files.
+
+## Studio hand-off - `holder: user`
+
+Fulcrum rule. A `manual` row that hands an app to the user to build in Studio
+(`../../fulcrum-design-loop/references/build-lanes.md`, heading "Studio lane") holds the
+app too: a Studio session and a Mentor session on one app are two sessions building it,
+and neither sees the other. A Studio session is invisible to this file, so the lease
+records the hand-off, not the session.
+
+- **Write.** At the hand-off, with every agent change published and no Mentor session
+  open on that app, the orchestrator writes `lease.<app>.json` with `holder: user`, `task`
+  that row and `ttl_seconds` sized to the expected pass, and appends a `hold lease` line.
+  The row stays `manual`, `parked`, `Blocked on: the user`; there is no new status.
+- **It counts as live at any age.** Never broken on expiry and never adopted: there is
+  no dispatch to know dead, so expiry says only that it is time to ask the user. Ask.
+  Steps 3 and 4 of "Acquire", "Breaking an expired lease" and "Resuming after a dead
+  session" give no route past it.
+- **No Mentor session opens on that app**, a read-only one included, until it is released.
+  Other apps keep running. Non-Mentor checks of a published revision still may.
+- **Release** on the user's "published": the orchestrator reads the live revision with
+  `env_app`, records it in the session file, deletes the file and appends a `release
+  lease` line. Only the user's answer ends it.
 
 ## Breaking an expired lease
 
@@ -167,7 +190,8 @@ State this plainly rather than trusting it further than it goes. `[UNVERIFIED]`
 - **A human working in the portal.** The platform attributes every publish to the
   authenticated tenant user regardless of origin, so a portal-made change is
   indistinguishable from an agent-made one after the fact. `[VERIFIED]` The lease
-  cannot see it at all.
+  cannot see it at all. A `holder: user` lease records a declared hand-off and nothing
+  more.
 - **A race between two agents reading the file at the same instant.** The read-then-write
   is not atomic. Acquiring is a convention, not a guarantee. It closes the common case
   - a second session started minutes later - and nothing more.

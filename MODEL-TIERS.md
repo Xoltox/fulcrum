@@ -42,13 +42,14 @@ work on the cheapest available and keep the loop bodies trivial.
    is still better than skipping the planning phase.
 
 The Claude Code adapters in `agents/claude-code/` bind roles to models: the
-poller role to the Anthropic `poller` tier (Haiku) and the workhorse roles to the
-`workhorse` tier (Sonnet). That binding reads this table and does not replace
+poller role to the Anthropic `poller` tier (Haiku), the workhorse roles to the
+`workhorse` tier (Sonnet) and the capturer to the `deep-reasoning` tier (Opus).
+That binding reads this table and does not replace
 it - **this file remains the one place that maps tiers to vendor models**; when
 a row here changes, the adapters follow.
 
-The Claude Code adapters hardcode `model:` (`haiku` for the poller, `sonnet`
-for the other two). A `MODEL-TIERS.local.md` override reaches a role only if
+The Claude Code adapters hardcode `model:` (`haiku` for the poller, `opus` for
+the capturer, `sonnet` for the other three). A `MODEL-TIERS.local.md` override reaches a role only if
 you edit that adapter's `model:` line in the installed copy. That one edit is
 allowed; `install.sh --force-agents` would overwrite it, so redo it after
 forcing.

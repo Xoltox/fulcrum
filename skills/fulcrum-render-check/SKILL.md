@@ -1,6 +1,6 @@
 ---
 name: fulcrum-render-check
-description: Renders a published ODC screen in a real browser and captures what a user actually sees, signed out or signed in, so proof rungs 6-7 and the render obligation stop being reported untested. Owns the browser preflight, the sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after a publish, evidence capture, and the security observations a render surfaces. Use when asked to "render the screen", "check the page actually shows", "does the new screen load", "is this screen public", "prove access for this role", "take a screenshot of the app", "run the render obligation", "click it and check it persisted", or after any publish that added or changed a screen.
+description: Use when asked to "render the screen", "check the page actually shows", "does the new screen load", "is this screen public", "prove access for this role", "take a screenshot of the app", "run the render obligation", "click it and check it persisted", or after any publish that added or changed a screen in an ODC app, even when the user does not mention Fulcrum. Renders a published ODC screen in a real browser and captures what a user actually sees, signed out or signed in, so proof rungs 6-7 and the render obligation stop being reported untested. Owns the browser preflight, the sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after a publish, evidence capture, and the security observations a render surfaces.
 version: "1.0.0"
 requires: A browser automation capability that can open a page, read page text and a DOM or accessibility snapshot, take a screenshot, click, and read console output where available (whatever browser MCP the harness has - e.g. firefox-devtools, Claude in Chrome, Claude's built-in browser, Playwright or Chrome DevTools MCP - or a headless driver otherwise); ODC MCP published-state reads (env_app, context_screens, context_search, context_roles); a wait that actually blocks; write access to the project's .fulcrum/ evidence folder.
 ---
@@ -115,11 +115,12 @@ rule)
 1. **Brief** the renderer blind: runtime URL and screen paths, the app key
    and the Development `env_key`, the assertions as observable outcomes, the
    sign-in mode and persona per assertion, viewport(s), the evidence folder,
-   the expected revision, whether it may change data, and whether screenshots
-   are allowed. On the design loop the viewport(s) come from
-   `.fulcrum/design/manifest.md`, and a brief may also ask for a reference
-   render of a local design file (an HTML source) into the evidence folder it
-   names (heading "Local-file reference render - no app"). Not the build's intent narrative. Plus everything in
+   the expected revision, whether it may change data, whether screenshots
+   are allowed, and on an app's first render, while `tenant-profile.md` has no
+   OutSystems UI version, that it reads one for the orchestrator to record. On
+   the design loop the viewport(s) come from `.fulcrum/design/manifest.md`, and
+   a brief may ask for a local design file's reference render (heading
+   "Local-file reference render - no app"). Not the build's intent narrative. Plus everything in
    `../fulcrum-unattended-guardrails/references/delegation.md`, heading "What
    a brief must contain".
 2. **Confirm live revision** with `env_app` before the first load.
@@ -179,9 +180,8 @@ failed network calls, observation. Layout and report format:
 `references/evidence-and-report.md`.
 
 **Screenshots: ask first** (Preflight, step 5): they can contain real data.
-Fulcrum never adds an ignore entry on its own. Until the answer is recorded, a
-render captures page text and the DOM snapshot only, writes no screenshot file,
-and the report says visibility was not captured. (Fulcrum rule)
+Fulcrum adds no ignore entry on its own. Until answered, a render writes no
+screenshot file and the report says visibility was not captured. (Fulcrum rule)
 
 ## Security observations - surface, never fix silently
 
@@ -202,7 +202,7 @@ and the report says visibility was not captured. (Fulcrum rule)
 - Comparison against a design, pixel or otherwise. The design loop's
   render-compare consumes this skill's captures:
   `../fulcrum-design-loop/references/render-compare.md`.
-- Load or performance testing; diagnosis or repair of what it sees.
+- Load testing; diagnosis or repair of what it sees.
 - Credential entry, account creation outside mode b, or role grants.
 
 ## Where the depth lives

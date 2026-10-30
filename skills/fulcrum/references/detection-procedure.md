@@ -43,6 +43,9 @@ index and never open `journal/<session-id>.md` to decide which of the two
 applies. That file is opened only by the loop engine, once it is already
 committed to resuming, to get recovery detail the row itself does not carry.
 
+Before dispatching on rows 5 and 6, glob `.fulcrum/lease.*.json` for `holder: user`:
+"A lease with `holder: user`" below. Row 4 still wins.
+
 ## The project.md marker
 
 **Before dispatching on rows 5-7, check the marker in `project.md`:** expect
@@ -116,6 +119,17 @@ A step that consumes an external system cannot start until
 heading "external/<system>.md"). Report which file is missing and route the next
 action to the user, or to a `Turn: external` task; building the system itself is out
 of family.
+
+### A lease with `holder: user`
+
+The app was handed to the user at a Studio `manual` row. Report that app's state as
+**user in Studio**, naming the lease's `task` and `acquired`, and ask whether the user has
+published. It is neither a crash nor a halt, and its age changes nothing: no Mentor
+session opens on that app until the user answers, because Studio work there is invisible
+and a second session on one app is the corruption path
+(`../../fulcrum-project-state/references/lease-and-concurrency.md`, heading "Studio
+hand-off"). Other apps route as usual. On "published":
+`../../fulcrum-design-loop/references/build-lanes.md`, heading "Studio lane", step 4.
 
 Detection degrades honestly rather than picking silently. Each case names what
 the router does; none of them is resolved by guessing.

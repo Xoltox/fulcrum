@@ -9,16 +9,16 @@ inside a web app halts when Mentor says so, and the re-spec adds an asset and a 
 
 ## 1. "Standalone Agent" is an entitlement refusal, and its meaning is unknown `[TENANT]`
 
-Text, verbatim `[VERIFIED]`, on the agent and on each Call Agent node:
-
-> The organization you're logged into doesn't support 'Standalone Agent'. Upgrade the organization to publish.
+The verbatim text and its validation shape:
+`../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Error texts", the row
+naming 'Standalone Agent'.
 
 **Not known.** The term is undefined in the vendor docs. That it means the Agentic App
 entitlement is inference only `[UNVERIFIED]`. Quote the text to the user; never state
 which licence fixes it.
 
-**Validation shape.** One "Unavailable feature" error per agent and per Call Agent
-node, no `OS-*` code `[VERIFIED]`. Mentor reads them as clearing later and carries on.
+**Mentor carries on.** It reads the "Unavailable feature" errors as clearing later
+`[VERIFIED]`, so a build turn reports nothing wrong.
 
 **Error count does not predict refusal** `[VERIFIED]`. One asset published at 2 errors,
 was refused at 4, then was refused back at the same 2. Other assets published with these
@@ -28,13 +28,13 @@ never as a standing yes or no.
 
 ## 2. Refused publish: no key, no `OS-*` code, no retry `[VERIFIED]`
 
-**Failure mode.** The Publish turn answers in text: no publish events, no publication
-key, no `OS-*` code. Nothing went live. It is not a build result and not transient, so a
-retry repeats it (refused three times running in one build).
+**Failure mode.** The Publish turn answers in text and nothing goes live:
+`mcp-surface.md`, heading "Publishing", row "A refused publish has no key". It is not a
+build result and not transient, so a retry repeats it.
 
-**Tell it apart.** Mentor also refuses a publish in text for ordinary validation errors
-`[SINGLE-OBSERVATION]`. Read the error text: it is this entry only when it names the
-feature (entry 1). Anything else is a fix turn.
+**Tell it apart.** A text refusal for ordinary validation errors looks the same. Read the
+error text: it is this entry only when it names the feature (entry 1). Anything else is a
+fix turn.
 
 **Do:** no retry. Close the session, since nothing in it can ship and the prompt is on
 the row (entry 4). Set the row `parked`, `Blocked on: the user`, and report the verbatim
@@ -110,7 +110,7 @@ caller needs the same guard.
 | Server Request Timeout on a Call Agent node cannot be set through Mentor; Studio only. Same for the agent itself, timers and screens | A `manual` row, or set it on the calling `RunServerAction` |
 | Client to server default 10 s. Cold agent call 24-25 s, warm 6 s; a light one 1 s | First call after idle fails unless the timeout is raised: `rest-and-integration.md` entry 15 |
 | Agent service actions are Text in and Text out | The consumer deserializes; see entry 11 |
-| `context_graph` errors for asset type Agent, `context_agents` gives only an app row, other `context_*` return 0 | Model binding and flow internals are readable only through Mentor read-back or Studio, so they are belief |
+| Agent `context_*` reads return next to nothing: `mcp-surface.md`, heading "Published-state inspection (context_*)" | Plan no proof on them: model binding and flow internals are belief until a real call shows them |
 
 ## 9. A new agent can take hours to become referenceable `[VERIFIED]`
 

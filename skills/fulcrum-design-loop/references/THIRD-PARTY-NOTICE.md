@@ -47,6 +47,8 @@ Derived files:
 - `osui-v3.0.0-theme.md`: condensed from `docs-ai/llms-tokens.txt`, `docs-ai/llms-utilities.txt`, `docs-ai/osui.icons.json`, `src/scss/01-foundations/_root.scss` and `stories/_helpers/token-data/*.ts`.
 - `block-map.md`: the library keys and the "More library blocks" table.
 
+Refresh path, maintainer only: `scripts/gen-osui-ref.py` at the repository root regenerates the two `osui-<tag>-*.md` files from a local clone of the tag, read as data. Nothing runs at install.
+
 ### BSD 3-Clause License text
 
 BSD 3-Clause License

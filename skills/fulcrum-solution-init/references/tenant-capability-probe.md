@@ -115,6 +115,11 @@ lands**, in the resulting model or rendered output. Never add a row to find out.
 **Input properties matter as much as existence.** A block that exists with different
 input names than a spec assumes fails at build time. Record the property names verbatim.
 
+**OutSystems UI version** sits beside this section in the profile. It is `first-row`: the
+reads need a rendered page, so `fulcrum-renderer` takes it on the app's first render,
+never with a row of its own (`../../fulcrum-render-check/SKILL.md`, heading "The
+procedure"), and the orchestrator records it.
+
 ## 3. Icon font family and name casing
 
 `first-row`, unless the app's published state already shows icons: placing an icon to

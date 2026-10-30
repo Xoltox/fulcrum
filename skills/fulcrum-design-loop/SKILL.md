@@ -1,16 +1,6 @@
 ---
 name: fulcrum-design-loop
-description: One-shot design-to-app for a single ODC app. Takes one design source - a
-  screenshot, concept image, mockup, Figma frames, an HTML page or TSX/React code - for an
-  app of about six or fewer screens, captures it into a per-screen widget-tree spec of real
-  OutSystems UI blocks, builds it through Mentor one step at a time, and render-compares
-  each published screen against the source with a bounded fix loop. Use when the user says
-  "build this screenshot", "turn this mockup into an app", "make this design work in
-  OutSystems", "one-shot this concept into ODC", "screenshot to app", "Figma to ODC app",
-  "build this HTML/TSX as an OutSystems app", or hands over one design for one app. Not
-  for multi-app solutions or piles of exports needing triage (fulcrum-solution-init), not
-  for an app that already exists (fulcrum-gap-analysis), not for an app with no design
-  once generating one is declined (fulcrum micro profile or fulcrum-discovery).
+description: Use when the user says "build this screenshot", "turn this mockup into an app", "make this design work in OutSystems", "one-shot this concept into ODC", "screenshot to app", "Figma to ODC app", "use Mentor to build this design", "build this HTML/TSX as an OutSystems app", or hands over one design for one app, even when the user does not mention Fulcrum. One-shot design-to-app for a single ODC app. Takes one design source - a screenshot, concept image, mockup, Figma frames, an HTML page or TSX/React code - for an app of about six or fewer screens, picks a build lane (image, Studio or text spec), captures it into a spec of real OutSystems UI blocks, builds it through Mentor one step at a time, and render-compares each published screen against the source with a bounded fix loop. Not for multi-app solutions or piles of exports needing triage (fulcrum-solution-init), not for an app that already exists (fulcrum-gap-analysis), not for an app with no design once generating one is declined (fulcrum micro profile or fulcrum-discovery).
 version: "1.0.0"
 requires: ODC MCP server authenticated; Mentor enabled on the tenant; an image-inspection
   capability for visual sources; a subagent mechanism with per-dispatch tier selection;

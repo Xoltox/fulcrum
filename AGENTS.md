@@ -6,7 +6,9 @@ derived from several ODC builds across different tenants and build styles, and
 their incident and build logs: the rules here encode what actually broke, and
 what proved a change had actually landed.
 
-This file is the entry point on harnesses without skill auto-triggering.
+This file is the entry point on harnesses without skill auto-triggering. In your
+own project, the one-line instruction in `INSTALL.md`, heading "Automatic
+triggers", does this job.
 
 ## Entry point
 
@@ -33,10 +35,12 @@ directly. Otherwise, load `skills/fulcrum`.
 | Where durable project state lives - `.fulcrum/` file set, the session lease, the halt record | `skills/fulcrum-project-state` |
 | Working through the task list - selecting the runnable frontier, dispatching, polling, verifying, recording, advancing | `skills/fulcrum-loop-engine` |
 | About to issue a Mentor turn, chunking a spec, unsure of session reuse vs fresh session, or a turn didn't land | `skills/fulcrum-mentor-turns` |
-| Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
+| Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, overlay, agent, workflow or sample sign-in | `skills/fulcrum-engine-traps` |
 | Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
 | Need to see a published screen render, signed out or signed in, or prove who can reach it | `skills/fulcrum-render-check` |
 | Seeding, resetting, or debugging sample/demo data | `skills/fulcrum-seed-data` |
+| Writing the demo script, checking demo readiness, or planning a scripted in-app tour | `skills/fulcrum-demo` |
+| Writing the demo script, checking demo readiness, or planning a scripted in-app tour | `skills/fulcrum-demo` |
 | Running many steps unattended, delegating to subagents, or defining stop/escalate rules | `skills/fulcrum-unattended-guardrails` |
 
 ## Non-negotiables

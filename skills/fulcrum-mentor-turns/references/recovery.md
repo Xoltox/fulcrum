@@ -85,6 +85,9 @@ trying to route around a policy denial; see the hard-stop list in
   publication key, or check `env_app` (`revision` vs the publication's
   `applicationRevision`). **Never re-publish on it** - a second
   revision building alongside the first can wedge the app. `[SCHEMA]`
+- Refused in text, with no publish events, no key and no `OS-*` code: nothing was
+  published, so there is nothing to poll, and a retry repeats it when the text names a
+  feature. `../../fulcrum-engine-traps/references/agents.md`, entry 2.
 
 ## 7. Abandoning an in-flight prompt or a whole stale session
 

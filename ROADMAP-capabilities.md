@@ -17,9 +17,15 @@ not dropped**: re-check on a later probe, and record per-tenant availability in
 `tenant-profile.md` section 1. Until they list again, live row data stays on the
 diagnostic REST endpoint (`skills/fulcrum-verification/references/diagnostic-endpoint.md`).
 
-Evidence rule: nothing here was executed. `[SCHEMA]` means the vendor's tool
-description asserts it; everything else is `[UNVERIFIED]`. `[SCHEMA]` beats
-inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
+**Status 2026-10-30:** done and out of the open list: `app_logs` / `app_traces` as
+proof rung 4, `app_health` as the runtime stop, `mentor_request_upload` through the
+image lane, the module graph and rigor dial, agent, workflow and sample sign-in
+traps, build lanes, and `fulcrum-demo`. What remains unproven is under "Open live
+evaluations"; what remains unbuilt is under "Follow-ups".
+
+Evidence rule: nothing here was executed unless marked done. `[SCHEMA]` means the
+vendor's tool description asserts it; everything else is `[UNVERIFIED]`. `[SCHEMA]`
+beats inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 
 
 ## Summary
@@ -28,12 +34,12 @@ inference, loses to `[VERIFIED]` - confirm live before a skill asserts it.
 |---|---|---|---|
 | `test_setup_start` / `test_setup_status` (absent 2026-10-16, parked) | Forked, disposable test app with an invocation harness | New skill: `fulcrum-runtime-harness` | Mutating - publishes a revision; refuses Production |
 | `exec_in_app` (absent 2026-10-16, parked) | Invoke any Server Action directly, with a log tail | `fulcrum-verification`, `fulcrum-seed-data` | Mutating as the invoked action is; runs against the fork |
-| `app_logs` / `app_traces` | Post-deploy error and span evidence | `fulcrum-verification` (new proof rung) | Read-only |
-| `app_health` / `env_health` | Error-rate and latency aggregates per app/env | `fulcrum-verification`, `fulcrum-unattended-guardrails` | Read-only |
+| `app_logs` / `app_traces` | Post-deploy error and span evidence | Done: `fulcrum-verification` rung 4 | Read-only |
+| `app_health` / `env_health` | Error-rate and latency aggregates per app/env | Done for `app_health`: `fulcrum-unattended-guardrails` runtime stop | Read-only |
 | `deploy_impact` / `deploy_impact_status` | Blast radius before promotion | New: safe-promotion section | Read-only analysis |
 | `deploy_rollback` / `build_list` / `deploy_start` | Cross-environment promotion and an undo for a **deployed** asset | New: safe-promotion section | High - mutating, needs human confirm |
 | `mentor_get_event` | Recover a truncated run event (now on the live surface) | `fulcrum-mentor-turns` | Read-only |
-| `mentor_request_upload` | Attach images and documents to a Mentor prompt (`attachmentRefs`; limits in `fulcrum-mentor-turns/references/mcp-surface.md`) | `fulcrum-solution-init` | Low; the presigned URL is a credential |
+| `mentor_request_upload` | Attach images and documents to a Mentor prompt (`attachmentRefs`; limits in `fulcrum-mentor-turns/references/mcp-surface.md`) | Done: `fulcrum-design-loop` image lane | Low; the presigned URL is a credential |
 | `mentor_create_asset` `templateAssetKey` | DEPRECATED, do not call (2026-10-30 listing). Template cloning has no replacement recorded; unprobed | `fulcrum-solution-init` | n/a |
 | `submit_feedback` | Agent-side telemetry on wrong-tool / empty-result events | `fulcrum-unattended-guardrails` | Read-only side channel |
 | `context_graph` | XRE / Graphviz whole-model export | `fulcrum-gap-analysis` (already cited) | Read-only, capacity-gated |
@@ -190,9 +196,9 @@ the tool mints a presigned PUT URL, `attachmentRefs` takes at most 3, and images
 are accepted and worked with `assetRefs`. Mentor read images and built from them,
 but no attachment became an app resource in the render, and CSV and JSON were read,
 not imported. So an attachment is a way to show Mentor a design or spec, not a way
-to put a logo or file into the app. Images as a design-to-app path is therefore
-reading only; whether the design loop's region turns gain anything from attached
-files over inline text is open and belongs to the design loop's live evaluation.
+to put a logo or file into the app. Done: the image lane in
+`skills/fulcrum-design-loop/references/build-lanes.md` builds on this. Images reach
+Mentor as reading only, and complex layouts and real data are `[UNVERIFIED]`.
 
 ## `context_graph` vs the rest of `context_*`
 
@@ -244,18 +250,16 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
    per-endpoint Mentor turns, revisions and permanent artifact debt become one
    disposable non-prod fork per session. Biggest single reduction in Fulcrum's
    verification cost.
-3. **`app_logs` + `app_traces` are a missing proof rung.** Cheap, read-only,
-   no setup, and they serve the core thesis directly. Lowest effort of the top
-   three; do this first even though it ranks third by value.
+3. **`app_logs` + `app_traces` are a missing proof rung.** Done: rung 4 in
+   `skills/fulcrum-verification/SKILL.md`.
 4. **`test_setup_start` warrants a new skill** (parked: absent on the 2026-10-16 listing). It is the substrate items 2 and
    1 both stand on.
-5. **`app_health` errorPercent as an unattended halt signal.** Fulcrum's stop
-   conditions are all model- and turn-shaped; none is runtime-shaped.
+5. **`app_health` errorPercent as an unattended halt signal.** Done: the runtime
+   step-change stop in `skills/fulcrum-unattended-guardrails/SKILL.md`.
 6. **`context_graph`'s concurrency limit contradicts fan-out delegation.** Small,
    but a rule Fulcrum would otherwise violate by design.
-7. **Attachments reach Mentor but did not become app resources** - record it so no
-   future design-to-app work assumes an image import path
-   (`mcp-surface.md`, "Tool families").
+7. **Attachments reach Mentor but did not become app resources.** Done: recorded in
+   `mcp-surface.md`, "Tool families", and carried by the image lane.
 
 ## Out of scope / not worth it
 
@@ -277,19 +281,43 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   it produces no evidence the run can act on. Mention once in the guardrails
   skill as an optional courtesy; never gate on it.
 
+## Open live evaluations
+
+None of these has run. Until one does, the matching text stays `[UNVERIFIED]`.
+
+- **Live evals, never run.** The design loop on a throwaway app: until it runs, the
+  loop's render-compare and capture are `[UNVERIFIED]` end to end. Trigger evals: the
+  skill descriptions over sample phrases ("use Mentor to add a Customers screen",
+  "here is the BRD", "build me an app in OutSystems").
+- **Sample sign-in recipe, unrun end to end**
+  (`skills/fulcrum-engine-traps/references/sample-signin.md`).
+- **Scripted tour, unrun.** No run has built one (`skills/fulcrum-demo/SKILL.md`).
+- **Agent replay, unrun.** The replay work order for a refused publish
+  (`skills/fulcrum-engine-traps/references/agents.md`).
+- **Three-screen comparison on a real design.** One prompt with three images beat
+  three prompts once, on simple screens; variance is not ruled out, so it stays a
+  starting batch.
+- **Trigger hook, unrun in a live session.** Sample stdin only
+  (`HARNESS-NOTES.md`, heading "Hooks").
+
 ## Follow-ups
 
+- **Claude Code plugin.** Packaging only, not a new trigger: skills, agents and the
+  hook installed and updated as one unit. Open before building: whether a namespaced
+  skill breaks plain-name cross-references, and whether a project-scope install is
+  the default. A plugin cannot ship the instruction line, and its hooks run in every
+  session, so they keep their self-gate. A `PreToolUse` check on Mentor tools is the
+  one deterministic trigger left, and it belongs here if layers 1 to 3 still miss.
 - **Executable surface-drift check.** A small script that diffs `tools/list` names
   and parameters against the latest `mcp-snapshots/*.md` and emits only the delta,
-  so the orchestrator never loads schemas itself. Until then the preflight drift
-  check is names-only (`skills/fulcrum/references/tool-preflight.md`).
+  so the orchestrator never loads schemas itself. Until then the full check is a
+  delegated read-only investigator (`skills/fulcrum/references/tool-preflight.md`).
 - **Design-compare - shipped as `fulcrum-design-loop`.** One design source for
   one app captured into a per-screen spec, built step by step, and each published
   screen render-compared against its reference by a blind verifier with image
   inspection (structural or visual bar; pixel-exact is not offered). The render
   skill still stops at capture; the design loop consumes its evidence folder. Open:
-  the live evaluation on a throwaway app; until it runs, the loop's render-compare and capture are `[UNVERIFIED]`
-  end to end.
+  the live evaluation, above.
 - **Full MCP re-probe - done 2026-10-16** (snapshot
   `skills/fulcrum-mentor-turns/references/mcp-snapshots/2026-10-16.md`; rows in
   `mcp-surface.md`). Not tested on it, open as follow-ups: `portfolioKey` omission;
@@ -304,7 +332,6 @@ approves a `ReadyForReview` operation into a **tenant-level asset**.
   (more than 25 minutes, end not seen) and `context_graph`'s own lag; the error texts
   `Portfolio ID is required.`, `asset_type_not_listable_by_env_app` and
   `invalid_env_key`; uploading to an attachment slot and attaching it to a prompt.
-- **Probe the renderer end to end** on one generated app in Dev: confirm the
-  sample-persona flow, sign-out, and what console/network signal the browser
-  tool really returns; then promote the `[SINGLE-OBSERVATION]` / `[UNVERIFIED]`
-  tags in `fulcrum-render-check`.
+- **Renderer probe.** Exercised in field builds and hardened on 2026-10-30. Open:
+  what console and network signal a browser tool really returns, then promote the
+  remaining `[SINGLE-OBSERVATION]` / `[UNVERIFIED]` tags in `fulcrum-render-check`.

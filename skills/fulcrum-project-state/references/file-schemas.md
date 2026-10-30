@@ -38,7 +38,7 @@ writer per shared file removes the race and makes staleness one agent's job to f
 | `JOURNAL.md` | the orchestrator; each working session writes **only its own index row** | Drivers never edit the index, `InFlight` or `Tasks` |
 | `journal/<session-id>.md` | the orchestrator, which mints the session id and creates the file | A driver appends rows only to the session or lane file whose path its brief names |
 | `RUN-IDS.md` | whoever issued the run (a driver, or the orchestrator acting as one) | Append only. With parallel lanes a driver appends to its lane file ("Lane files") |
-| `lease.<app>.json` | **the orchestrator only** (Fulcrum rule): one per app a dispatch holds, taken before a Mentor dispatch, released when it returns `session_state: closed`; held (with `open_session`) when it returns `session_state: open` | Drivers and pollers never write it; no per-poll refresh |
+| `lease.<app>.json` | **the orchestrator only** (Fulcrum rule): one per app a dispatch holds, taken before a Mentor dispatch, released when it returns `session_state: closed`; held (with `open_session`) when it returns `session_state: open`; written with `holder: user` at a Studio hand-off | Drivers and pollers never write it; no per-poll refresh |
 | `HALT.md` | **the orchestrator only** | A driver reports and stops. Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
 | `demo-script.md` | the agent running the demo script row, that path only | Skill `fulcrum-demo` owns the format; G2 at `demo` reads it |
 | `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
@@ -151,7 +151,7 @@ read and takes the lease. The rest are not:
 | Turn | Means | Lease |
 |---|---|---|
 | `verify` | Proof with no Mentor rung, run at every rigor. Emitted only for joins, G2 and owed G3 | none |
-| `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none |
+| `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none; a Studio hand-off writes `holder: user` (`lease-and-concurrency.md`, heading "Studio hand-off") |
 | `code` | Repository code the agent writes outside Mentor - an External Logic library's source, a script, a test harness | none |
 | `infra` | Infrastructure or environment work - gateway, connector, CI, local tooling | none |
 | `external` | Building, deploying or changing an external system or integration target (`external/<system>.md`) | none |
@@ -275,6 +275,10 @@ difference. Resolve it against the lease, never by guessing:
 |---|---|---|
 | Live lease held by that session id | The session is running now, or died inside its TTL | Wait or stop the lane. Never take. `../../../AGENTS.md`: one Mentor session per app. Dead: adopt it (`lease-and-concurrency.md`, heading "Resuming after a dead session"). |
 | No lease, or an expired one whose holder's dispatch is known dead (no return, budget exceeded) | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
+
+A `holder: user` lease belongs to no session, so it answers neither row: read it as "user
+in Studio" for that app, whatever its age (`lease-and-concurrency.md`, heading "Studio
+hand-off").
 
 ### Index growth - the arithmetic
 
@@ -559,5 +563,5 @@ neither wrote the file. `[VERIFIED]` Contents and clearing: `resume-and-halt.md`
 
 ## lease.<app>.json
 
-Not committed. One per app, including each app of a multi-asset dispatch. See
-`lease-and-concurrency.md`.
+Not committed. One per app, including each app of a multi-asset dispatch. `holder: user`
+marks an app handed to the user in Studio. See `lease-and-concurrency.md`.

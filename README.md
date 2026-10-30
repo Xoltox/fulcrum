@@ -17,6 +17,10 @@ Derived from multiple zero-shot, one-shot, multi-shot, and long-running ODC buil
 - [The skills](#the-skills)
 - [Quickstart](#quickstart)
 - [How it is meant to be used](#how-it-is-meant-to-be-used)
+- [The standard path](#the-standard-path)
+- [Design lanes](#design-lanes)
+- [Agent assets: the honest limits](#agent-assets-the-honest-limits)
+- [What is untested](#what-is-untested)
 - [Non-negotiables](#non-negotiables)
 - [Model tiers](#model-tiers)
 - [Conventions](#conventions)
@@ -32,7 +36,7 @@ longer, unattended, many-step builds that came after - the kind where nobody
 is watching to notice a Mentor turn quietly go sideways at step 23 of 47.
 
 - **Platform success signals are unreliable in both directions.** Zero validation errors and a clean publish are compatible with blank rows, empty repeaters, unrendered icons, and corrupted content. Model-layer checks are structurally blind to whole defect classes.
-- **Tenant-varying facts get probed once per project during init**, then referenced thereafter. Differences in available UI blocks, icon fonts, meridiem tokens, and Mentor backend identifiers are never hardcoded. Tool-specific facts live, dated, in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
+- **Tenant-varying facts are read, asked at intake, or recorded on the first real row that needs them**, then referenced thereafter - never a spike. Differences in available UI blocks, icon fonts, meridiem tokens, and Mentor backend identifiers are never hardcoded. Tool-specific facts live, dated, in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
 - **Every rule carries its failure mode explicitly.** Measured finding: prompts that named *why* a construct fails stopped the failure recurring. Prompts that only said "don't" did not.
 - **Claims carry explicit evidence strength tags:** `[VERIFIED]` (observed multiple times), `[SINGLE-OBSERVATION]` (real but not generalized), `[UNVERIFIED]` (inferred only), `[TENANT]` (deferred to the profile), or `[SCHEMA]` (asserted by the vendor's own MCP tool documentation, not observed live).
 - **Hand-restated rules degrade over a long build.** These rules are packaged as skills so the same logic runs unmodified across many sessions, on any harness.
@@ -42,19 +46,20 @@ is watching to notice a Mentor turn quietly go sideways at step 23 of 47.
 
 | Skill | Owns | When it fires |
 |---|---|---|
-| `fulcrum` | The router and entry point: detecting engagement state from the filesystem and tenant, resuming, mode selection, guided-mode question discipline, dispatching to the right skill | Load this first on any harness without skill auto-triggering. It routes; it performs no Mentor turn, verification, or planning itself. |
+| `fulcrum` | The router and entry point: detecting engagement state from the filesystem and tenant, resuming, mode selection, asking `Rigor`, guided-mode question discipline, dispatching to the right skill | Any OutSystems, ODC or Mentor work. Load this first on any harness without skill auto-triggering. It routes; it performs no Mentor turn, verification, or planning itself. |
 | `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements; producing the brief that `fulcrum-solution-init` ingests | Before any plan exists and nothing is written down yet. |
-| `fulcrum-solution-init` | Ingesting source material; decomposing into apps, agents, workflows; sizing phases and steps; probing tenant capabilities; scaffolding repo and specs | Once per project, before any Mentor turn. Run on deep-reasoning tier. |
-| `fulcrum-design-loop` | One design source (screenshot, concept image, mockup, Figma frames, HTML or TSX) for one app of about six or fewer screens: capture into a per-screen spec of real OutSystems UI blocks, the block-mapping gate, step decomposition, render-compare against the source with a bounded fix loop | When the router proposes it for one design and one app and the user confirms, or per app from `fulcrum-solution-init` for a visual or code source. |
+| `fulcrum-solution-init` | Ingesting source material; decomposing into apps, agents, workflows; emitting the task graph; asking `Rigor`; read-only tenant checks; scaffolding repo and specs | Once per project, before any Mentor turn. Run on deep-reasoning tier. |
+| `fulcrum-design-loop` | One design source (screenshot, concept image, mockup, Figma frames, HTML or TSX) for one app of about six or fewer screens: build lanes (image, Studio, text spec), capture into a spec of real OutSystems UI blocks, the block-mapping gate, step decomposition, render-compare against the source with a bounded fix loop | When the router proposes it for one design and one app and the user confirms, or per app from `fulcrum-solution-init` for a visual or code source. |
 | `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, remediation sequencing | When an app already exists (generated or inherited) and you need to know where it stands against its requirements before planning further work. |
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and ceiling; session reuse vs fresh session; staleness guard before mutations; polling cadence (rate depends on whether a discardable poller absorbs the cost); run-id durability; publish sequencing | Before issuing any `mentor_start_session` / `mentor_prompt` call and during turn-by-turn execution. |
-| `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming | When building or editing any screen component or model element. |
-| `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
+| `fulcrum-engine-traps` | Construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST integrations, static entities, charts, overlays, wizards, theming, agents, workflows, sample sign-in | When building or editing any screen component or model element. |
+| `fulcrum-verification` | Proof obligations; the gates G0 to G3 and the rigor table; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern for live data; what platform signals do and do not mean | Before marking any build step done. After publish. When changes seem not to land. |
 | `fulcrum-render-check` | Rendering published screens in a browser: preflight, sign-in modes (anonymous, generated sample personas, user hand-off), render timing, evidence capture, security observations | After a publish passes the gate, for any step that adds or changes a screen, and for access checks. |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static-entity identifiers; reset and teardown paths | Before building any screen that reads from data. |
+| `fulcrum-demo` | The demo script format (`.fulcrum/demo-script.md`), the readiness checklist, the optional scripted in-app tour | Preparing a demo, and the demo script row of a `demo` rigor build. |
 | `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps; halt-and-report rules; subagent depth and delegation; context and call budgeting; checkpoints and handoff discipline; Mentor concurrency locks; model tier policy | Load before the first dispatch of any long unattended session. |
 | `fulcrum-project-state` | The `.fulcrum/` file contract: file set and schemas, append-only vs rewritten discipline, crash-idempotent write ordering, the one-session-per-app lease, the decision record, the halt record | Whenever any Fulcrum skill needs to read or write durable project state. |
-| `fulcrum-loop-engine` | The iteration mechanism: select task, precondition/staleness check, dispatch, poll, verify, record, advance; the bounded fix-loop; oscillation detection against `JOURNAL.md`; per-iteration budget accounting | Running through the task list - "work through the tasks," "run the next task," "resume the loop." |
+| `fulcrum-loop-engine` | The iteration mechanism: select the runnable frontier, precondition/staleness check, dispatch parallel lanes, poll, verify, record, advance; the bounded fix-loop; oscillation and stall detection; per-iteration budget accounting | Running through the task list - "work through the tasks," "run the next task," "resume the loop." |
 
 ## Quickstart
 
@@ -71,6 +76,12 @@ default branch) following INSTALL.md.
 Your agent knows where its own skills directory lives, and `INSTALL.md` walks it through a short interview to resolve model tiers and wait-primitive support. Install from a released tag, not the tip of the default branch - a tag is a revision someone reviewed and froze.
 
 For harnesses without skill auto-triggering, `AGENTS.md` is the entry point: it routes by situation to the named skill.
+
+**Making it fire on its own.** Three layers, in `INSTALL.md` under "Automatic triggers":
+
+1. Skill descriptions lead with the words a user types, including "use Mentor to" and a BRD in the folder. Nothing to install.
+2. One conditioned line in a project or workspace instruction file, never at user scope. Recommended. The install asks, because it writes a file you own.
+3. An opt-in hook (Claude Code, Node, one file): hints on a `.fulcrum/` directory or on `outsystems`, `odc`, or `mentor` with `.fulcrum/` present, silent otherwise. It never blocks. Not installed by default; a hook is a command that runs every session, so the install shows it and asks.
 
 ## How it is meant to be used
 
@@ -89,6 +100,54 @@ On a harness without skill auto-triggering, load `AGENTS.md` first - it names `f
 
 Tiers are vendor-neutral - see [Model tiers](#model-tiers) below for the mapping and rationale.
 
+## The standard path
+
+The plan is a module graph, not a line of stages. Parallelism is the point: one Mentor session per app, as many apps as the frontier allows.
+
+- **Module graph.** `fulcrum-solution-init` splits the solution into apps, agents and workflows and emits a task graph: `TASKS.md` rows with `App`, `DependsOn` and `Batchable`. Foundation rows run first and serially, lanes fan out per app, and they join at integration, with gate rows last. No spike rows: an unknown is asked at intake or tried on the first real row, which fails fast.
+- **Lanes.** Each app is a lane with the same inner order: base, UI, logic, polish. `fulcrum-loop-engine` runs the whole runnable frontier in parallel, and the slowest lane gates nobody. Work that needs no Mentor session (renders of a published revision, seed design, the demo script) runs alongside.
+- **Rigor dial.** `demo`, `pilot` or `production`, asked at init in every mode, never defaulted or inferred. It sets depth of evidence only, never safety and never posture. Two of the field builds overspent because depth was never chosen.
+- **Gates.** G0 publish gate, G1 runtime check, G2 blind pass by a separate verifier, G3 per-row proof. Which gate runs when is one table in `skills/fulcrum-verification/SKILL.md`, heading "Gates and rigor"; it is not restated here.
+- **User-action rows.** What only a person can do (a Studio shell, a role grant) is a `manual` row, and a row waiting on a user parks only its dependents.
+
+## Design lanes
+
+`fulcrum-design-loop` asks one lane per app:
+
+| Lane | Who builds | Carries the design by |
+|---|---|---|
+| `image` (recommended) | The Mentor driver | Uploaded images on `mentor_prompt`, at most 3 per prompt |
+| `studio` | You, in Studio Mentor, from a work order | Images fed to Studio's image input |
+| `text` | The Mentor driver | Region-by-region anatomy; the most turns |
+
+The image lane reads a picture and builds from it, on a new app and on an existing one. Only simple screens were tried: complex layouts and real data are `[UNVERIFIED]`, so the text lane stays complete. An attachment is read by Mentor; it does not become an app resource, so a logo or file still needs its own path. Render-compare against the source runs on every lane.
+
+## Agent assets: the honest limits
+
+Fulcrum can plan and drive an agent asset, but it cannot promise you a publish.
+
+- **A publish can be refused.** The text names a "Standalone Agent" entitlement. The term is undefined in the vendor docs, so Fulcrum quotes it and never says which licence fixes it. Refusal changed over time on the same asset, and the error count does not predict it.
+- **A refused publish has no key and no `OS-*` code, and a retry repeats it.** The row parks, you are told the verbatim text, and every other lane keeps moving.
+- **The shell comes from Studio**, as a `manual` row: Mentor-built shells were not reliable.
+- **Studio cannot rescue a refused turn.** It cannot see a harness turn that was never published, so that work is gone with the session. The row keeps the exact prompt as a replay work order; that replay has never been run.
+- **A new agent can take hours to become referenceable**, overnight in one case, so its consumer rows start `blocked`.
+- **Almost nothing inside an agent is readable** through `context_*`. Model binding and flow internals rest on Mentor read-back or Studio, so a claim about them is belief, and only a real call proves runtime.
+
+Details: `skills/fulcrum-engine-traps/references/agents.md`.
+
+## What is untested
+
+Stated so you do not assume otherwise. `ROADMAP-capabilities.md`, heading "Open live evaluations", tracks each one.
+
+- **The v0.6 path has not run as a whole.** Its parts come from field builds and probes on throwaway apps; no build has gone end to end on the module graph and rigor dial, and the rigor table is unmeasured.
+- **Live evals were never run**, neither the design loop's render-compare and capture end to end, nor trigger evals on the skill descriptions.
+- **The sample sign-in recipe has not been run end to end.**
+- **The scripted tour has not been built by any run.**
+- **The agent replay work order has not been run.**
+- **One prompt with three images beat three prompts once, on simple screens.** It has not been repeated on a real design, so it is a starting batch, not a rule.
+- **The trigger hook has only seen sample stdin**; it has never run in a live session.
+- **Other harnesses.** Everything has been exercised on one harness only.
+
 ## Non-negotiables
 
 These hold even if no skill file is ever loaded (from `AGENTS.md`):
@@ -96,7 +155,7 @@ These hold even if no skill file is ever loaded (from `AGENTS.md`):
 - Never publish from a Mentor session whose model state you have not just verified - a stale model reverts completed work while the revision number still advances.
 - One Mentor session at a time **per app** (concurrency across different apps is allowed; the ceiling is unpublished and may change server-side). `[VERIFIED]` Mentor can only handle one prompt at a time per session: a `mentor_prompt` call issued while a prior prompt is still running is silently ignored, not rejected with an error.
 - Aggressive orchestration is the default, not an advanced option: delegate poll loops and read-only inspection to subagents; keep judgement and verification verdicts in the orchestrator. Mutating work is depth 1 always.
-- One subagent depth level. No nesting.
+- One subagent depth level, with one exception: the Mentor-driver role may spawn exactly one nested poller that only waits and reports.
 - The orchestrator never calls Mentor, issues the "Publish" turn, polls `publish_status`, calls REST, or runs gate scripts itself - it dispatches.
 - Zero validation errors and a clean publish prove nothing about rendering or logic.
 - Stuck twice on the same problem means stop and report. Never escalate model tier to break a stuck bug.
@@ -127,18 +186,18 @@ All skills are bound by the authoring contract in `CONVENTIONS.md`. Read it befo
 Two headline rules:
 
 - **Harness agnostic.** No vendor model names (use tier vocabulary from `MODEL-TIERS.md`), no harness tool names, no harness-specific frontmatter in skill bodies.
-- **Platform truth by default.** Every rule is general ODC/Mentor truth, not incident history from one build. Tenant-varying facts are probed via `tenant-profile.md`, never hardcoded. Rules state their failure mechanism.
+- **Platform truth by default.** Every rule is general ODC/Mentor truth, not incident history from one build. Tenant-varying facts go through `tenant-profile.md`, never hardcoded. Rules state their failure mechanism.
 
 <details>
 <summary>Full authoring contract detail</summary>
 
 - **Hard rule 1 - harness agnostic.** Never name a harness-specific tool as the required instrument; say what capability is needed and let the agent map it. Never name a model - use tier vocabulary. ODC MCP tool names (`mentor_start_session`, `mentor_request_upload`, `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`, `env_app`, `app_revisions`, `context_*`) are allowed since they are the ODC surface itself, written bare with no harness-specific prefix. No harness-specific frontmatter (`allowed-tools`, slash-command syntax, `$ARGUMENTS`) in a skill body. Harness quirks go in `HARNESS-NOTES.md`, never in a skill.
-- **Hard rule 2 - platform truth by default.** Strip all project nouns; keep the consequence, drop the anecdote. Tenant-varying facts are probed once per project by `fulcrum-solution-init` into `tenant-profile.md`, and skills reference the profile rather than hardcoding the answer.
+- **Hard rule 2 - platform truth by default.** Strip all project nouns; keep the consequence, drop the anecdote. Tenant-varying facts live in `tenant-profile.md`, read, asked, or recorded on the first real row, and skills reference the profile rather than hardcoding the answer.
 - **Hard rule 3 - state the mechanism, not just the ban.** A rule that cannot state what breaks is not ready to write.
 - **Hard rule 4 - mark evidence strength** on any claim that is not directly observed: `[VERIFIED]`, `[SINGLE-OBSERVATION]`, `[UNVERIFIED]`, `[TENANT]`.
 - **Skill file layout:** `SKILL.md` thin (target under 200 lines) plus `references/*.md` loaded on demand, and `templates/` where applicable.
 - **Frontmatter** is a portable subset only: `name`, `description`, `version`, `requires`. No `allowed-tools`, `license`, `compatibility`, or `metadata:` block.
-- **Cross-references** are relative paths (`../fulcrum-verification/SKILL.md`), never `§`-numbered anchors.
+- **Cross-references** are relative paths (`../fulcrum-verification/SKILL.md`), never section-number anchors.
 - **Tone:** terse, imperative, evidence-first. No hedging, no filler, no praise. A rule per line where possible. The reader is an agent mid-task with limited context - every line must earn its place.
 
 Skill boundaries (one topic, one owner) and the full canonical-facts list (polling cadence math, subagent depth exception, gap-analysis finding taxonomy, coverage-denominator rule) are in `CONVENTIONS.md` itself - read it directly rather than through this summary before editing any skill.
@@ -166,7 +225,7 @@ fulcrum/
       templates/                  # Handoff and spec templates; tenant-profile skeleton
     fulcrum-design-loop/
       SKILL.md
-      references/                 # Intake, capture recipes, design spec format, block map, archetypes, render-compare, interop, third-party notice
+      references/                 # Intake, build lanes, capture recipes, design spec format, block map, OutSystems UI reference, archetypes, render-compare, interop, third-party notice
       templates/                  # Manifest, screen, fidelity and report templates
     fulcrum-gap-analysis/
       SKILL.md
@@ -194,6 +253,8 @@ fulcrum/
     fulcrum-seed-data/
       SKILL.md
       references/                 # Idempotent loader pattern
+    fulcrum-demo/
+      SKILL.md                    # Demo script format, readiness, scripted tour
     fulcrum-unattended-guardrails/
       SKILL.md
       references/                 # Halt conditions, budgeting, checkpoints, delegation rules
@@ -201,7 +262,10 @@ fulcrum/
     README.md                     # Agent roles: why, tool classes, harness mapping
     roles/                        # Harness-neutral role specs: poller, mentor driver, verifier, renderer, capturer
     claude-code/                  # Claude Code adapters, installed by install.sh
-  install.sh                      # Portable installer: skills/ and Claude Code agents
+      hooks/                      # Opt-in trigger hook, copied only with install.sh --hooks
+  scripts/
+    gen-osui-ref.py               # Maintainer-only: refreshes the OutSystems UI reference; never run at install
+  install.sh                      # Portable installer: skills/, Claude Code agents, opt-in hook
   AGENTS.md                       # Entry point for harnesses without skill auto-triggering
   CONVENTIONS.md                  # Authoring contract (binding)
   MODEL-TIERS.md                  # Tier vocabulary and vendor mapping
@@ -219,9 +283,9 @@ fulcrum/
 <summary>For a person installing without an agent's help</summary>
 
 1. **Find your skills directory.** Claude Code reads from `~/.claude/skills/`. Other harnesses commonly use `~/.agents/skills/` by convention - check your harness's own docs if unsure.
-2. **Copy all thirteen skill directories in whole**, not just their `SKILL.md` files: `fulcrum`, `fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-design-loop`, `fulcrum-gap-analysis`, `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-render-check`, `fulcrum-seed-data`, `fulcrum-unattended-guardrails`. Each carries a `SKILL.md` plus a `references/` directory, and some carry a `templates/` directory - a skill missing its `references/` is broken even though it looks installed.
-3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`). `--dry-run` prints what it would do without changing anything. It is additive only - it never deletes anything already in the target directory.
-4. **Verify the install.** Confirm each of the thirteen directories exists at the target path with its `SKILL.md` and `references/` intact, and that your agent's skill listing (or equivalent discovery mechanism) picks them up.
+2. **Copy all fourteen skill directories in whole**, not just their `SKILL.md` files: `fulcrum`, `fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-design-loop`, `fulcrum-gap-analysis`, `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-render-check`, `fulcrum-seed-data`, `fulcrum-demo`, `fulcrum-unattended-guardrails`. Almost all carry a `references/` directory beside `SKILL.md`, and some a `templates/` directory - a skill missing its `references/` is broken even though it looks installed.
+3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`). `--dry-run` prints what it would do without changing anything. It is additive only - it never deletes anything already in the target directory. `--hooks` also copies the opt-in trigger hook and prints its settings snippet; it never edits a settings file.
+4. **Verify the install.** Confirm each of the fourteen directories exists at the target path, whole, and that your agent's skill listing (or equivalent discovery mechanism) picks them up.
 5. **Update later** by re-running step 2 or 3 against a newer tag - both are safe to re-run and only add or overwrite files this repo ships.
 
 > [!NOTE]

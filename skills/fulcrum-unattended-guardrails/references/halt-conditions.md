@@ -90,7 +90,7 @@ open `sessionId` (`../../fulcrum-project-state/references/lease-and-concurrency.
 | Trigger | Detail |
 |---|---|
 | A previously verified behaviour now fails, beyond one app | Regression. Continuing builds on a corrupted state. Confined to one app: "Lane stops" below |
-| A step needs the **user's own action** | A portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
+| A step needs the **user's own action** | A portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a role grant, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
 | **Mentor capacity stop** | With no other driver in flight, the first turn of a session still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
 | The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause - if so, fix it and disclose prominently"* |
@@ -199,6 +199,11 @@ simply not the agent's to take. Write the checkpoint, set the `TASKS.md` row to 
   Before handing off, try an approved generated sample persona
   (`delegation.md`, heading "A UI check behind a sign-in is a user-action
   hand-off").
+- **A role grant.** A role-gated app has no authenticated render until the user holds
+  the role in Development, and neither an agent nor the renderer can grant it. Ask when
+  the plan is made, not when the render is due: asked late, it parks the render with the
+  build already done (`../../fulcrum-render-check/references/harness-limits.md`, heading
+  "Session identity"). `[SINGLE-OBSERVATION]`
 - A portal-only operation and an upload with no MCP path follow the same shape.
   Lost auth does not: every lane shares it, so it is a halt ("Hard stops" above).
 

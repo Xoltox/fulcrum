@@ -109,6 +109,16 @@ foundation (serial)      shared entities, cross-app contracts
   `Unblocks when` "element shows in `context_actions`". Plan other rows of that lane
   around the wait: the lane never stalls on it. A Workflow can be made with its app in one multi-asset session; a library cannot
   (`../../fulcrum-mentor-turns/references/mcp-surface.md`).
+- **An agent's shell comes from Studio.** Emit a `manual` row, parked `Blocked on: the
+  user`, ahead of the agent's first Mentor row, which depends on it: "Create agent shell
+  `<Name>` in Studio, publish it once, send the asset key." A Mentor-made shell has come
+  out empty or unreferenceable, and an unpublished one is unreachable from another
+  session (`../../fulcrum-engine-traps/references/agents.md`, entries 3 and 10).
+- **Agent consumers need the index too.** Emit the row `blocked`, depending on the row
+  that publishes the agent, `Blocked on` naming that producer, `Unblocks when` "service
+  action shows in `context_actions`". The wait has run overnight, not minutes, so plan
+  the lane's other rows around it (`agents.md`, entry 9). The agent is its own `App` lane:
+  a parked agent row holds only its dependents (`agents.md`, entry 5).
 
 ### Gate rows
 

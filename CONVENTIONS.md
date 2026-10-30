@@ -92,7 +92,7 @@ Skills must **reference the profile, never hardcode the answer**:
 
 Facts belonging in the profile include, at minimum: which UI blocks exist
 (`Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`);
-icon-font family and name casing; available `ModelFeature_*` flags;
+the OutSystems UI version; icon-font family and name casing; available `ModelFeature_*` flags;
 meridiem/format-token behaviour; whether server actions can be marked public;
 Mentor backend identifier; and the Mentor prompt-length ceiling.
 
@@ -169,8 +169,9 @@ Skills reference roles **by role name only** (`fulcrum-poller`,
 ```yaml
 ---
 name: <directory name, exactly>
-description: <what it does, then "Use when ..." with concrete trigger phrases a
-  user would actually type. This is the auto-trigger surface - be specific.>
+description: <"Use when ..." first, with concrete trigger phrases a user would
+  actually type, then what it does. Under 1,536 characters. This is the
+  auto-trigger surface - be specific.>
 version: "1.0.0"
 requires: <capabilities in prose, e.g. "ODC MCP server authenticated; Mentor
   enabled on the tenant; a browser automation capability for visual proof">
@@ -313,7 +314,7 @@ Overlap causes mis-triggering. One topic, one owner:
 |---|---|---|
 | `fulcrum-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; emitting the task graph (foundation, lanes, gate rows, cross-app contracts) and the no-spike rule; step sizing; asking `Rigor` at init; repo scaffold; the read-only tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup; frontier selection and batching; what `Rigor` sets |
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session reuse vs fresh session; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
-| `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
+| `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming, agents, workflows, sample sign-in | Turn mechanics; verification procedure |
 | `fulcrum-verification` | Proof obligations; the gates G0 to G3 and the rigor table (once, here; others point to it); which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
 | `fulcrum-render-check` | Executing renders: browser preflight, sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after publish, evidence capture, security observations a render surfaces | What counts as proof (verification); why a construct renders wrong (traps); the verdict |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
@@ -323,7 +324,8 @@ Overlap causes mis-triggering. One topic, one owner:
 | `fulcrum-project-state` | Where durable state lives and what shape it has: the `.fulcrum/` file set and each file's schema, TASKS schema v3 and its migration, the full and micro profiles and which files each requires, who writes which file, append-only versus rewritten discipline, crash-idempotent write ordering, the runtime lease enforcing one Mentor session per app, the decision record gap analysis consumes, the halt record | What goes in any of those files. It never decides what to build, when to stop, what counts as proof, or how to iterate |
 | `fulcrum-loop-engine` | The iteration mechanism: select the runnable frontier grouped by app, batch, precondition and staleness check, dispatch parallel lanes, poll, verify, record, advance per lane; the bounded fix-loop; oscillation and stall detection (detect only); crash-idempotency of a single iteration; per-iteration budget accounting | Stop conditions and halt rules - those are `fulcrum-unattended-guardrails`'. Also not what to build |
 | Out of family: external systems and integration targets (not a skill) | Building and deploying the system - another vendor's server, a workflow engine, a third-party API, a service another team builds, its infrastructure - happens outside Fulcrum, under the user's own process. It appears in `TASKS.md` only as `Turn: external` rows | Its contract, which is Fulcrum's: `.fulcrum/external/<system>.md` (template `skills/fulcrum-project-state/templates/external-system.md`: endpoint and auth, payload contract, error codes, verified log locations), owned by `fulcrum-project-state`. It **must exist before the ODC step that consumes the system starts** |
-| `fulcrum-design-loop` | One design source for one app built into a published app: design capture and the design spec format; the block-mapping gate; step decomposition of a captured design; render-compare against the source and diff triage | Turn mechanics, traps, proof rungs, render execution, seed loaders, iteration, stop rules |
+| `fulcrum-design-loop` | One design source for one app built into a published app: design capture and the design spec format; the block-mapping gate; the build lanes (image, Studio, text) and the Studio hand-off; step decomposition of a captured design; render-compare against the source and diff triage | Turn mechanics, traps, proof rungs, render execution, seed loaders, iteration, stop rules; the `holder: user` lease (`fulcrum-project-state`) |
+| `fulcrum-demo` | The demo script `.fulcrum/demo-script.md` and its format; the demo readiness checklist; the optional scripted in-app tour | Gate definitions and what `demo` rigor runs; sign-in mechanics; seed loaders; the sample sign-in build |
 | `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements, and producing the source material - a BRD or equivalent spec - that `fulcrum-solution-init` then ingests | Decomposition, sizing and planning; the `Rigor` question. It stops at the spec; `fulcrum-solution-init` takes it from there |
 
 ## Mode and posture

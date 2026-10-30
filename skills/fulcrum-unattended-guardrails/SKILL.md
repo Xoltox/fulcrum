@@ -1,15 +1,6 @@
 ---
 name: fulcrum-unattended-guardrails
-description: >
-  Safety rails for long, largely unattended ODC Mentor build sessions - stop conditions, fix-turn
-  caps as a ceiling, halt-and-report rules, escalation rules, subagent depth and delegation
-  boundaries, tool-call budgeting, checkpoint discipline, Mentor concurrency locks and model tier
-  policy. It does not own the iteration mechanism - that is `fulcrum-loop-engine`. Use when the user
-  says "run the build unattended", "let it run overnight", "keep going while I'm away", "work
-  through the remaining steps on your own", "don't stop and ask me every time", "delegate this to
-  subagents", "long-running Mentor session", "how do I stop it breaking the app while I'm not
-  watching", or when starting any session expected to run many steps without a human reading each
-  one.
+description: Use when the user says "run the build unattended", "let it run overnight", "keep going while I'm away", "work through the remaining steps on your own", "don't stop and ask me every time", "delegate this to subagents", "long-running Mentor session", "how do I stop it breaking the app while I'm not watching", or when starting any ODC session expected to run many steps without a human reading each one, even when the user does not mention Fulcrum. Safety rails for long, largely unattended ODC Mentor build sessions - stop conditions, fix-turn caps as a ceiling, halt-and-report rules, escalation rules, subagent depth and delegation boundaries, tool-call budgeting, checkpoint discipline, Mentor concurrency locks and model tier policy. It does not own the iteration mechanism - that is `fulcrum-loop-engine`.
 version: "1.0.0"
 requires: >
   ODC MCP server authenticated; Mentor enabled on the tenant; a subagent
@@ -85,7 +76,7 @@ does not:** the row parks, its dependents hold, the lane is reported, other lane
 | **Fix-turn cap exceeded** - more than 1 build (a pass of up to 4 short turns counts as one) + 2 fix turns for one step | **Lane stop, not a halt.** Beyond that, Mentor is being asked to guess; each turn mutates the model |
 | A mutating turn is about to run against a session whose **staleness guard did not pass** | **Lane stop, not a halt.** This is the revert failure mode above |
 | The live app **regressed** - something previously verified now fails | **Lane stop if confined to that app**, otherwise a halt. Continuing builds on top of a corrupted state |
-| A step needs **the user's own action** - a portal-only operation, an asset upload with no MCP path, **the user setting a secret in the Portal**, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** No amount of retrying creates a capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |
+| A step needs **the user's own action** - a portal-only operation, an upload with no MCP path, **the user setting a secret in the Portal**, a role grant, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** Retrying creates no capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |
 | **Mentor capacity stop** - with no other driver in flight, the first turn of a Mentor session still refused as "busy" after the bounded retry in `../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset" | Report it as capacity, not as a model, auth or trap failure. Retrying past the bound only burns the window |
 | **All lanes flat** - every lane with open rows is flat or parked, at least one flat. One lane flat (done-count unchanged across 3 consecutive dispatches, Fulcrum rule) parks that lane and reports; others continue. All lanes parked on user actions alone is a user-action stop, not a halt | Dispatching with no progress spends mutating turns on a live app and says the plan or the model of the problem is wrong. `references/halt-conditions.md`, heading "Stall and no-op decisions" |
 | **Auth lost**, **a secret exposed**, or **surface drift** | Each undercuts every lane at once: one connection, one credential, one tool surface. `references/halt-conditions.md`, heading "Hard stops" |

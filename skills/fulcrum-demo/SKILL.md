@@ -1,13 +1,6 @@
 ---
 name: fulcrum-demo
-description: >
-  Writes the demo script, a short happy path derived from the brief and plan
-  that the demo-rigor final pass walks, checks demo readiness, and optionally
-  plans a scripted in-app tour. Owns the format of `.fulcrum/demo-script.md`.
-  Use when asked to prepare a demo, write the demo script, make the app
-  demo-ready, rehearse the happy path, or add a guided tour or walkthrough to
-  the app. Trigger phrases: "write the demo script", "is this demoable",
-  "prepare the demo", "add a guided tour", "walk the audience through the app".
+description: Use when the user says "write the demo script", "prepare the demo", "is this demoable", "make the app demo-ready", "rehearse the happy path", "add a guided tour", "add a walkthrough to the app" or "walk the audience through the app" for an OutSystems or ODC app, or when a `demo` rigor build reaches its demo script row, even when the user does not mention Fulcrum. Writes `.fulcrum/demo-script.md`, the short happy path derived from the brief and plan that the demo-rigor final blind pass walks; checks demo readiness; optionally plans a scripted in-app tour (no AI agent, no entitlement). Not for seed loaders (fulcrum-seed-data), gate definitions (fulcrum-verification) or building sample sign-in (fulcrum-engine-traps).
 version: "1.0.0"
 requires: >
   Brief and plan in the project repo; a finished or near-finished build to read

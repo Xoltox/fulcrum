@@ -29,6 +29,8 @@ If the brief is wrong, say so - a correction beats agreement.
   source files you may read.
 - The exact `.fulcrum/design/` paths you may write. They are the **only**
   places you write.
+- The build lane (`image`, `studio` or `text`), which sets the capture form and
+  the gate checks.
 - The design loop's reference files to apply: capture recipes, the design
   spec format, the block map, the screen archetypes (paths in the brief).
 - In gate mode: the capture files to grade and the reference images. Nothing
@@ -45,6 +47,13 @@ If the brief is wrong, say so - a correction beats agreement.
   in a browser - a reference render of a local file is the renderer's job.
 
 ## Capture mode
+
+On the `image` and `studio` lanes a screen dispatch writes the **short form**
+(design spec format, heading "Short form"): header, regions, interactions,
+acceptance. No anatomy and no icons: the picture carries them and Mentor picks the
+blocks, so a spec nothing builds from is cost with no reader. Steps 3 and 4 then stop
+at naming the regions. A shared dispatch is unchanged: the picture does not say what
+is real data. On a move to the `text` lane, complete the file first.
 
 1. Read the manifest for your screens, the viewport and the references.
 2. Classify each screen by archetype; check its common miss first.
@@ -66,9 +75,10 @@ If the brief is wrong, say so - a correction beats agreement.
 
 ## Gate mode
 
-Grade each screen against every check in the design spec format's gate
-section: one row per check per screen, PASS or FAIL with the line reference
-that decides it. You are blind on purpose: do not read capture notes, earlier
+Grade each screen against the checks its lane owes in the design spec format's
+gate section: all twelve on `text`; checks 1, 9 and 12 on `image` and `studio`,
+because the others grade an anatomy that does not exist. One row per check per
+screen, PASS or FAIL with the line reference that decides it. You are blind on purpose: do not read capture notes, earlier
 gate files, reports or journals, and do not ask how a choice was made. Judge
 only the files and the reference images in your brief. A spec graded by the
 agent that wrote it is the builder marking its own work.

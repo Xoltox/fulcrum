@@ -116,6 +116,48 @@ compare against, not a fix to copy.
   How noticed: the UI check could not complete unattended. What changed: a
   sign-in-gated UI check is a user-action hand-off, briefed as "ask the user for
   a screenshot or a confirmation".
+- **Claude Code CLI - classifier blocks on Mentor prompts** (observed 2026-10 on
+  three separate builds, `[VERIFIED]`). The classifier denied `mentor_prompt` build
+  and first-publish turns, `mentor_close_session`, `env_app` and `mentor_get_run`,
+  a sign-in click, and shell calls in a driver. A prompt carrying a demo password
+  and a rewrite of a log's timestamps were among the triggers. A denied close left
+  a Mentor session open. How noticed: runs halted on denials, four times on one
+  build, each costing a user round trip. What changed: the user added an allow
+  rule for the OutSystems tools (project-local settings; the server name in the
+  rule varies per user), and a run that needs those tools should get that rule
+  before the first dispatch, not after the first halt. This is a permission
+  setting the user grants; no agent adds it for itself. A prompt-length limit
+  seen only through one of these blocks is not a Mentor limit.
+- **Claude Code CLI - Firefox launch failure, dedicated profile** (observed 2026-10,
+  `[SINGLE-OBSERVATION]`). A browser MCP failed to launch Firefox twice with
+  "Process unexpectedly closed with status 0" while the user's main profile was in
+  use. A profile also carried a signed-in session into a first-click sign-in test.
+  How noticed: the render step reported the browser unavailable. What changed: the
+  browser MCP was pointed at a dedicated profile through local-scope MCP
+  configuration, and a sign-in test signs out first. Other browser MCPs and
+  browsers may not share this.
+
+## Design tools
+
+`fulcrum-design-loop` asks for capabilities: `design-source-read` and design
+generation. Stitch, Figma and Claude Design are examples of what can serve them,
+through an MCP server or an export the user makes. None is required, and none is a
+recommendation: with no such tool the user exports frames as images, and a design
+can come from any source. Which tool a user has is theirs to say at intake.
+
+## Hooks
+
+- **Claude Code CLI - opt-in hint hook** (recorded 2026-10-30, not yet observed).
+  `agents/claude-code/hooks/fulcrum-hint.cjs` serves `SessionStart` and
+  `UserPromptSubmit` from one file. Per the vendor docs `[SCHEMA]`, plain stdout on
+  those events is added as context, and `UserPromptSubmit` has no matcher, so the
+  gate is inside the script. Tried only on sample stdin, never wired into a live
+  session. `[UNVERIFIED]` that a session acts on the hint. A silent run took about
+  27 ms on one Windows machine. Node was chosen over Python for one command name
+  across operating systems (Python's bare startup there was faster, about 17 ms).
+  On an install with no Node on PATH the command fails and the hint is simply
+  absent. Whether other harnesses offer an equivalent is not checked; layers 1 and 2
+  in `INSTALL.md`, heading "Automatic triggers", are the portable ones.
 
 ## Agent definitions
 
