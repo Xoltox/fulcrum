@@ -13,7 +13,8 @@ reads it cold, every time, with no conversational history. Design it for that re
 <project>/
   DOMAIN.md             derived domain source of truth (step 1)
   .fulcrum/
-    plan.md              phases, steps, apps/agents/workflows, entity owners
+    plan.md              phase labels, steps, apps/agents/workflows, entity owners
+    TASKS.md             the task graph, schema v3 (step 5)
     tenant-profile.md    the capability probe result (step 3)
     HANDOFF.md           two parts: RULES (stable) + BRIEF (replaced each session)
     JOURNAL.md           session index; per-session detail in journal/<session-id>.md
@@ -40,8 +41,9 @@ at the project root - full layout and file contracts:
 | File | Owns | Never contains |
 |---|---|---|
 | `DOMAIN.md` | Domain truth: personas, entities, screen inventory, resolved questions | Build mechanics, phase order |
-| `.fulcrum/plan.md` | Scope and ordering: phases, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
-| `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence | Anything not probed |
+| `.fulcrum/plan.md` | Scope: phase labels, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
+| `.fulcrum/TASKS.md` | Current truth and the graph: `App`, `DependsOn`, `Batchable`, `Risk` per row | Narrative, prose in cells |
+| `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence, or `first-row` | Anything not observed |
 | `.fulcrum/HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
 | `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history - session index plus per-session action lines, including withdrawn claims | Rules, plans |
 | `.fulcrum/RUN-IDS.md` | Run ids and their outcomes, including publish records | Anything else |
@@ -61,7 +63,7 @@ the target app identity, error handling, what is not to be re-litigated. Changes
 when a rule changes.
 
 **PART 2 - BRIEF.** Replaced **wholesale** every session. Where the build is now, the
-one next step, and what that step needs. Never appended to.
+current frontier, and what its rows need. Never appended to.
 
 **Why the split.** A handoff that accumulates step narrative grows without bound and
 buries the rules under history. The fresh agent then reads mostly-irrelevant past-step
@@ -71,8 +73,9 @@ act.
 
 Hard rules:
 
-- The BRIEF names **exactly one** next step. Two next steps means the orchestrator picks.
-- The BRIEF never narrates completed steps beyond what the next step depends on.
+- The BRIEF lists the **current frontier**, one line per lane, copied from `TASKS.md`
+  selection. An orchestrator that picks its own next step from prose drops lanes.
+- The BRIEF never narrates completed steps beyond what the frontier depends on.
 - The RULES section is where a new standing decision lands - once, in one place.
 - Neither part restates a spec. Specs are self-sufficient by design.
 
@@ -150,9 +153,10 @@ stub explaining what belongs there:
 - [ ] No fact appears in two files at two strengths.
 - [ ] No rule list is duplicated by hand.
 - [ ] No `§` anchor and no line-number reference anywhere.
-- [ ] `.fulcrum/HANDOFF.md` has both parts, and the BRIEF names one next step.
+- [ ] `.fulcrum/HANDOFF.md` has both parts, and the BRIEF lists the current frontier.
+- [ ] `.fulcrum/TASKS.md` carries the graph in schema v3, with no spike or probe row.
 - [ ] `.fulcrum/RUN-IDS.md` exists and is empty rather than absent.
-- [ ] Phase-one specs are written and each passes the right-sizing test.
+- [ ] Specs up to the first join are written and each passes the right-sizing test.
 
 ## Failures to design against
 

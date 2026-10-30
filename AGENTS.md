@@ -31,7 +31,7 @@ directly. Otherwise, load `skills/fulcrum`.
 | Starting a new engagement: raw BRD, Figma/Stitch export, mockups, or screenshots, not yet a plan | `skills/fulcrum-solution-init` |
 | An app already exists and you need to know how it compares to its requirements, what is missing, or what to build next | `skills/fulcrum-gap-analysis` |
 | Where durable project state lives - `.fulcrum/` file set, the session lease, the halt record | `skills/fulcrum-project-state` |
-| Working through the task list - selecting, dispatching, polling, verifying, recording, advancing | `skills/fulcrum-loop-engine` |
+| Working through the task list - selecting the runnable frontier, dispatching, polling, verifying, recording, advancing | `skills/fulcrum-loop-engine` |
 | About to issue a Mentor turn, chunking a spec, unsure of session reuse vs fresh session, or a turn didn't land | `skills/fulcrum-mentor-turns` |
 | Building or editing a screen, aggregate, repeater, link, icon, date expression, REST integration, static entity, chart, or overlay | `skills/fulcrum-engine-traps` |
 | Need to prove a change actually works, not just that publish was clean | `skills/fulcrum-verification` |
@@ -47,7 +47,15 @@ These hold even if no skill file is ever loaded:
   verified - a stale model reverts completed work while the revision number
   still advances.
 - One Mentor session at a time **per app** (concurrency across different apps
-  is allowed; the ceiling is unpublished and may change server-side).
+  is allowed; the ceiling is unpublished and may change server-side). The plan
+  is a task graph: the loop runs the whole runnable frontier in parallel, one
+  driver per app, and the slowest lane gates nobody.
+- `Rigor` (`demo`, `pilot`, `production`) is asked of the user, never defaulted
+  or inferred, and it changes depth of evidence, never safety or posture. See
+  `skills/fulcrum-verification`.
+- Do not plan a spike or probe row to test a platform capability. Ask at intake
+  or try it on the first real row, which fails fast: spikes consume hours,
+  publish throwaway revisions, and prove what that row would prove anyway.
 - Aggressive orchestration is the default, not an advanced option: delegate
   poll loops and read-only inspection to subagents; keep judgement and
   verification verdicts in the orchestrator. Mutating work is depth 1 always.
@@ -62,7 +70,8 @@ These hold even if no skill file is ever loaded:
 - Zero validation errors and a clean publish prove nothing about rendering
   or logic.
 - A schema that loads is not a tool that dispatches - tool availability is
-  probed, not assumed, and the result is recorded in `tenant-profile.md`.
+  checked by read-only calls, not assumed, and the result is recorded in
+  `tenant-profile.md`.
 - A halt record is never resumed past without a new human decision.
 - Project state lives in `.fulcrum/` in the project repository, never in the
   installed skills.
@@ -80,7 +89,8 @@ These hold even if no skill file is ever loaded:
 
 Facts that vary by tenant, licence, or platform version (UI-block
 availability, icon font, and similar) live in the
-project's own `tenant-profile.md`, produced once by `fulcrum-solution-init`.
+project's own `tenant-profile.md`, started by a read-only pass in
+`fulcrum-solution-init` and filled by the first real row that needs a fact.
 Skills reference that file - they never hardcode the answer.
 
 ## Model tiers

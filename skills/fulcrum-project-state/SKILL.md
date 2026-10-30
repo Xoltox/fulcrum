@@ -50,15 +50,15 @@ never let anything write back.
 
 ```
 <project>/.fulcrum/
-  project.md          solution identity, apps, mode, posture, tier overrides
+  project.md          solution identity, apps, mode, posture, Rigor, tier overrides
   brief.md            derived requirements brief - written by fulcrum-discovery
   tenant-profile.md   the capability probe result - written by fulcrum-solution-init
   plan.md             phases and steps - stable, rarely rewritten (micro: plan-micro template)
-  TASKS.md            current truth: checkbox table of Mentor-turn-shaped tasks
+  TASKS.md            current truth: task graph of Mentor-turn-shaped rows (schema v3)
   JOURNAL.md          session index: one ROW per session, completed in place
   journal/<session-id>.md  APPEND-ONLY: one file per session, one line per action
   DECISIONS.md        APPEND-ONLY: ADR-lite records
-  RUN-IDS.md          APPEND-ONLY: durable run ids, with a publish slot
+  RUN-IDS.md          APPEND-ONLY: durable run ids, with a publish slot (lanes: lane files)
   external/<system>.md  contract per external system the solution consumes
   HANDOFF.md          two-part RULES/BRIEF snapshot, regenerated
   runs/<run-id>.md    optional per-run detail
@@ -97,9 +97,9 @@ their trigger occurs. The router proposes it and the user confirms; `profile` in
 
 One writer per shared file. The orchestrator alone writes `project.md`, `plan.md`,
 `TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*`, the `JOURNAL.md` index (with
-`InFlight` and `Tasks`) and the lease, and it alone mints session ids. A driver only
-appends rows to the session journal file its brief names and to `RUN-IDS.md`, and, if
-it stops the run, writes `HALT.md`. At every wave close the orchestrator reconciles `TASKS.md`
+`InFlight` and `Tasks`), the lease and `HALT.md`, and it alone mints session ids. A driver only
+appends rows to the journal and run-id files its brief names (parallel lanes: their own
+lane files); to stop, it reports and stops. At every wave close the orchestrator reconciles `TASKS.md`
 and `project.md` against the journal and run ids, then commits. In every field project
 inspected, `.fulcrum/` was stale within a day because nobody owned that step.
 `[VERIFIED]` No resume point lives outside `.fulcrum/`. Table and reconciliation
@@ -118,11 +118,11 @@ Before the first mutating call - **including app creation** - and before any wai
 
 1. At session start: create `journal/<session-id>.md` and append the session's
    `JOURNAL.md` index row with `State: open`.
-2. For Mentor work, the orchestrator acquires the lease before the dispatch, TTL sized
-   to the dispatch's budget plus margin (`references/lease-and-concurrency.md`; before
+2. For Mentor work, the orchestrator acquires the lease for every app the dispatch
+   holds before the dispatch, TTL sized to its budget plus margin (`references/lease-and-concurrency.md`; before
    creation it is keyed by the intended app name).
-3. Write the task's `TASKS.md` row with status `active`, then append its `started`
-   line to the session file and its id to the row's `InFlight`.
+3. Write each `TASKS.md` row of the dispatch with status `active`, then append its
+   `started` line to the session file and its id to the row's `InFlight`.
 4. Dispatch. Append the `RUN-IDS.md` line the instant the run id is issued.
 
 In the field, the first journal line was written after the app had been created and
@@ -137,15 +137,15 @@ second Mentor session on the same app - breaking the one-session-per-app
 non-negotiable `[VERIFIED]` - and can publish from a stale model, which advances the
 revision while silently reverting completed work. `[VERIFIED]`
 
-Corollary: never write `[x]` with an empty verdict. `unproven` is the honest value
-and it is what tells a resuming session the work needs re-proving.
+Corollary: never write `[x]` with an empty verdict. Unproven work stays `todo` with
+`Verdict: unproven`, which tells a resuming session to re-prove it.
 
 ## The lease, in one paragraph
 
-`lease.json` is the only file here that is **not committed** - a committed lock is
-stale the moment it is pushed. It carries a holder identity, an acquisition
-timestamp, and a TTL sized to the dispatch's budget plus margin. The orchestrator alone
-writes it: acquire before a Mentor dispatch, release when it returns `session_state: closed`,
+`lease.<app>.json` is the only file here that is **not committed** - a committed lock
+is stale the moment it is pushed. It carries a holder identity, an acquisition
+timestamp, and a TTL sized to the dispatch's budget plus margin. A session holding
+several apps takes one lease per app, all or none. The orchestrator alone writes it: acquire before a Mentor dispatch, release when it returns `session_state: closed`,
 hold it (recording the open `sessionId`) when it returns `session_state: open`, no per-poll
 refresh. A live lease held by someone else means wait or halt, never take; an expired
 lease may be broken only when the holder's dispatch is also known dead, and only with a
@@ -178,16 +178,16 @@ here. Shape: `references/file-schemas.md`, heading "DECISIONS.md".
 
 ## Mode and posture
 
-`project.md` records two orthogonal settings. This skill owns only that they live
-there and what values are legal. **Their definitions, the orthogonality rule, the
-failure mechanism and the opt-in rule are owned by `../../CONVENTIONS.md`, heading
-"Mode and posture".** Read it there; it is not restated here.
+`project.md` records three orthogonal settings. This skill owns only that they live
+there and what values are legal. **Definitions and the opt-in rule are owned by
+`../../CONVENTIONS.md`, heading "Mode and posture".** Not restated here.
 
 - `mode`: `guided` | `expert`
-- `posture`: `collaborative` | `directive`
+- `posture`: `collaborative` (the default) | `directive`
+- `Rigor`: `demo` | `pilot` | `production`. Never defaulted; missing on resume: ask.
 
-`collaborative` is the default. Turn mechanics for each posture belong to
-`../fulcrum-mentor-turns/SKILL.md`; do not write them here either.
+Posture turn mechanics: `../fulcrum-mentor-turns/SKILL.md`. Rigor gates:
+`../fulcrum-verification/SKILL.md`, heading "Gates and rigor".
 
 ## Routing
 

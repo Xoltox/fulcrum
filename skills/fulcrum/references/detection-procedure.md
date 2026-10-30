@@ -32,8 +32,8 @@ already gone off cheap - stop and re-derive the answer from the index instead.
 | 3 | No `.fulcrum/`, app exists | `../../fulcrum-gap-analysis/SKILL.md` | An app with no `.fulcrum/` was built by something other than a Fulcrum-tracked session (a generator, a prior manual build, another agent). Never re-run `fulcrum-solution-init` against it - that skill is pre-build only. |
 | 4 | `.fulcrum/` present, `HALT.md` present | Stop, report, ask a human | See `../SKILL.md`, heading "HALT.md is absolute - state the mechanism". Absolute - no exceptions below override this row. |
 | 5 | `.fulcrum/` present, last `JOURNAL.md` row `State: open` | Resume at `../../fulcrum-loop-engine/SKILL.md` phase 4 (poll to terminal) | Possible crash or a run still executing - not a halt. See `../../fulcrum-project-state/references/resume-and-halt.md`, "Crash recovery". |
-| 6 | `.fulcrum/` present, last row `State: clean`, open task in `TASKS.md` | Resume -> `../../fulcrum-loop-engine/SKILL.md` phase 1 | Clean stop; select the next actionable row. |
-| 7 | `.fulcrum/` present, all tasks closed | Report status; offer next phase | Read `plan.md` only now, to name what phase comes next. If none remains, offer `../../fulcrum-gap-analysis/SKILL.md` as a completeness check. |
+| 6 | `.fulcrum/` present, last row `State: clean`, open task in `TASKS.md` | Resume -> `../../fulcrum-loop-engine/SKILL.md` phase 1 | Clean stop; select the runnable frontier. |
+| 7 | `.fulcrum/` present, all tasks closed: every row `done`, the final G2 row among them at `Verdict: pass` | Report status; offer next phase | This row can only mean G2 ran. A G2 row still open is row 6. No G2 row (a plan older than the rule): add it, then row 6. Read `plan.md` only now, to name what phase comes next. If none remains, offer `../../fulcrum-gap-analysis/SKILL.md` as a completeness check. |
 
 Rows 4-7 apply unchanged to a `.fulcrum/` on the micro profile (`profile: micro` in
 `project.md`); only its file set is smaller.
@@ -43,6 +43,19 @@ index and never open `journal/<session-id>.md` to decide which of the two
 applies. That file is opened only by the loop engine, once it is already
 committed to resuming, to get recovery detail the row itself does not carry.
 
+## The project.md marker
+
+**Before dispatching on rows 5-7, check the marker in `project.md`:** expect
+`<!-- fulcrum-schema: project v4 -->`. A newer or unknown version: stop and report,
+because guessing its fields misreads the settings every later decision reads. An older
+version: read it per `../../fulcrum-project-state/references/file-schemas.md`, heading
+"project.md", and rewrite it as v4 once `Rigor` is answered.
+
+**Then read `Rigor`.** Missing (a project older than the setting): ask the user, in every
+mode, with no recommendation, and record the answer. It sets how much proof every
+remaining row owes, so resuming on a guess applies the wrong depth to the rest of the
+build.
+
 ## Proposing the micro profile
 
 Signals, all required, all answerable from the user's ask and the cheap checks above:
@@ -51,7 +64,7 @@ ask is sketched as steps; no BRD, design export or other source material that ne
 triage. A short written ask, or a one-paragraph note, is not source material in this
 sense.
 
-Put it to the user in the first batch, alongside mode, as one question: micro
+Put it to the user in the first batch, alongside mode and `Rigor`, as one question: micro
 (recommended, with the one-clause reason - "one app, about N steps, no source
 material to triage") or the full path (discovery, or solution-init if source material
 appears). If micro is confirmed, the app-creation choice follows as the micro
@@ -71,7 +84,7 @@ few states, one Figma page, or one HTML or TSX entry point); about six or fewer
 distinct screens; no BRD. A single design source for one app that needs no
 deduplication is not source material to triage.
 
-Put it to the user in the first batch, alongside mode, as one question: design loop
+Put it to the user in the first batch, alongside mode and `Rigor`, as one question: design loop
 (recommended, with the one-clause reason) or the full path
 (`../../fulcrum-solution-init/SKILL.md`). **Never auto-pick the design loop**,
 including in `expert` mode. Intake from there: `../../fulcrum-design-loop/SKILL.md`,

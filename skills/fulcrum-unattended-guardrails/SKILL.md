@@ -31,25 +31,23 @@ rules in force for the whole session. It owns nothing about *what* to build.
 - Where durable state lives and its schemas -> `../fulcrum-project-state/SKILL.md`
 
 **The seam with the loop: the loop detects, this file decides.** The loop notices a repeat failure,
-an exhausted cap, a regression or a runtime step-change and hands it here. Every stop condition, cap
+an exhausted cap, a regression, a stall or a runtime step-change and hands it here. Every stop condition, cap
 and halt rule is stated here and only here - do not restate one inside a loop procedure, and do not
 iterate from this file.
 
-**Delegation is the default posture.** The orchestrator supervises and never
-executes; subagents work and absorb poll traffic; tiers are set per dispatch.
-Run undelegated only without a subagent capability (`references/delegation.md`).
+**Delegation is the default posture.** The orchestrator supervises and never executes; subagents
+work and absorb poll traffic; tiers are set per dispatch. Run undelegated only without a subagent capability (`references/delegation.md`).
 
 ## The premise
 
-Unattended does not mean autonomous. It means: **the agent is trusted to stop
-safely, not trusted to recover from anything.** The worst outcome of an unwatched
-hour must be lost time, never lost work.
+Unattended does not mean autonomous. It means: **the agent is trusted to stop safely, not trusted
+to recover from anything.** The worst outcome of an unwatched hour must be lost time, never lost work.
 
 The failure mode this is built against [VERIFIED]: an agent resumed a **stale Mentor session** and
 published from it, silently reverting the live app past six completed steps while the revision
 number advanced normally. Every platform success signal read green; a human noticed, and recovery
 was manual through the vendor portal. The only defences are a staleness guard before every mutating
-turn, a checkpoint that survives the agent, and a halt rule that fires early. Full account:
+dispatch, a checkpoint that survives the agent, and a halt rule that fires early. Full account:
 `references/halt-conditions.md`, heading "The revert failure mode - why halting early is cheap".
 
 ## Session-start checklist
@@ -68,29 +66,35 @@ turn, a checkpoint that survives the agent, and a halt rule that fires early. Fu
 4. **Record the current app revision** - the baseline for every later "did this
    land / did this revert" question.
 5. **Name the checkpoint path** and the handoff path. Agents do not invent them.
-6. **State the step budget for the session** - how many steps, and the halt rule.
+6. **State the step budget for the session** and the halt rule. Read `Rigor` from `project.md`:
+   missing is a stop for the question, never a default (`../fulcrum-verification/SKILL.md`).
 
 ## Hard stops - halt and report to the user
 
-Do not work around any of these. A halt writes `.fulcrum/HALT.md` first, then the
+Do not work around any of these. The orchestrator writes `.fulcrum/HALT.md` first, then the
 journal line (`../fulcrum-project-state/references/resume-and-halt.md`), then reports.
 A halt whose dispatch returned `session_state: open` keeps the lease and records the
 open `sessionId` in `HALT.md` (`../fulcrum-project-state/references/lease-and-concurrency.md`,
-"Hold").
+"Hold"). **A halt stops every lane:** no new dispatch anywhere; running dispatches finish and
+are recorded (`references/halt-conditions.md`, heading "Halts with parallel lanes"). **A lane stop
+does not:** the row parks, its dependents hold, the lane is reported, other lanes continue.
 
 | Trigger | Why it is a hard stop |
 |---|---|
-| **Stuck twice** on the same defect after a diagnostic step | Two failures at the same tier means the model of the problem is wrong, not the attempt count. Detected mechanically: two `<task-id>:fail` entries in the `.fulcrum/JOURNAL.md` session index (`../fulcrum-loop-engine/SKILL.md`, heading "Oscillation detection - mechanical, not remembered") |
-| **Fix-turn cap exceeded** - more than 1 build (a pass of up to 4 short turns counts as one) + 2 fix turns for one step | Beyond that, Mentor is being asked to guess; each turn mutates the model |
-| A mutating turn is about to run against a session whose **staleness guard did not pass** | This is the revert failure mode above |
-| The live app **regressed** - something previously verified now fails | Continuing builds on top of a corrupted state |
-| A step needs **the user's own action** - re-auth, a portal-only operation, an asset upload with no MCP path, **the user setting a secret in the Portal**, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** No amount of retrying creates a capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |
-| **Mentor capacity stop** - the first turn of a Mentor session still refused as "busy" after the bounded retry in `../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset" | Report it as capacity, not as a model, auth or trap failure. Retrying past the bound only burns the window |
+| **Stuck twice** on the same defect after a diagnostic step | **Lane stop, not a halt** (`references/halt-conditions.md`, heading "Lane stops"). Two failures at the same tier means the model of the problem is wrong, not the attempt count. Detected mechanically: two `<task-id>:fail` entries in the `.fulcrum/JOURNAL.md` session index (`../fulcrum-loop-engine/SKILL.md`, heading "Oscillation detection - mechanical, not remembered") |
+| **Fix-turn cap exceeded** - more than 1 build (a pass of up to 4 short turns counts as one) + 2 fix turns for one step | **Lane stop, not a halt.** Beyond that, Mentor is being asked to guess; each turn mutates the model |
+| A mutating turn is about to run against a session whose **staleness guard did not pass** | **Lane stop, not a halt.** This is the revert failure mode above |
+| The live app **regressed** - something previously verified now fails | **Lane stop if confined to that app**, otherwise a halt. Continuing builds on top of a corrupted state |
+| A step needs **the user's own action** - a portal-only operation, an asset upload with no MCP path, **the user setting a secret in the Portal**, a UI check behind a sign-in the harness will not let an agent perform | **User-action stop, not a halt.** No amount of retrying creates a capability. Ask for the action (a screenshot or confirmation for a UI check); never attempt a workaround. Detail: `references/halt-conditions.md`, heading "User-action stops" |
+| **Mentor capacity stop** - with no other driver in flight, the first turn of a Mentor session still refused as "busy" after the bounded retry in `../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset" | Report it as capacity, not as a model, auth or trap failure. Retrying past the bound only burns the window |
+| **All lanes flat** - every lane with open rows is flat or parked, at least one flat. One lane flat (done-count unchanged across 3 consecutive dispatches, Fulcrum rule) parks that lane and reports; others continue. All lanes parked on user actions alone is a user-action stop, not a halt | Dispatching with no progress spends mutating turns on a live app and says the plan or the model of the problem is wrong. `references/halt-conditions.md`, heading "Stall and no-op decisions" |
+| **Auth lost**, **a secret exposed**, or **surface drift** | Each undercuts every lane at once: one connection, one credential, one tool surface. `references/halt-conditions.md`, heading "Hard stops" |
+| **Budget** - the orchestrator's hand-back trigger | One budget funds every lane, so selection stops everywhere. This stop is the hand-back: `../fulcrum-loop-engine/references/iteration-budget.md`; it writes no `HALT.md` |
 | A **permission or policy denial** | Confirm it is genuine with one direct retry, then stop. Never iterate looking for a way around it |
 | The change required would **weaken validation, auth, or a business rule** to clear an error | Park it, disclose it, stop |
-| Two candidate actions would both **touch Mentor concurrently** | See the concurrency lock below |
+| Two candidate actions would both **touch Mentor concurrently on one app** | **Lane stop, not a halt.** See the concurrency lock below |
 | A step depends on an op **confirmed unavailable** in `tenant-profile.md` with **no fallback** recorded | Improvising a path around a missing capability is unreviewed, unrecorded drift. `references/halt-conditions.md`, heading "Halt on an unavailable op with no fallback" |
-| **Runtime errors stepped up across a build step** - `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` inside the after window `[SCHEMA]` | The deployed app is now failing for real users in a way the build turn did not predict; the only stop that reads the running app. Take the reading per `../fulcrum-verification/references/runtime-telemetry.md`; rule in `references/halt-conditions.md` |
+| **Runtime errors stepped up across a G1** - `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` inside the after window `[SCHEMA]` | The deployed app is now failing for real users in a way the build turn did not predict; the only stop that reads the running app. Take the reading per `../fulcrum-verification/references/runtime-telemetry.md`; rule in `references/halt-conditions.md` |
 
 **Not** reasons to continue: "nearly working", "one more turn", "the user said
 unattended". A halt report can be the correct output.
@@ -119,7 +123,7 @@ a `context_*` inventory tool; curl a REST endpoint; or run browser automation or
 script.
 
 Not to finish a small piece, not to "just quickly check", not when a prior subagent left a run
-half-done - dispatch one to resume that same run. Re-verifying a wave means dispatching a fresh
+half-done - dispatch one to resume that same run. Re-verifying a lane means dispatching a fresh
 blind verifier, never running the check inline. **Sole exception:** a live blocker needing the
 user's own action, where one direct attempt confirms the block is genuine; confirm once, then report
 and wait. Rationale, brief structure, mandatory prompt elements and the blind-verifier rule:
@@ -132,25 +136,21 @@ Parallel agents are siblings, never nested. **Mutating work is depth 1, always.*
 
 **One exception, polling only.** The Mentor-driver role may spawn **exactly one** nested agent that
 **does nothing but wait and report**, when its *own* tier is expensive and the phase is long. Every
-other role never spawns. [VERIFIED] on one harness (a depth-1 subagent spawned a nested poller,
-2026-10-08, and again in a project journal); [UNVERIFIED] elsewhere. Where a nested agent cannot
-spawn, use a **sibling poller** dispatched by the orchestrator. It buys nothing when the poller tier
-is cheap or a native wait primitive exists - prefer the primitive. It is mechanically checkable (one
-role, one action), which is why it does not reopen the depth dial; "successor spawning" is
-**SUPERSEDED**. Read `references/delegation.md` before granting any agent the ability to dispatch.
+other role never spawns. [VERIFIED] on one harness; [UNVERIFIED] elsewhere, where a **sibling
+poller** is the fallback. It buys nothing when the poller tier is cheap or a native wait primitive
+exists. "Successor spawning" is **SUPERSEDED**. Read `references/delegation.md` before granting any
+agent the ability to dispatch.
 
 ## Concurrency lock - one Mentor session per app
 
-The lock is **per app, not per tenant**; concurrent sessions across *different* apps are supported.
-[VERIFIED] A `mentor_prompt` issued while a prior prompt is running is **silently ignored** - a
+The lock is **per app, not per tenant**, so parallelism comes only from different apps. [VERIFIED] A `mentor_prompt` issued while a prior prompt is running is **silently ignored** - a
 racing agent gets no signal; treat it as never sent.
 
-- **Never dispatch two agents concurrently if both may touch Mentor on the same
-  app.** A poller watching a run and a driver starting the next turn are not
-  safely concurrent unless the second provably cannot start a turn.
-- The cross-app ceiling is unpublished and can change. [UNVERIFIED] Fan out
-  opportunistically, never on a critical path, degrade to sequential on the
-  first rejection.
+- **Never dispatch two agents concurrently if both may touch Mentor on the same app.** A poller watching
+  a run and a driver starting the next turn are not safely concurrent unless the second provably cannot start a turn.
+- **In-flight cap: 5 drivers across all apps** (Fulcrum rule). The platform ceiling is unpublished:
+  10 parallel read-only sessions were seen once `[SINGLE-OBSERVATION]`; builds were not measured.
+- **On the first capacity text, stop adding:** finish what is running, then run sequentially.
 - Parallel subagents must **never write the same files**: assign disjoint file
   scopes; shared project documents belong to the orchestrator.
 - Enforcing lease: `../fulcrum-project-state/references/lease-and-concurrency.md`.
@@ -166,9 +166,8 @@ accounting: `../fulcrum-loop-engine/references/iteration-budget.md`.
 
 ## Always handoff-ready
 
-Write durable state to a checkpoint file **continuously**, after every unit of
-work that produced a durable result or resumable identifier, not when near a
-limit: it needs no number the agent cannot see and survives sudden death.
+Write durable state to a checkpoint file **continuously**, after every unit of work that produced a
+durable result or resumable identifier, not when near a limit: it survives sudden death.
 
 Write every run id, session id, job handle and revision number to the file **at the moment it is
 issued**. A handle held only in context dies with the agent, and an ODC run whose id is lost can
@@ -190,6 +189,6 @@ input to the next failure. Honest vocabulary only: `OK` / `PARTIAL` / `PARKED` /
 | Sizing an agent's budget, or an agent overran | `references/budgeting.md` |
 | Writing a brief, choosing a role, or tempted to nest a subagent | `references/delegation.md` |
 | Setting up checkpoints, or resuming after a death | `references/checkpoints.md` |
-| A step is failing repeatedly, or needs a user action, and you must decide whether to continue | `references/halt-conditions.md` |
+| A step is failing repeatedly, a lane stalled, or a user action is needed, and you must decide whether to continue | `references/halt-conditions.md` |
 | A reading from the running app looks like a stop signal, or you are about to call an app healthy | `references/halt-conditions.md`, headings "The runtime-shaped stop" and "Never report an untouched app as healthy" |
 | You need to run the tasks, not decide whether to stop | `../fulcrum-loop-engine/SKILL.md` |

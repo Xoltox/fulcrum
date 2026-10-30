@@ -1,29 +1,38 @@
 # Solution decomposition and step sizing
 
 Read this for steps 4 and 5 of `../SKILL.md`. It covers how to split a solution into
-apps, agents and workflows, and how to size phases and steps against measured cost.
+apps, agents and workflows, how to emit the task graph, and how to size steps against
+measured cost.
 
 ## Part 1 - Decomposition
 
 ### Apps
 
-Split on **persona plus lifecycle**, not on screen area or on volume of screens.
+Split on **persona plus lifecycle** or a **real module boundary in the domain**, not on
+screen area or on volume of screens.
 
 Reasons to open a new app boundary:
 
 - A genuinely different persona with a different entry point and different data scope.
 - A different release cadence or a different deployable owner.
 - A hard data-isolation requirement.
+- A real module boundary: a part of the domain that owns its data and meets the rest
+  through a narrow contract.
 
 Reasons that are **not** enough:
 
 - "The plan has a lot of screens." A large screen count is a phasing problem.
-- "These screens are about a different domain area." That is a module or a flow.
+- "These screens are about a different domain area." A topic is a flow, not a module
+  boundary.
 - "It would be tidier." Tidiness inside one app is free; a cross-app dependency is not.
+- "It would run in parallel." Parallelism alone is no reason to split an app: a split
+  adds cross-app references and library index waits, which can cost what the lane saved.
 
 Every extra app boundary costs a dependency that every later step must respect, a second
 theme surface to keep consistent, and a publish ordering constraint. Default to one app
-and justify each additional one in the plan.
+and justify each additional one in the plan. Each app is also a lane: parallelism only
+comes from different apps, and a single-app plan is a chain whose speed comes from
+batching.
 
 ### Agents and workflows
 
@@ -48,15 +57,15 @@ non-determinism to a build that already has plenty.
 - **Consumers reference the owner. They never redeclare it.** A redeclared entity is two
   entities that look like one, and the divergence surfaces as data that "disappears".
 - **Shared reference data belongs at the lowest level** everything above it can consume.
-- **Confirm the cross-app consumption mechanism against the tenant** before planning
-  around it, and record what you confirmed. `[UNVERIFIED]` - the reference engagement
-  shipped a single-app solution, so multi-app entity sharing was never exercised there.
-  Treat any multi-app data plan as unproven until you have confirmed it on the tenant.
+- **The cross-app consumption mechanism is unproven until a real contract row lands it.**
+  `[UNVERIFIED]` - the reference engagement shipped a single-app solution, so multi-app
+  entity sharing was never exercised there. Ask at intake what the user knows, make the
+  contract an explicit upstream row, and let it fail fast; do not plan a spike for it.
 
 ### Deployable units
 
 State which apps and libraries ship together. That set is what "demoable" means at a
-phase boundary, and it is what the publish sequence at the end of each phase must cover.
+join row, and it is what the publishes before that join must cover.
 Publish sequencing itself: `../../fulcrum-mentor-turns/SKILL.md`.
 
 ### External systems and integration targets
@@ -71,21 +80,98 @@ ODC step that consumes the system, and that step lists the file as a preconditio
 A system whose contract is unknown at planning time is an unresolved item gating that
 step, not an assumption written into a spec.
 
-## Part 2 - Phase sizing
+## Part 2 - The task graph
 
-### Global-then-local ordering
+Emit a graph, not a stage list. A linear plan runs one Mentor session where several
+could run, and a spike-first plan pays before anything is built. The loop selects
+whatever the graph makes runnable (`../../fulcrum-loop-engine/SKILL.md`), so the graph
+is where parallelism and speed are won or lost.
 
-1. **Global, once, up front:** theme, navigation shell, data model.
-2. **Then vertical slices**, one at a time: cheapest and most central slice first.
+### Shape
 
-A vertical slice is data + screens + navigation for one coherent user job. Slicing
-horizontally instead - all entities, then all screens, then all bindings - leaves the
-solution un-demoable for the whole middle of the build and defers every integration risk
-to the end.
+```
+foundation (serial)      shared entities, cross-app contracts
+  -> lanes (fan out)     one per app: base, UI, logic, polish
+  -> gate rows           join, demo script, final G2 last
+```
+
+- **Foundation rows** come first and serial: anything several lanes read.
+- **Lanes fan out**, one per app. Standard lane order inside an app: base, UI, logic,
+  polish. Base carries the app's theme, navigation shell, entities and seed. A row on one
+  lane never waits for another lane unless a `DependsOn` says so.
+- **Cross-app contracts are explicit upstream rows.** A consumer depends on the contract
+  row (entity or REST shape, auth, URLs), not on the whole producer app, so the producer
+  lane can keep going. Slowest lane gates nobody.
+- **Non-Mentor rows** (`verify`, `code`, `infra`, `external`, `manual`) sit in the graph
+  like any other and run alongside; they take no lease.
+- **Library consumers need the index, not just a dependency.** Emit the row `blocked`,
+  depending on the row that publishes the library, `Blocked on` naming that producer,
+  `Unblocks when` "element shows in `context_actions`". Plan other rows of that lane
+  around the wait: the lane never stalls on it. A Workflow can be made with its app in one multi-asset session; a library cannot
+  (`../../fulcrum-mentor-turns/references/mcp-surface.md`).
+
+### Gate rows
+
+Gates are ordinary rows, so selection, crash recovery and records need no special path.
+A gate owed only by convention is the one a crash loses.
+
+| Row | `Turn` | `App` | `DependsOn` | Emit |
+|---|---|---|---|---|
+| Join, one per consumer app (a single-app plan has one), plus any cross-app check | `verify` | `solution` | The rows it joins | Always |
+| Lane G2 | `verify` | `solution` | The lane's last row; its join depends on it | `production`, one per lane |
+| Demo script, output `.fulcrum/demo-script.md` | `code` | `solution` | Nothing it cannot read | `demo` |
+| Final G2 | `verify` | `solution` | All leaves | Always, once |
+
+`solution` is a literal: no lane, no lease. Skill `fulcrum-demo` owns the demo script
+format. `verify` rows carry no Mentor rung and run their rungs at every rigor; emit them
+only for joins, G2 and owed G3. Micro plans get the same rows
+(`../../fulcrum-project-state/templates/plan-micro.md`).
+
+### Filling the TASKS columns
+
+Column values and order: `../../fulcrum-project-state/references/file-schemas.md`,
+heading "TASKS.md". Here, only how to choose them:
+
+| Column | How to choose |
+|---|---|
+| `App` | The app the row touches, or a declared pair `<producer>+<consumer>`, one lease per identifier. It is the lane and the lease key. Gate rows: `solution` |
+| `DependsOn` | Task IDs of **true data dependencies** only, or `-`. "Comes earlier in the plan" is not a dependency; a false edge turns a parallel frontier back into a chain |
+| `Batchable` | `yes` when the row can share one build pass and one Publish with its neighbours on the same app, `no` otherwise. A row may batch with a row it depends on: an open id in `DependsOn` is allowed when it is in the same batch |
+| `Risk` | `high` for auth, a data model change on populated data, integrations, money or PII, or anything touching a prior verified feature. Otherwise `std`. High rows run solo |
+| `Verify` | The row's rung list; which rows actually pay for it depends on `Rigor`: `../../fulcrum-verification/SKILL.md`, heading "Gates and rigor" |
+| `Gate` | `-` at emission. Set only from the gate a row actually ran |
+
+Under-marking `Risk` is the expensive mistake: a `std` row batches, so an auth change
+hidden in a batch shares its blast radius and skips its solo proof.
+
+### No spike or probe rows
+
+**Do not plan a spike or probe row to test a platform capability.** An unknown is asked
+at intake, or tried on the first real row, which fails fast. Traps already live in
+skills, so a known construct needs no rediscovery. A tenant capability check stays
+read-only and free (`tenant-capability-probe.md`).
+
+The failure mode: spikes consume hours and publish throwaway revisions, and prove what
+the first real row would prove anyway. If a row exists only to learn something and ships
+nothing, delete it and put the question to the user or to the first row that needs the
+answer.
+
+### Slices inside a lane
+
+A vertical slice is data + screens + navigation for one coherent user job. In a large
+app, group a lane's UI and logic rows by slice, cheapest and most central first, rather
+than all screens and then all bindings: that leaves the app un-demoable for the whole
+middle of its lane and defers every integration risk to the end.
 
 "Cheapest and most central first" resolves ties: the slice that the most other slices
 depend on, weighted down by how expensive it is. Auth and a primary dashboard usually
 win. A settlement or reporting slice usually loses.
+
+### Phases are labels
+
+A phase is a derived label: a layer in the graph, written in `plan.md` and the `Step` id.
+It is not a gate, and nothing stops at one except what the mode says
+(`../../fulcrum-loop-engine/SKILL.md`).
 
 ### Every phase ends demoable
 
@@ -95,10 +181,10 @@ deliberate intermediate state from a defect, and will "fix" the intermediate sta
 
 Practical consequences:
 
-- Navigation only ever lists screens that exist in the current phase. A nav entry to a
-  screen built next phase is a broken link in a demo.
-- A phase that renames or restructures something finishes the rename inside the phase.
-- If a phase would end mid-transformation, the phase is drawn wrong. Redraw it.
+- Navigation only ever lists screens that exist by then. A nav entry to a screen built
+  later is a broken link in a demo.
+- A row group that renames or restructures something finishes the rename inside the group.
+- If a layer would end mid-transformation, the layer is drawn wrong. Redraw it.
 
 ### Data before screens
 
@@ -107,18 +193,10 @@ looks identical whether the binding is correct or absent, so the build agent get
 signal and the fix turns get spent later at higher cost. Loader patterns:
 `../../fulcrum-seed-data/SKILL.md`.
 
-### Phase count and shape
+### Scale
 
-Reference engagement: a ~28 screen/flow-group scope became **5 phases, 47 numbered
-steps**. `[SINGLE-OBSERVATION]`
-
-Shape that worked:
-
-| Phase | Content |
-|---|---|
-| 1 | Theme, navigation shell, auth, data model, seed, one dashboard slice |
-| 2-4 | One vertical slice each, cheapest and most central first |
-| 5 | Remaining slice plus a cross-phase QA pass (reachability, nav completeness, visual parity) |
+Reference engagement, built before the graph existed: a ~28 screen/flow-group scope
+became **5 phases, 47 numbered steps**. `[SINGLE-OBSERVATION]`
 
 Explicitly: **a ~28-screen scope is not a one-shot, and neither is a 12-screen one.**
 `[VERIFIED]` If a plan proposes doing a solution-sized scope in one session, that is the
@@ -146,6 +224,9 @@ Every clause carries weight:
 - **One build plus two fix turns** - if it habitually needs more, split it. The cap is a
   measuring instrument here; as a stop condition it belongs to
   `../../fulcrum-unattended-guardrails/SKILL.md`.
+
+Sizing stays per row even when rows run as a batch. A batch is a loop decision over
+right-sized rows, so a row too big to pass this test alone is not made safe by batching.
 
 ### Cost anchors
 

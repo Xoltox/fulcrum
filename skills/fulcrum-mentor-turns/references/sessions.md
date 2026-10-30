@@ -20,28 +20,29 @@ staleness guard". Tool facts cited here are recorded, dated and tagged in
   `[UNVERIFIED]` - publish once early (`../SKILL.md`, heading "Publish
   sequencing").
 
-## One session per step, or carry one across steps
+## One session per dispatch, or carry one across dispatches
 
 The tradeoff, stated so the choice is made rather than defaulted:
 
 | Keep the session | Start fresh |
 |---|---|
-| Mentor carries its own earlier proposals, names and corrections into the next turn - the consult and build turns of a step depend on this | Mentor re-reads the model with no remembered beliefs; nothing it got wrong earlier steers the next turn |
+| Mentor carries its own earlier proposals, names and corrections into the next turn - the consult and build turns of a dispatch depend on this | Mentor re-reads the model with no remembered beliefs; nothing it got wrong earlier steers the next turn |
 | No new first turn, so no fresh exposure to the capacity throttle | Each new session has a first turn, and the first Mentor call of a session has been refused under capacity (`mcp-surface.md`, "Creating and loading an asset") |
-| Risk: carried beliefs go stale - Mentor "remembers" a state the model no longer has, and the staleness guard is the only check | Risk: costs a first turn and loses useful context; a cross-step dependency must be restated in the prompt |
+| Risk: carried beliefs go stale - Mentor "remembers" a state the model no longer has, and the staleness guard is the only check | Risk: costs a first turn and loses useful context; a cross-dispatch dependency must be restated in the prompt |
 
 Rules that follow:
 
-- **Within a step: always one session.** Consult, build and its fix turns
+- **Within a dispatch: always one session.** Consult, build and its fix turns
   share it. Splitting them makes Mentor re-derive an approach and silently
   drops the review's corrections (`posture.md`).
-- **Across steps: a fresh session per step** (Fulcrum rule). Each step is one
-  driver dispatch, and a fresh session's `assetRefs` with no revision works on
-  the latest `[SCHEMA]`, so the step's staleness guard proves the previous step
-  landed. Carrying a session into the next step trades that proof for remembered
-  context; restate any cross-step dependency in the prompt instead.
-- **Resume a session only within the same step**: the orchestrator passes the
-  `sessionId` a previous dispatch of that step handed back with
+- **Across dispatches: a fresh session per dispatch** (Fulcrum rule). One
+  dispatch is one batch or one solo row with one Publish, and a fresh session's
+  `assetRefs` with no revision works on the latest `[SCHEMA]`, so the dispatch's
+  staleness guard proves the previous one landed. Carrying a session into the
+  next dispatch trades that proof for remembered context; restate any
+  cross-dispatch dependency in the prompt instead.
+- **Resume a session only within the same row or batch**: the orchestrator passes
+  the `sessionId` a previous dispatch of that row or batch handed back with
   `session_state: open` (budget stop, halt with unpublished changes). Do not
   resume when the guard fails or a read-back contradicts published state and
   the session holds no unpublished changes, after a cancel or an interrupted

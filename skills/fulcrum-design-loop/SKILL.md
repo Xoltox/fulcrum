@@ -65,7 +65,7 @@ included. (Fulcrum rule)
 | 4 | Build | Step's Publish passes the `env_app` revision gate | `fulcrum-mentor-driver` + `fulcrum-poller` |
 | 5 | Verify | Rungs in the row's `Verify` have evidence | `fulcrum-renderer`, `fulcrum-verifier` |
 | 6 | Render-compare | Verdict per screen at the bar | verifier judges; orchestrator triages |
-| 7 | Fix | Re-compare done, or cap -> halt path | driver, new dispatch on a `fix` row of the same `Step` |
+| 7 | Fix | Re-compare done, or cap -> lane stop | driver, new dispatch on a `fix` row of the same `Step` |
 | 8 | Report | All screen rows terminal; promotion offered, never done | orchestrator |
 
 Phases 4-7 are the loop engine's iteration unchanged; this skill supplies the rows,
@@ -185,7 +185,7 @@ When `project.md` has `design`, rung 6 on a screen row runs
    owning step, then re-compare every affected screen.
 4. **Fix** - diagnostic first, a fix turn led by the measured symptom, Publish,
    re-judge. At most 3 compare rounds per screen (the initial judge plus one re-judge
-   per fix turn; fix turns stay <= 2); then `fail`, guardrails halt path.
+   per fix turn; fix turns stay <= 2); then `fail`, guardrails lane stop.
 5. **Record** `design/fidelity/<SID>-r<n>.md` from `templates/fidelity.md`.
 
 ## Stop and report

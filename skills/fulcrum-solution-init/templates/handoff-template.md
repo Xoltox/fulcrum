@@ -32,7 +32,8 @@ wholesale each handoff; read this every resume. Append-only history:
 | File | Role |
 |---|---|
 | `DOMAIN.md` | Domain source of truth |
-| `.fulcrum/plan.md` | Phases, steps, decomposition, entity owners |
+| `.fulcrum/plan.md` | Phase labels, steps, decomposition, entity owners |
+| `.fulcrum/TASKS.md` | Current truth and the task graph |
 | `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence |
 | `specs/step-<NN>-*.md` | Self-sufficient spec per step |
 | `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history - session index, read for "what happened" |
@@ -53,11 +54,11 @@ Do not re-scan these. They are resolved in `.fulcrum/tenant-profile.md`.
 
 ## Session start sequence
 
-1. Re-run the **Mentor liveness gate** (`.fulcrum/tenant-profile.md`, row 0). On fail,
-   halt.
-2. Read PART 2 - BRIEF. It names exactly one next step.
-3. Read that step's spec. Read nothing else.
-4. Record the run id in `.fulcrum/RUN-IDS.md` before polling it.
+1. Run no **Mentor liveness gate** yourself: it runs on the first staleness guard of the
+   first dispatch (`.fulcrum/tenant-profile.md`, row 0). On fail, halt.
+2. Read PART 2 - BRIEF. It lists the current frontier, one line per lane.
+3. Read the specs of the rows you dispatch. Read nothing else.
+4. Record each run id in `.fulcrum/RUN-IDS.md` before polling it.
 
 ## Standing decisions - do not re-litigate
 
@@ -91,17 +92,18 @@ table exists to prevent.
 **Replaced wholesale each handoff. Everything below is current state only.**
 
 **Session:** \<date\>
-**Phase:** \<n\> - \<name\>
-**Last completed step:** \<NN\> - \<title\>. Landed at revision \<r\>.
+**Phase label:** \<n\> - \<name\>
+**Last completed, per lane:** \<app\>: \<NN\> - \<title\>. Landed at revision \<r\>.
 
-## The one next step
+## The current frontier
 
-**Step \<NN\> - \<title\>**
-**Spec:** `specs/step-<NN>-<slug>.md`
+One line per lane, from `.fulcrum/TASKS.md`. A single-app project has one line.
 
-\<Two or three lines: what it produces and why it is next. Nothing else.\>
+| App | Rows | Spec | What it produces |
+|---|---|---|---|
+| \<app\> | \<T-NNN, or a batch\> | `specs/step-<NN>-<slug>.md` | \<one line. Nothing else.\> |
 
-## What that step needs before it can start
+## What those rows need before they can start
 
 - \<Precondition, e.g. a confirmed manual asset upload, a seeded table, a resolved
   question. Empty is fine - write "Nothing".\>
@@ -115,7 +117,7 @@ This BRIEF is the orchestrator's resume point. Do not keep a second one (a check
 file at the repo root, a long commit message): it gets updated instead of this file and
 the two diverge. Regenerate this part at every wave close.
 
-## Known-open items that do NOT block this step
+## Known-open items that do NOT block the frontier
 
 - \<item\> - \<which step it gates instead\>
 

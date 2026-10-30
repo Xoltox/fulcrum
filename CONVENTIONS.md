@@ -55,7 +55,8 @@ from one build and not one tenant's configuration.
   specific to a real engagement, no project-specific CSS class prefixes, no
   specific revision numbers. Where a concrete example genuinely aids
   comprehension, invent a neutral one (`Order`, `Shipment`, `Customer`).
-- **Tenant-varying facts do not get asserted.** They get probed. See below.
+- **Tenant-varying facts do not get asserted.** They get read, asked, or observed on the
+  first real row. See below.
 - Keep the *consequence*, drop the anecdote. "Deleting a Gallery's default `List`
   child collapses the repeater to one row while validation and publish stay
   clean" is platform truth. "This happened on step 18" is not.
@@ -70,9 +71,12 @@ names is `skills/fulcrum-mentor-turns/references/mcp-snapshots/`.
 
 ### The tenant profile contract
 
-Facts that vary by tenant, licence, or platform version are resolved once per
-project by a read-only capability probe during `fulcrum-solution-init`, which writes
-`tenant-profile.md` into the project repo.
+Facts that vary by tenant, licence, or platform version live in `tenant-profile.md` in
+the project repo. A read-only, free capability probe during `fulcrum-solution-init`
+writes the file: the Mentor liveness gate, plus what a read can answer. A fact no free
+read answers is asked at intake, or marked `first-row` and recorded when the first real
+row that needs it lands. Never a spike: a row built only to learn a fact consumes hours
+and publishes throwaway revisions to prove what that first real row proves anyway.
 
 Lookup rule: the agent looks for `tenant-profile.md` in the project's `.fulcrum/`
 first, then walks up parent directories and uses the nearest one found; it writes a
@@ -84,7 +88,7 @@ Skills must **reference the profile, never hardcode the answer**:
 - Wrong: "Icon names are PascalCase - write `ArrowRight`."
 - Right: "Check `tenant-profile.md` for the icon-font family and its name
   casing. A wrongly cased icon name renders blank or falls back to a default
-  glyph with no error, so quote names in the convention the probe confirmed."
+  glyph with no error, so quote names in the convention the profile records."
 
 Facts belonging in the profile include, at minimum: which UI blocks exist
 (`Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`);
@@ -307,26 +311,27 @@ Overlap causes mis-triggering. One topic, one owner:
 
 | Skill | Owns | Explicitly does NOT own |
 |---|---|---|
-| `fulcrum-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; phase and step sizing; repo scaffold; the tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup |
+| `fulcrum-solution-init` | Ingesting source artifacts; decomposing a solution into apps/agents/workflows; emitting the task graph (foundation, lanes, gate rows, cross-app contracts) and the no-spike rule; step sizing; asking `Rigor` at init; repo scaffold; the read-only tenant capability probe; the handoff document structure | Individual Mentor turn mechanics; trap lookup; frontier selection and batching; what `Rigor` sets |
 | `fulcrum-mentor-turns` | Turn granularity and decomposition; prompt shape and length ceiling; session reuse vs fresh session; staleness guard before mutating; polling cadence; run-id durability; publish sequencing | What to build; how to prove it landed |
 | `fulcrum-engine-traps` | The construct-indexed trap registry: aggregates, repeaters, links, icons, dates, REST, static entities, charts, overlays, wizards, theming | Turn mechanics; verification procedure |
-| `fulcrum-verification` | Proof obligations; which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
+| `fulcrum-verification` | Proof obligations; the gates G0 to G3 and the rigor table (once, here; others point to it); which instrument catches which defect class; visual capture and comparison; diagnostic REST endpoint pattern; what platform success signals do not mean | Trap causes; orchestration |
 | `fulcrum-render-check` | Executing renders: browser preflight, sign-in mode choice (anonymous, generated sample personas, user hand-off), render timing after publish, evidence capture, security observations a render surfaces | What counts as proof (verification); why a construct renders wrong (traps); the verdict |
 | `fulcrum-seed-data` | Idempotent loaders; natural keys; relative timestamps; static entity identifiers; reset paths and their absence | Screen construction |
 | `fulcrum-gap-analysis` | Assessing an app that already exists against the requirements it was meant to satisfy: establishing build provenance, requirement-to-artifact traceability, classifying gaps vs drift vs stale requirements vs undocumented additions vs unfalsifiable requirements, repair-versus-rebuild, sequencing remediation | How to build or prove any individual fix; trap causes |
-| `fulcrum-unattended-guardrails` | Stop conditions; fix-turn caps as a ceiling; escalation and halt rules; subagent depth and delegation boundaries; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific; the iteration mechanism itself - selecting, dispatching, polling, recording and advancing a task is `fulcrum-loop-engine`'s |
-| `fulcrum` | The router and entry point: detecting project state from the filesystem, resuming an engagement, mode selection, proposing the micro profile for the user to confirm, question-asking discipline in `guided` mode, dispatching to the right skill | Anything it routes to. It performs no Mentor turn, no verification, no planning and no state-file schema of its own |
-| `fulcrum-project-state` | Where durable state lives and what shape it has: the `.fulcrum/` file set and each file's schema, the full and micro profiles and which files each requires, who writes which file, append-only versus rewritten discipline, crash-idempotent write ordering, the runtime lease enforcing one Mentor session per app, the decision record gap analysis consumes, the halt record | What goes in any of those files. It never decides what to build, when to stop, what counts as proof, or how to iterate |
-| `fulcrum-loop-engine` | The iteration mechanism: select task, precondition and staleness check, dispatch, poll, verify, record, advance; the bounded fix-loop; oscillation detection against `JOURNAL.md`; crash-idempotency of a single iteration; per-iteration budget accounting | Stop conditions and halt rules - those are `fulcrum-unattended-guardrails`'. Also not what to build |
+| `fulcrum-unattended-guardrails` | Stop conditions, including the stall decision; fix-turn caps as a ceiling; escalation and halt rules; subagent depth and delegation boundaries, including the in-flight cap on parallel drivers; context and call budgeting; checkpoint and handoff discipline; concurrency locks; model tier policy | Anything ODC-construct-specific; the iteration mechanism itself - selecting, dispatching, polling, recording and advancing is `fulcrum-loop-engine`'s |
+| `fulcrum` | The router and entry point: detecting project state from the filesystem, resuming an engagement, mode selection, asking `Rigor` on first run and on resume when it is missing, proposing the micro profile for the user to confirm, question-asking discipline in `guided` mode, dispatching to the right skill | Anything it routes to. It performs no Mentor turn, no verification, no planning and no state-file schema of its own |
+| `fulcrum-project-state` | Where durable state lives and what shape it has: the `.fulcrum/` file set and each file's schema, TASKS schema v3 and its migration, the full and micro profiles and which files each requires, who writes which file, append-only versus rewritten discipline, crash-idempotent write ordering, the runtime lease enforcing one Mentor session per app, the decision record gap analysis consumes, the halt record | What goes in any of those files. It never decides what to build, when to stop, what counts as proof, or how to iterate |
+| `fulcrum-loop-engine` | The iteration mechanism: select the runnable frontier grouped by app, batch, precondition and staleness check, dispatch parallel lanes, poll, verify, record, advance per lane; the bounded fix-loop; oscillation and stall detection (detect only); crash-idempotency of a single iteration; per-iteration budget accounting | Stop conditions and halt rules - those are `fulcrum-unattended-guardrails`'. Also not what to build |
 | Out of family: external systems and integration targets (not a skill) | Building and deploying the system - another vendor's server, a workflow engine, a third-party API, a service another team builds, its infrastructure - happens outside Fulcrum, under the user's own process. It appears in `TASKS.md` only as `Turn: external` rows | Its contract, which is Fulcrum's: `.fulcrum/external/<system>.md` (template `skills/fulcrum-project-state/templates/external-system.md`: endpoint and auth, payload contract, error codes, verified log locations), owned by `fulcrum-project-state`. It **must exist before the ODC step that consumes the system starts** |
 | `fulcrum-design-loop` | One design source for one app built into a published app: design capture and the design spec format; the block-mapping gate; step decomposition of a captured design; render-compare against the source and diff triage | Turn mechanics, traps, proof rungs, render execution, seed loaders, iteration, stop rules |
-| `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements, and producing the source material - a BRD or equivalent spec - that `fulcrum-solution-init` then ingests | Decomposition, sizing and planning. It stops at the spec; `fulcrum-solution-init` takes it from there |
+| `fulcrum-discovery` | Interviewing a user who has an idea but no written requirements, and producing the source material - a BRD or equivalent spec - that `fulcrum-solution-init` then ingests | Decomposition, sizing and planning; the `Rigor` question. It stops at the spec; `fulcrum-solution-init` takes it from there |
 
 ## Mode and posture
 
-Two settings, **two orthogonal axes**. Never collapse them into one dial. An expert
-user may want `collaborative`; a `guided` user may want `directive`. Every
-combination of the four is legal and must be honoured as written.
+Three settings, **three orthogonal axes**: mode, posture and rigor. Never collapse them
+into one dial. An expert user may want `collaborative`; a `guided` user may want
+`directive`; a `demo` may run under either posture. Every combination is legal and must
+be honoured as written.
 
 **Mode - `guided` | `expert`.** Governs who decides and how much is asked of the user.
 
@@ -360,7 +365,21 @@ or budget. Same principle as the non-negotiable "never escalate model tier to br
 stuck bug" in `AGENTS.md`: posture is a user decision, never a machine one. A cheaper
 tier is a reason to lean harder on `collaborative`, not a licence to switch.
 
-**Both settings are recorded in `.fulcrum/project.md`** - see
+**Rigor - `demo` | `pilot` | `production`.** Governs depth of evidence: which gates run
+and how often. Recorded as `Rigor` in `.fulcrum/project.md`. The gates and the rigor
+table live once, in `skills/fulcrum-verification/SKILL.md`, heading "Gates and rigor";
+never restate them.
+
+**Rigor is asked at init in every mode, never defaulted, never inferred.** Missing on
+resume: ask. Changing it is a user decision. The failure mechanism: a guessed rigor sets
+proof depth for the whole build, so a demo pays for production proof, or a production
+build ships on demo evidence, and nothing in the run says the setting was a guess.
+
+**Rigor never changes posture.** `directive` stays an explicit user opt-in, at `demo`
+too. Rigor is depth of evidence, not safety: it relaxes no safety rule. The list of what
+holds at every rigor lives with the table.
+
+**All three settings are recorded in `.fulcrum/project.md`** - see
 `skills/fulcrum-project-state/SKILL.md`, heading "Mode and posture" - never in the
 installed skill files. Precedent: `MODEL-TIERS.md`, heading "The install interview
 must not edit installed files". Installed content carrying project state makes every

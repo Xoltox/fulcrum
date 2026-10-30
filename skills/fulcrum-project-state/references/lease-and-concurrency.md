@@ -32,12 +32,14 @@ someone held a lock at push time, which is not a question anyone needs answered.
   "ttl_seconds": 5400,
   "task": "T-014",
   "note": "<what is being done, one line>",
-  "open_session": "<Mentor sessionId - only while a dispatch returned session_state: open>"
+  "open_session": "<Mentor sessionId - only while a dispatch returned session_state: open>",
+  "held_with": ["<other app identifiers in the same session - only on a multi-asset dispatch>"]
 }
 ```
 
 `ttl_seconds` above is an example (a 75-minute dispatch budget plus margin), not a
-default - see the TTL rule below.
+default - see the TTL rule below. On a batch, `task` lists every row of the dispatch,
+comma-separated.
 
 One lease file per app when the solution has several: `lease.<app identifier>.json`.
 The lock is per app, so a single shared file would serialise apps that the platform
@@ -65,8 +67,8 @@ re-read for the key; before it, the app may exist with no id on file.
   per-poll refresh.
 - `ttl_seconds` is a **liveness claim, not a permission window.** Set it to the
   dispatch's wall-clock budget plus margin - never a fixed figure. One driver dispatch
-  covers a whole plan step (guard, consult, build, fix, Publish), so the TTL must cover
-  all of it. A TTL shorter than the work it covers manufactures the expiry case on a
+  covers a whole batch or solo row (guard, consult, build, fix, Publish), so the TTL
+  must cover all of it. A TTL shorter than the work it covers manufactures the expiry case on a
   perfectly healthy run.
 
 ## Protocol
@@ -79,7 +81,8 @@ re-read for the key; before it, the app may exist with no id on file.
    dispatch, proceed. This is the normal resume-your-own-work path.
 3. Present, another holder, `acquired + ttl_seconds` **in the future** -> the lease is
    live. **Do not take it.** Either work on a different app, or stop and report. Never
-   "check whether the other agent is really running" by starting a turn.
+   "check whether the other agent is really running" by starting a turn. A dead
+   session's lease: "Resuming after a dead session" below.
 4. Present, another holder, `acquired + ttl_seconds` **in the past** -> expired. It may
    be broken only if the holder's dispatch is also known dead (it never returned and
    its budget is exceeded), under the rules below.
@@ -90,15 +93,37 @@ session-file `release lease` line. A lease released only on the success path is 
 leaks on exactly the runs where recovery matters.
 
 **Hold** (the orchestrator), when the dispatch returns `session_state: open` (a budget stop,
-or a halt with `on_exit: keep-open`, typically with `unpublished_changes: yes`): do **not**
+or a halt or lane stop with `on_exit: keep-open`, typically with `unpublished_changes: yes`): do **not**
 release. The app still has a live Mentor session, and a second session on it is the
 corruption path this file exists to prevent. Rewrite the lease with `open_session` set to the
 returned `sessionId` and a new `acquired` / `ttl_seconds` sized to the expected resume dispatch
 (or, when the next move is the user's, to a hold until the user decides), and append a
 session-file `hold lease` line naming the sessionId. The next action is either a resume
-dispatch of the **same** step with that `sessionId`, or a halt for the user (`HALT.md`
-records the open sessionId). Release only when a later dispatch returns
+dispatch of the **same** row or batch with that `sessionId`, or a stop for the user
+(`HALT.md` records the open sessionId on a halt, the `hold lease` line on a lane stop).
+Release only when a later dispatch returns
 `session_state: closed`. (Fulcrum rule.)
+
+## Several apps in one session
+
+A driver may hold one declared producer and consumer pair
+(`../../fulcrum-loop-engine/references/frontier-and-batching.md`, heading "Multi-asset
+dispatch"). Each held app is still locked: a session holding a producer read-only is
+still a session on that app, and a second session there is the same corruption path.
+(Fulcrum rule.)
+
+- **One lease file per app**, same `holder`, `acquired`, `ttl_seconds`, `task`, and
+  `held_with` naming the others. The lock stays per app, so a reader of one file needs
+  nothing else to see it is taken.
+- **Acquire all or none.** Write them in sorted identifier order. If any is live under
+  another holder, delete those just written and treat the dispatch as not ready. A
+  partial set blocks one lane to no purpose and, with the opposite order elsewhere, two
+  agents can each hold half forever.
+- **Release all together**, on `session_state: closed`. **Hold all together**, on
+  `session_state: open`: `open_session` goes in every file. The Mentor session is one
+  thing, so its lock must not end app by app.
+- **A break covers the set.** Check `held_with`, and confirm no run is in flight on any
+  held app before overwriting any of the files.
 
 ## Breaking an expired lease
 
@@ -116,6 +141,20 @@ exceeded. A holder whose dispatch may still be running is waited on or halted fo
 3. Append a session-file line recording the break, naming the previous holder and its
    `acquired` timestamp. An unrecorded break makes a later corruption undiagnosable -
    there is no other trace that two agents both believed they held the app.
+
+## Resuming after a dead session
+
+Polling a known run needs no lease: a read cannot race a turn, and a run left unread is
+how a run id goes unpollable.
+
+To dispatch on the lane again, a new session adopts the dead session's lease rather than
+breaking it. A TTL is no test here: a hold until the user decides can outlast the session.
+
+1. Confirm the session is dead (no return, budget exceeded, or the user says so) and
+   no run is live for that app, as in step 1 above, across any `held_with`.
+2. Rewrite the lease with your own `holder`. Keep `open_session`: the next dispatch
+   resumes that session.
+3. Append a session-file `adopt lease` line naming the previous holder and `acquired`.
 
 ## What the lease does not protect against
 

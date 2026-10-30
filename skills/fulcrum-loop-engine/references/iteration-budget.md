@@ -36,7 +36,7 @@ A `collaborative` iteration costs the orchestrator roughly:
 |---|---|
 | 1 Select | 1 read (`TASKS.md`) |
 | 2 Precondition | 1 halt check, 1 journal scan, 1 lease write (the invariant turn runs inside the phase 3 dispatch) |
-| 3 Dispatch | 2-3 state writes, 1 driver dispatch per plan step (guard, consult, build, fix, Publish in one session), 1 report read |
+| 3 Dispatch | 2-3 state writes, 1 driver dispatch per batch or solo row (guard, consult, build, fix, Publish in one session), 1 report read |
 | 4 Poll | 0 - delegated. It is 0 **only** if delegated |
 | 5 Verify | 1 dispatch per rung group, 1 report read each |
 | 6 Record | 3-4 writes |
@@ -69,13 +69,19 @@ whatever the run may have changed - strictly more than the iteration would have
 cost to finish. Stopping one iteration early is cheap; stopping halfway through
 one is the most expensive stop available.
 
+Each lane's dispatch is counted against the one orchestrator budget, so parallel
+lanes spend it faster than wall clock suggests. Before adding a lane, the remaining
+budget must cover every dispatch already in flight plus the new one. When it does
+not, stop selecting, let the running lanes return, record them, then hand back. A
+hand-back with a lane still in flight is the mid-iteration stop this rule forbids.
+
 So, at phase 1:
 
 ```
 remaining = budget - used
-if remaining < cost_of_one_iteration:   hand back now
-if used >= 0.85 x budget:               hand back now   (budgeting.md)
-if used >= 0.65 x budget:               write the checkpoint, continue
+if remaining < cost_of_one_iteration x (in_flight + 1):   stop selecting
+if used >= 0.85 x budget:                                 hand back now   (budgeting.md)
+if used >= 0.65 x budget:                                 write the checkpoint, continue
 ```
 
 `cost_of_one_iteration` is the class-calibrated figure above, plus the fix-loop

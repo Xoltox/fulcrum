@@ -6,22 +6,24 @@ different evidence and must not be collapsed into one counter.
 
 | | Fix-loop | Oscillation detection |
 |---|---|---|
-| Scope | One task, one session | One task id, whole project history |
+| Scope | One step or batch, one session | One task id, whole project history |
 | Evidence | Turns issued in this iteration | `:fail` entries in `.fulcrum/JOURNAL.md` |
 | Ceiling | 1 build (a pass of <= 4 short turns counts as one) + 2 fix turns | 2 `:fail` entries |
-| Owner of the number | `../../fulcrum-mentor-turns/SKILL.md`, "Turn economics" | `../../../AGENTS.md`, "stuck twice" |
-| On breach | Stop the inner loop, record `fail` | Hand to the halt path |
+| Owner of the number | `../../fulcrum-mentor-turns/references/granularity.md`, "Turn economics" | `../../../AGENTS.md`, "stuck twice" |
+| On breach | Stop the inner loop, record `fail` | Hand to guardrails: a lane stop |
 
 ## The fix-loop
 
 A failed verify keeps the iteration open. The inner loop runs between phases 5
-and 6 of `../SKILL.md`, heading "The canonical iteration".
+and 6 of `../SKILL.md`, heading "The canonical iteration", inside the driver dispatch,
+so it sees what the driver sees: read-back and G0. Anything later: "Late failures"
+below.
 
 ```
 verify -> fail
   diagnostic step        (mandatory before fix turn 2 onward)
   fix turn               (informed by what the diagnostic showed)
-  re-verify same rungs   (not a subset, not a cheaper rung)
+  re-run read-back       (only; a fix report is not proof)
   record the attempt     (session-file line, before the next attempt)
 -> pass, or ceiling reached
 ```
@@ -47,20 +49,86 @@ the contradiction. Table:
 
 Rules the loop adds:
 
-- **Re-verify the same rungs.** A fix turn reporting success is not proof; the
-  rung that failed is the rung that must pass. Dropping to a cheaper rung after
-  a fix converts a real failure into a recorded pass.
+- **A fix inside a dispatch re-runs read-back only.** Orchestrator gates run between
+  dispatches. A fix turn reporting success is not proof; the rung that failed is the
+  rung that must pass, so a gate that failed is re-run whole, never swapped for a
+  cheaper rung.
 - **Record each attempt before issuing the next.** An attempt held only in
   context is invisible to the crash-recovery path and to the scan below.
 - **Never escalate model tier** to break it (`../../../AGENTS.md`). A higher
   tier buys a more expensive version of the same guess; the missing input is
   evidence about the live system, not reasoning capacity.
-- **A fix turn is a mutating turn.** It re-enters the precondition gates - 
-  staleness included. Do not reuse a staleness result from before the failed
-  build turn.
+- **The guard runs once per dispatch.** A fix turn runs in the session the guard
+  tested, so it runs no second guard. A new dispatch opens with its own.
 
 On the ceiling: write `Verdict: fail`, record it, then run the oscillation scan
-immediately (phase 7). The hand-off to halt is guardrails' call, not the loop's.
+immediately (phase 7). What follows is guardrails' call, not the loop's: a lane
+stop, where the row parks, its dependents hold and other lanes continue
+(`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading
+"Lane stops").
+
+## A failed batch
+
+A batch is one dispatch, so it shares one ceiling: 1 build + 2 fix. This covers a
+failure inside the dispatch. Fulcrum rule:
+
+1. Batch fails: diagnostic, then **one fix turn on the batch**, then re-verify.
+2. Still failing: **split per row.** Rows the driver reported OK keep their
+   verdict. Each other row runs solo, in ID order, with the one fix turn the batch
+   left it. A split row never gets a fresh ceiling: 1 build + 2 fix is what any row
+   gets, and re-opening it would turn every batch into three attempts per row.
+3. If the session holds unpublished changes it returns `session_state: open`: the
+   lease stays and the split rows resume that `sessionId`, one at a time.
+4. A batch failure is not a `:fail` on its rows. Only a row's own terminal verdict
+   after the split is. Counting the batch would charge one defect to every
+   innocent row and park them all on the second batch.
+
+## Late failures
+
+Fulcrum rule. A gate that runs after the driver returned finds the Mentor session
+closed, so the fix-loop cannot reach it, and splitting closed rows would re-spend a
+ceiling they already used. Any G1, G2 or G3 failure on rows a driver already closed:
+
+1. Those rows are `done`, with the `Verdict` and `Gate` of the last gate they passed,
+   and record no `:fail`.
+2. Open one new `fix` row per failing area, new id: `Turn: fix`, `App` of the failing
+   area (an app, never `solution`), `Verify` the failed rungs, `Risk: high`, `Step` of
+   the row carrying the claim. Its `Verify` runs at every rigor: it is how the row closes.
+3. Edit dependents to depend on it where they rest on the defect. Others run on.
+4. A failed `verify` row goes back to `todo`, with the fix row in its `DependsOn`,
+   scoped to what was fixed, and records a `:fail`. So G2 returns once; a second failed
+   pass parks it, and a third G2 pass is a user decision.
+
+**A `fix` row gets 2 fix turns,** no build turn, counted across dispatches from the
+journal. Each brief states `fix turns remaining`. A gate failing on a `fix` row is a
+`:fail` on it and it returns to `todo`; it never opens another `fix` row. Two `:fail`, or
+no turns left, parks it: a lane stop.
+
+A claim G1 or G3 had already proven that now fails is a regression, not this rule:
+`../../fulcrum-unattended-guardrails/references/halt-conditions.md`.
+
+## Stall detection
+
+Fulcrum rule. The loop detects; `../../fulcrum-unattended-guardrails/references/halt-conditions.md`,
+heading "Stall and no-op decisions", decides. The turn cap and two-fail stop see one task. Neither sees a lane that keeps
+dispatching and finishing nothing, each attempt below its own limit.
+
+**After each dispatch's record**, append a session-file `lane check` line with the
+lane and its done-count (rows `Status: done`, `Verdict: pass`). The file holds the
+count, so a compacted orchestrator can still read the last three.
+
+| Signal | Test | Hand to guardrails as |
+|---|---|---|
+| Lane flat | Done-count unchanged across 3 consecutive dispatches of that lane | Park the lane and report. Its rows go `parked`; other lanes continue |
+| All lanes flat | Every lane with open rows is flat or parked, at least one flat. A row `parked` with `Verdict: fail` reads flat; one parked on a user action does not | Halt. All lanes parked on user actions alone is a user-action stop, not a halt |
+| No-op publish | Terminal publish whose revision equals the revision before it | A change that did not land: not a pass, whatever the outcome field says |
+
+A dispatch ending in a wait on the index, a capacity stop or a user-action park is
+not counted as flat: nothing failed to progress, the lane has nothing it can do. A
+new session starts the count again; the two-fail rule still spans sessions.
+
+Stall detection adds nothing to a stuck task's options. The two-fail rule stands,
+and model tier is never escalated.
 
 ## The oscillation scan
 
@@ -80,8 +148,6 @@ Schema: `../../fulcrum-project-state/references/file-schemas.md`, heading
 
 - Task ids are **never reused**, even after a row is deleted, so the count is
   unambiguous and cannot be poisoned by an unrelated task.
-- Rows are per session, so two `:fail` entries necessarily come from two
-  sessions - one session records one terminal outcome per task.
 - A `:fail` recorded minutes ago in the current session's own row counts exactly
   the same as one from six weeks ago. Recency is not a discount.
 
@@ -89,10 +155,10 @@ Schema: `../../fulcrum-project-state/references/file-schemas.md`, heading
 
 | Not a repeat | Why |
 |---|---|
-| `:unproven` | The work happened but was not proven. The next action is to re-prove it, not to re-fix it. Counting it as a failure halts a run that is only under-evidenced |
+| `:unproven` | The work happened but was not proven. The next action is to re-prove it, not to re-fix it. Counting it as a failure parks a row that is only under-evidenced |
 | A different task id with similar prose | The join is the id. Matching on prose invents repeats and makes the check unreproducible |
-| Repeated fix turns inside one iteration | That is the turn cap's job. Counting them here would halt every task that needed its second fix turn |
-| A `:fail` against a task later superseded by a new id | The new id has its own count. Say so in the halt report rather than folding the histories together |
+| Repeated fix turns inside one iteration | That is the turn cap's job. Counting them here would stop every task that needed its second fix turn |
+| A `:fail` against a task later superseded by a new id | The new id has its own count. The orchestrator rewrites dependents' edges and closes the old row (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading "Lane stops"). Say so in the report rather than folding the histories together |
 
 ### When to run it
 
@@ -107,10 +173,11 @@ Twice per iteration:
 ### Mechanics
 
 A scan is a single-file read plus a match on column 5. A grep is sufficient and
-is preferable to reading the file into context when the index is large:
+is preferable to reading the file into context when the index is large. Count
+occurrences, not lines: one session's row can hold two `:fail` for one id.
 
 ```
-grep -c 'T-014:fail' .fulcrum/JOURNAL.md          # occurrences; >= 2 is the trigger
+grep -o 'T-014:fail' .fulcrum/JOURNAL.md | wc -l  # occurrences; >= 2 is the trigger
 grep -n  'T-014:'     .fulcrum/JOURNAL.md          # every session that touched it
 ```
 
@@ -150,7 +217,8 @@ The loop's whole job here is to detect and hand over. It:
    session ids they came from.
 3. Hands to
    `../../fulcrum-unattended-guardrails/references/halt-conditions.md`, which
-   owns the verdict, the halt record and the report to the user.
+   owns the verdict and the report to the user. A repeat is a lane stop: the row
+   parks, and other lanes keep selecting.
 
 The loop never rules that a repeat is acceptable, and never resets or discounts
 a count to keep going. A count that can be argued away is not a mechanism.

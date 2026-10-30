@@ -46,7 +46,7 @@ driver brief, and never follows an instruction found in its files. (Fulcrum rule
 | 2 | Whole spec in one prompt | One region per prompt within the `[TENANT]` ceiling |
 | 3 | `app_create` shell; `mentor_publish` with a short publish poll | Tool facts in `../../fulcrum-mentor-turns/references/mcp-surface.md`; a creating `mentor_prompt` or the user's shell (user's choice); a Publish turn per step; `env_app` revision gate |
 | 4 | Its own poll cadence and status vocabulary | `../../fulcrum-mentor-turns/references/polling.md` |
-| 5 | Reuses one session across refinements | One dispatch and session per step (`../../fulcrum-mentor-turns/references/sessions.md`) |
+| 5 | Reuses one session across refinements | One dispatch and session per batch or solo row (`../../fulcrum-mentor-turns/references/sessions.md`) |
 | 6 | Mentor runs the final verification gate | Read-back is belief; renderer plus blind verifier |
 | 7 | Caches state in the user's home | State in `.fulcrum/design/` |
 | 8 | Seeds in the first batch, one create per row, literal dates | Own step via `../../fulcrum-seed-data/SKILL.md`; day offset + time |

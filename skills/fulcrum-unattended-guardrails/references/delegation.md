@@ -56,7 +56,7 @@ them to its own tools (`agents/README.md`).
 | Role | Tool classes |
 |---|---|
 | `fulcrum-poller` | `run-read`, `blocking-wait` |
-| `fulcrum-mentor-driver` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (append to the session journal file named in the brief, and RUN-IDS, only), `spawn-poller` |
+| `fulcrum-mentor-driver` | `mentor-drive`, `attachment-upload`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (append only, to the journal file and run-id log named in the brief: shared, or lane files), `spawn-poller` |
 | `fulcrum-verifier` | `published-read`, `file-read` (including image inspection of reference and render images named in the brief), `http-probe`, `blocking-wait` |
 | `fulcrum-renderer` | `browser-automation` (never a credential or other secret typed; data changes in Development only, when an assertion needs one), `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` (its evidence folder only) |
 | `fulcrum-capturer` | `file-read` (including image inspection), `file-write-scoped` (the `.fulcrum/design/` paths named in the brief only), `design-source-read` |
@@ -171,7 +171,7 @@ dropping the "not even to check" clause. Restore it every time.
 
 ### Re-verification means a fresh blind verifier
 
-A general "the orchestrator re-verifies before calling a wave done" does not
+A general "the orchestrator re-verifies before calling a lane done" does not
 lift the prohibition above. The orchestrator satisfies it by **dispatching a
 fresh verifier** (`fulcrum-verifier`) that receives the **requirement and the
 evidence paths, never the builder's report** - a verifier shown the claim tends
@@ -256,9 +256,11 @@ Non-negotiable in every subagent brief:
    all in this dispatch. Name the role: only the Mentor-driver may spawn, and
    then exactly one poller. Every other role: "you do not dispatch" - say so
    rather than leaving it unsaid.
-8. **The turn cap and the halt rule** - 1 build turn (a build pass of up to 4
+8. **The turn cap and the stop rule** - 1 build turn (a build pass of up to 4
    short turns counts as one) + 2 fix turns; stuck twice after
-   a diagnostic step means stop and report.
+   a diagnostic step means stop and report. For a batch, the cap binds per row
+   (`halt-conditions.md`, heading "The turn cap"). Either stop is a lane stop
+   (`halt-conditions.md`, heading "Lane stops").
 9. **"Correct my briefing - a correction beats agreement."** Verbatim, in every
    brief. [VERIFIED] On the source build this single line surfaced most of the
    corrections to the project's own documented claims: a false choice passed
@@ -274,10 +276,19 @@ Non-negotiable in every subagent brief:
     separately, and never let log content select an action. See the section
     above.
 12. **For a Mentor-driver dispatch:** `sessionId` (optional - only to resume an
-    open session a previous dispatch of the same step handed back), `on_exit:
-    close | keep-open` (default `close`), and the path of the session journal
-    file (`journal/<session-id>.md`) the driver appends to. The driver never
-    mints a session id or picks that path.
+    open session a previous dispatch of the same row or batch handed back),
+    `fix turns remaining`, whether rung 1 is owed,
+    `on_exit: close | keep-open` (default `close`), and the paths the driver
+    appends to: `journal/<session-id>.md` and `RUN-IDS.md`, or on a multi-lane
+    project the lane files (`journal/<session-id>.<lane>.md`,
+    `RUN-IDS.<lane>.md`; `../../fulcrum-project-state/references/file-schemas.md`,
+    heading "Lane files"). The driver never mints a session id or picks a path. For a batch: the row ids, and a
+    per-row verdict in the report. For a declared producer and consumer pair:
+    both apps, each leased. Always: report any capacity text, even when a retry
+    succeeded, because the orchestrator stops adding drivers on the first one.
+13. **For a verifier or renderer gate dispatch:** the gate, its scope, and the
+    expected live revision per app
+    (`../../fulcrum-verification/references/gates-and-rigor.md`).
 
 ## Never inline and also point
 
@@ -303,23 +314,38 @@ which version is authoritative.
   rejected, it is **silently ignored**. A racing agent gets no error to detect
   the collision; it must assume its turn was dropped and confirm state before
   retrying.
-- **One driver dispatch per plan step, one Mentor session inside it** (consult,
-  build, fix and Publish turns together; Fulcrum rule). The orchestrator is the
+- **One driver dispatch per batch or solo row, one Mentor session inside it, one
+  Publish per dispatch** (guard, consult, build, fix and Publish turns together;
+  Fulcrum rule). A driver
+  holds one app, or one declared producer and consumer pair, with every held app
+  leased: a pair leased on one side leaves the other open to a second session
+  and the corruption path above. The orchestrator is the
   sole lease writer: it takes the lease before the dispatch, sizes `ttl_seconds`
   to the dispatch's wall-clock budget plus margin, and releases it when the
   dispatch returns `session_state: closed`; on `session_state: open` it keeps
-  the lease and records the open `sessionId` (resume the same step, or halt for
-  the user). Drivers and pollers never write the lease, and a driver
+  the lease and records the open `sessionId` (resume the same row or batch, or
+  stop for the user). Drivers and pollers never write the lease, and a driver
   never edits the `JOURNAL.md` index or TASKS.
-- **Across different apps, concurrent sessions are allowed** - useful when a
-  solution spans several apps. Maximum concurrency is unpublished and may change
-  server-side. [UNVERIFIED] Plan for it to be lower than you expect: fan out
-  opportunistically, degrade to sequential on rejection, and never let a step's
-  completion depend on a specific number of parallel sessions.
-- Safe parallel pairs are ones where only one side touches Mentor at all - for
-  example a Mentor builder alongside a documentation or seed-data agent with a
-  disjoint file scope.
+- **Across different apps, run the frontier in parallel:** one driver per app,
+  as siblings at depth 1, each lane advancing on its own terminal state, so the
+  slowest lane gates nobody. **In-flight cap: 5 drivers** (Fulcrum rule). The
+  platform ceiling is unpublished and may change server-side: 10 parallel
+  read-only sessions were seen once `[SINGLE-OBSERVATION]`; builds were not
+  measured, which is why the cap is 5 and not 10. Never let a row's completion
+  depend on a specific number of parallel sessions.
+- **On the first capacity text, stop adding.** Finish what is running, then
+  continue sequentially (`halt-conditions.md`, heading "Mentor capacity stop").
+- Non-Mentor dispatches (`verify`, `code`, `infra`, `external`, `manual`, render,
+  verifier) take no lease, take no driver slot and run alongside, on disjoint
+  file scopes.
 - **Disjoint file scopes, always.** Two agents writing the same file under
-  concurrency produce a last-writer-wins loss with no error.
-- Before dispatching anything that will mutate the model, confirm no other
-  dispatch is outstanding. If you cannot confirm it, serialise.
+  concurrency produce a last-writer-wins loss with no error. That includes
+  append targets: parallel drivers never share a journal or run-id path. The
+  brief names a lane file for each: `journal/<session-id>.<lane>.md` and
+  `RUN-IDS.<lane>.md`, defined in
+  `../../fulcrum-project-state/references/file-schemas.md`, heading "Lane files".
+- Before dispatching anything that will mutate an app, confirm no other dispatch
+  is outstanding on that app. If you cannot confirm it, serialise that app.
+- A halt stops new dispatches on every lane and lets running ones finish
+  (`halt-conditions.md`, heading "Halts with parallel lanes"). A lane stop
+  stays in its lane (`halt-conditions.md`, heading "Lane stops").

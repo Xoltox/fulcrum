@@ -1,13 +1,13 @@
 # Template - `.fulcrum/RUN-IDS.md`
 
 Copy to `<project>/.fulcrum/RUN-IDS.md`. **Append-only**, whole lines at the end of the
-file. Written by whoever issued the run. Exists and is empty rather than absent before
+file. Written by whoever issued the run, or folded in from a lane file. Exists and is empty rather than absent before
 the first run. Line format, field meanings and the publish slot:
 `../references/file-schemas.md`, heading "RUN-IDS.md".
 
 Append the `started` line the instant a start call returns its id - before the first
 poll, and before anything else. Append each later state as a new line repeating the
-run id; never edit a line.
+run id; never edit a line. On a batch `<task-id>` is a comma-separated list, no spaces.
 
 ---
 

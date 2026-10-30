@@ -8,7 +8,9 @@ starts a competing one. Error texts to match against:
 ## 1. Transport-level auth expires mid-turn
 
 The connection's own authentication expires. It has **no in-session
-recovery path.** [VERIFIED]
+recovery path.** [VERIFIED] Every lane shares the connection, so this is a halt
+(`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading
+"Hard stops").
 
 Recovery: reconnect out of band (re-authenticate the transport), then **read
 the same orphaned run** with the same `sessionId` and `runId` - do not start

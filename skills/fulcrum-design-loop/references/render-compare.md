@@ -94,7 +94,7 @@ session closed at Publish.
 
 **At most 3 compare rounds per screen** (the initial judge plus one re-judge per fix
 turn; fix turns stay <= 2). A diff surviving round 3, or the fix cap, -> the row's verdict is `fail` and the guardrails
-halt path runs. The loop engine's oscillation scan covers repeats across sessions
+lane stop runs. The loop engine's oscillation scan covers repeats across sessions
 (`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`).
 
 ## 6. Record

@@ -29,7 +29,7 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | A small engagement run on the micro profile | `../fulcrum-project-state/references/micro-profile.md` |
 | One design source for one app -> a published app | `../fulcrum-design-loop/SKILL.md` |
 | **Out of family:** external systems and integration targets (an integration target or external system (another vendor's server, a workflow engine, a third-party API)) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
-| What `mode` and `posture` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
+| What `mode`, `posture` and `Rigor` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
 
 ## The detection ladder
 
@@ -45,7 +45,7 @@ including every conflicting-signal case: `references/detection-procedure.md`.
 | No `.fulcrum/`, an app already exists | `../fulcrum-gap-analysis/SKILL.md` |
 | `.fulcrum/` present, `HALT.md` present | **STOP. Report. Ask a human.** Never auto-resume - see below. |
 | `.fulcrum/` present, an open task per the `JOURNAL.md` index | resume -> `../fulcrum-loop-engine/SKILL.md` |
-| `.fulcrum/` present, all tasks closed | Report status. Offer the next phase in `plan.md`, or gap analysis if none remains. |
+| `.fulcrum/` present, all tasks closed, the final G2 row among them at `Verdict: pass` | Report status. Offer the next phase in `plan.md`, or gap analysis if none remains. |
 
 **Micro is proposed, never picked.** The signals say the engagement looks small; only
 the user knows whether it will stay small. Ask once, with micro recommended and the
@@ -65,9 +65,8 @@ exists. Building that system is out of family; recording its contract is not.
 
 **Detection is cheap by construction.** Resume answers from the last row of
 `.fulcrum/JOURNAL.md` alone - never open a session file to decide where to
-route. That index exists precisely so a resume decision costs one file read.
-See `../fulcrum-project-state/references/resume-and-halt.md`, heading "Read
-order on every session start".
+route. See `../fulcrum-project-state/references/resume-and-halt.md`, heading
+"Read order on every session start".
 
 ## HALT.md is absolute - state the mechanism
 
@@ -87,41 +86,45 @@ skip it.
 `HALT.md` absent does not mean the last session finished cleanly. The last
 `JOURNAL.md` index row's `State` column plus the lease tell live from dead -
 full signal table in `../fulcrum-project-state/references/resume-and-halt.md`,
-heading "Crash recovery - the four signals of interrupted work". This router
+heading "Crash recovery - the five signals of interrupted work". This router
 does not diagnose a crash itself:
 
 - `State: clean` in the last row -> clean stop. Route by the ladder above as
   if starting fresh at that point.
 - `State: open` in the last row -> possible crash or a run still executing.
-  Hand off to `../fulcrum-loop-engine/SKILL.md` to resume at its phase 4
-  (poll the recorded run to a terminal state) - never restart the turn, and
-  never re-run source triage or decomposition over a repo already scaffolded.
+  Hand off to `../fulcrum-loop-engine/SKILL.md` to resume at its phase 4 (poll the
+  recorded run, which needs no lease; lane resume: `../fulcrum-project-state/references/lease-and-concurrency.md`,
+  heading "Resuming after a dead session") - never restart the turn or re-run triage.
 
 ## Session-start tool preflight
 
-Before dispatching into any skill below, confirm the ops the next phase needs
+Before dispatching into any skill below, confirm the ops the next work needs
 are actually callable - a schema that loads is not a tool that dispatches.
 Consult `tenant-profile.md` where it already has the answer; probe only what
-it does not. Keep it proportionate: a short preflight, not a full audit every
-session. Full procedure: `references/tool-preflight.md`.
+it does not. Full procedure: `references/tool-preflight.md`.
 
-## Mode: read it, or establish it once
+## Mode and Rigor: read them, or establish them once
 
-Mode (`guided` | `expert`) lives in `.fulcrum/project.md`. What each mode means
-is owned by `../../CONVENTIONS.md`, heading "Mode and posture" - not restated
-here.
+Mode (`guided` | `expert`) and `Rigor` (`demo` | `pilot` | `production`) live in
+`.fulcrum/project.md`. Their meaning is owned by `../../CONVENTIONS.md`, heading
+"Mode and posture" - not restated here.
 
-- **Present:** read it, do not ask.
-- **Absent** (first run, `.fulcrum/` not yet scaffolded): this router
-  establishes it. Ask once, in the first question batch, with the two options
-  named and a recommendation (`guided`, for a first engagement or an
-  unfamiliar tenant). The skill that scaffolds `.fulcrum/` writes the answer
-  to `project.md`; this router never writes that file itself.
+- **Present:** read them, do not ask. Expect schema `project v4`: `references/detection-procedure.md`, heading "The project.md marker".
+- **Mode absent** (first run): ask once, in the first question batch, with the
+  two options and a recommendation (`guided`, for a first engagement or an
+  unfamiliar tenant).
+- **`Rigor` absent, on first run or on resume, in every mode:** ask before
+  dispatching, on every path, with the three options and no recommendation.
+  Never default it, never infer it: a guessed value sets proof depth for the
+  whole build, so it overbuilds a demo or under-proves production.
+
+The skill that scaffolds `.fulcrum/` writes the answers to `project.md`, or the
+orchestrator on resume; this router never writes that file itself.
 
 ## Question-asking discipline (guided mode only)
 
 This is the only place in the family this discipline is defined. `expert` mode
-skips it - the user invokes skills directly and decides for themselves.
+skips it, except that `Rigor` is still asked.
 
 - **Batch, never drip.** Small batches of related questions, not one
   question per turn. One-at-a-time multiplies round trips and reads as an
@@ -134,23 +137,20 @@ skips it - the user invokes skills directly and decides for themselves.
   an app, or source material already answers a question, do not ask it.
 
 **The failure mechanism.** A router that asks what it could have detected
-trains the user to distrust it - every future question reads as "did it even
-look?" - and it spends the interaction budget genuine decisions need on
-questions that had a mechanical answer. That budget does not refill mid-batch.
+trains the user to distrust it, and spends the interaction budget genuine
+decisions need on questions that had a mechanical answer.
 
 **Where this stops and discovery starts.** This router's questions are about
-*routing and mode* - is there source material, does an app exist, guided or
-expert - never about requirements content. The instant a question is about
+*routing, mode and Rigor* - is there source material, does an app exist, guided
+or expert, how much proof - never about requirements content. The instant a question is about
 what the app should do (roles, entities, screens, acceptance criteria), it
 belongs to `../fulcrum-discovery/SKILL.md`'s interview, not here. Full
 interaction contract, including the batch templates: `references/guided-mode-interaction.md`.
 
 ## Auto-trigger surface
 
-This is the only skill in the family with a broad `description` - every other
-skill's is narrow so a user who does not know the family lands here first
-(`../../CONVENTIONS.md`, skill file layout). Do not narrow this one to match
-the others.
+This is the only skill with a broad `description`, so a user who does not know
+the family lands here first. Do not narrow it to match the others.
 
 ## Routing to references
 

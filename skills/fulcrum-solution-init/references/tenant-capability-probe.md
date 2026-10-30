@@ -1,12 +1,19 @@
 # Tenant capability probe
 
-One read-only pass at project start. Resolves every fact that varies by tenant, licence
-or platform version, and writes the answers into `tenant-profile.md` in the project repo.
-Read this when starting step 3 of `../SKILL.md`.
+One read-only, free pass at project start: the liveness gate, plus every tenant-varying
+fact a read can answer, written into `tenant-profile.md` in the project repo. Read this
+when starting step 3 of `../SKILL.md`.
 
 **Why it exists.** A tenant-varying fact baked into a skill or a spec is a permanently
-wrong instruction. The contract is: skills reference the profile, the probe resolves the
-profile, and nothing else asserts a tenant fact.
+wrong instruction. The contract is: skills reference the profile, this pass and the
+first real rows fill the profile, and nothing else asserts a tenant fact.
+
+**What it is not: a build, or a spike.** A fact no free read can answer is asked at
+intake if the user can answer it, otherwise marked `first-row`: the first real row that
+needs it tries it, fails fast if it fails, and the orchestrator records what landed in
+that profile row. Nobody builds a throwaway to find out. The failure mode: a per-project
+basics pass consumes hours and publishes throwaway revisions, and proves what the first
+real row would prove anyway.
 
 ## Rules for the whole probe
 
@@ -14,14 +21,16 @@ profile, and nothing else asserts a tenant fact.
    bump a revision. In the reference corpus a test-setup operation invoked with a real
    environment key republished a fork into the live revision chain and overwrote a clean
    build. `[VERIFIED]` If an operation's read-only status is unclear, do not run it here.
-2. **Record evidence, never assertions.** Every profile row carries *what you observed*,
+2. **Free.** No throwaway asset, no revision, and no Mentor turn except the liveness
+   gate's. A second answer-back turn "just to check" is the first step of a spike.
+3. **Record evidence, never assertions.** Every profile row carries *what you observed*,
    not *what Mentor said*. See "Evidence format".
-3. **A Mentor denial is not evidence.** `[VERIFIED]` See "Probing for a UI block".
-4. **Run the liveness gate first.** Everything else is worthless if Mentor is not
+4. **A Mentor denial is not evidence.** `[VERIFIED]` See "Probing for a UI block".
+5. **Run the liveness gate first.** Everything else is worthless if Mentor is not
    actually reading the app.
-5. **Re-probe on a stale profile.** If the profile is older than the platform's release
-   cadence, or a downstream session hits a contradiction, re-run the affected row rather
-   than editing it from memory.
+6. **Refresh on a stale profile.** If the profile is older than the platform's release
+   cadence, or a downstream session hits a contradiction, re-run the affected read, or
+   return the row to `first-row`, rather than editing it from memory.
 
 ## 0. Mentor liveness gate - run before anything else
 
@@ -43,12 +52,16 @@ name what it can see - screens, entities, or both. Pass only if the returned sum
   app, or names nothing.
 
 On fail: **halt the engagement.** Do not begin a build, do not retry in a loop, do not
-attempt a workaround. Record the failure and the time. Re-gate before any later session
-resumes; a session that starts on a dead backend burns budget producing nothing while
+attempt a workaround. Record the failure and the time. A later session re-gates on its
+first staleness guard; a session that starts on a dead backend burns budget producing nothing while
 every status field reads healthy.
 
-After init, this gate has no turn of its own: it is folded into loop gate 5, the
-per-step staleness guard that opens every step's driver dispatch
+**No target app yet.** When Mentor will create the app, there is nothing real to name at
+init. Record the gate as deferred; it runs on the first staleness guard that has an app
+to read, and a fail there halts the same way.
+
+After init, the orchestrator never runs this gate and it has no turn of its own: it is folded into loop gate 5, the
+staleness guard that opens every driver dispatch
 (`../../fulcrum-loop-engine/references/iteration-contract.md`, heading "Phase 2 -
 Precondition"). That guard asks about named screens and widgets of the real app, so an
 answer that names real content passes liveness too; a generic or no-app answer is this
@@ -78,8 +91,10 @@ Mentor turns and two revisions per seed step. Procedure:
 
 ## 2. Which UI blocks exist - and their real inputs
 
-Probe each of: `Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`.
-Add any block a phase-one spec depends on.
+Rows: `Modal`, `BottomSheet`, `ActionSheet`, `Sidebar`, `Accordion`, `Wizard`, and any
+block a spec up to the first join depends on. Fill a row now only if published-state
+reads (`context_*`, on an app already using the block) show it. Every other row is
+`first-row`.
 
 ### Probing for a UI block
 
@@ -87,22 +102,24 @@ Add any block a phase-one spec depends on.
 reported absent was later found to exist *and* to be public. `[VERIFIED]` A denial
 conflates "not in my index" with "not on the tenant", and the two are different.
 
-Instead: **attempt to reference the block and read what lands.** Build the smallest thing
-that uses it, then read the resulting model or rendered output.
+Instead: **reference the block on the first real row that needs it and read what
+lands**, in the resulting model or rendered output. Never add a row to find out.
 
 | Observation | Record as |
 |---|---|
 | The block is placed and its inputs appear in the model | Exists. Record the exact input property names and types you saw. |
 | A validation or model error naming the block | Absent, with the exact error text quoted. |
 | Mentor substitutes a different block silently | Absent-in-practice. Record what it substituted - that substitution is what specs will get. |
-| Mentor says it does not exist but nothing was attempted | **Unresolved.** Attempt the reference before recording anything. |
+| Mentor says it does not exist but nothing was attempted | **Unresolved.** Attempt the reference on that row before recording anything. |
 
 **Input properties matter as much as existence.** A block that exists with different
 input names than a spec assumes fails at build time. Record the property names verbatim.
 
 ## 3. Icon font family and name casing
 
-Probe: place one icon and read back what the model holds.
+`first-row`, unless the app's published state already shows icons: placing an icon to
+learn this is a mutation. The first real row that places one reads back what the model
+holds.
 
 Record: the icon font family in use, the exact casing convention for icon names
 (`ArrowRight` vs `arrow-right` vs `arrow_right`), and one confirmed working example.
@@ -111,25 +128,24 @@ error, so specs must quote names in the confirmed convention.
 
 ## 4. Available `ModelFeature_*` flags
 
-Probe: read the flags the tenant exposes.
+Fill it only if a free read lists the flags; otherwise `first-row`.
 
 Record the list. Flags reported "removed on this tenant" in the reference corpus were
 tenant state, not platform truth. `[VERIFIED]` A spec depending on a flag that is absent
-must be re-specified, not retried, so resolve this before authoring phase-one specs.
+must be re-specified, not retried.
 
 ## 5. Date and meridiem format-token behaviour
 
-Probe: format one known date/time through the tenant's formatting path and read the
-output string.
+`first-row`: the first real row that formats a date reads the output string.
 
 Record: which tokens produced which output, and specifically whether a meridiem token
 renders as expected, renders empty, or renders literally. Record the observed output
-string verbatim. Specs then quote the confirmed token, and no build agent guesses.
+string verbatim. Later specs quote the confirmed token, and no build agent guesses.
 
 ## 6. Can server actions be marked public?
 
-Probe: attempt to mark a trivial server action public and read whether the property
-takes.
+A public action already visible in `context_actions` answers yes. Otherwise `first-row`:
+marking one public is a mutation.
 
 Record yes/no plus the error text if no. If no, exposing logic outside the app needs a
 REST method instead, which is a step in the plan and a cost in the budget - notably for
@@ -137,21 +153,21 @@ seeding and for diagnostic row reads.
 
 ## 7. Mentor backend identifier
 
-Probe: read whatever identifier the Mentor surface reports for the backend serving this
-tenant.
+Record it if the liveness run or a tool listing reports one, with no extra call;
+otherwise `first-row`.
 
-Record it. Behaviour changes between backends, so a profile without this cannot be
-compared against a later one, and a regression cannot be attributed.
+Behaviour changes between backends, so a profile without this cannot be compared against
+a later one, and a regression cannot be attributed.
 
 ## 8. Mentor prompt-length ceiling
 
-Probe: establish the ceiling the tenant actually enforces, by the cheapest available
-route - a documented or reported limit, or a bounded escalation of prompt size on a
-throwaway read-only turn.
+No escalation turn. Record a documented or reported limit with its source; the dated
+surface record is `../../fulcrum-mentor-turns/references/mcp-surface.md`. With none,
+`first-row`.
 
-Record the number and how you obtained it. Spec turn blocks are sized against this, so
-an unknown ceiling means every long spec risks a truncation whose failure mode is a
-partial build reported as success. Turn-splitting rules live in
+Record the number and how you obtained it. An unknown ceiling means a long spec risks a
+truncation whose failure mode is a partial build reported as success, so split long turn
+blocks until a row confirms the length. Turn-splitting rules live in
 `../../fulcrum-mentor-turns/SKILL.md`.
 
 ## 9. Target app identity
@@ -165,8 +181,8 @@ name, and mark it explicitly as not the target. A stale scaffold with a near-ide
 name is how a session builds into the wrong app. `[VERIFIED]`
 
 Also record here the answer to the mobile-application-type question from step 2 of
-`../SKILL.md`: whether Mentor can add screens to an app of the type you intend to use, as
-observed on this tenant.
+`../SKILL.md`: whether Mentor can add screens to an app of the type you intend to use.
+That is `first-row`: the first real screen row shows it, and it fails fast.
 
 Also record whether the app carries the generated sample sign-in picker
 (detection: `../../fulcrum-render-check/references/sign-in-modes.md`, heading
@@ -208,14 +224,13 @@ and recorded in that project's `project.md` field `browser`
 (`../../fulcrum-render-check/SKILL.md`, heading "Preflight - once per
 project").
 
-## 11. Portfolio, environments and template screen set
+## 11. Environments and template screen set
 
-Read-only, from `env_list`. Record: the **portfolioKey** (creation by prompt does not need it, see
-`../../fulcrum-mentor-turns/references/mcp-surface.md#creating-and-loading-an-asset`),
-the **environment keys** (name to key), and the **new-app template screen set**, meaning
-which screens a freshly created app from the standard template already contains
-(observe on a shell app, never assume). Note that `context_*` reflects published state
-only and lags (`mcp-surface.md#published-state-inspection-context_`).
+Read-only, from `env_list`. Record the **environment keys** (name to key). Also record
+the **new-app template screen set**, meaning which screens a freshly created app from the
+standard template already contains: read it from the user's shell app if one exists,
+otherwise `first-row`, never assumed. Note that `context_*` reflects published state only
+and lags (`mcp-surface.md#published-state-inspection-context_`).
 
 ## Where the profile lives
 
@@ -241,12 +256,13 @@ the result, or the row is unresolved.
 
 ## Exit criteria
 
-- The liveness gate passed against the real target app.
-- Every section above that names a probe has a row in `tenant-profile.md` with all
-  five fields. Section 1 names no probe and gets no row.
+- The liveness gate passed against the real target app, or is recorded as deferred
+  because Mentor creates the app.
+- Every section above has a row in `tenant-profile.md`, either with all five fields or
+  marked `first-row` with the planned row that will answer it. Section 1 gets no row.
 - Any unresolved row is marked **UNRESOLVED** with what blocked it and which planned step
   it gates.
-- No mutating operation was run and no revision was bumped.
+- No mutating operation was run, no throwaway asset exists and no revision was bumped.
 - Every read-only op the plan depends on has a tool-availability row in one of the three
   states. Every mutating op the plan depends on is recorded **unknown** - not called, not
   guessed.

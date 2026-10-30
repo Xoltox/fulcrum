@@ -11,14 +11,26 @@ More than 4 build turns means the step is too big: split it into two steps, each
 ending in its Publish turn, rather than spending fix turns on build work. Consult,
 guard and Publish turns are not build turns. (Fulcrum rule)
 
+**A batch is one dispatch, and the cap still binds per row.** A batch's build pass stays inside
+those 4 short turns; rows that do not fit go to the next dispatch. On batch failure, one fix turn on
+the batch, then split per row. That fix turn counts against every row in the batch, so each row
+keeps at most one more. A split that handed each row a fresh cap would turn 2 fix turns into 3
+mutating guesses at the same defect. Procedure:
+`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`, heading "A failed batch".
+(Fulcrum rule)
+
+**A `fix` row gets 2 fix turns and no build turn;** two `:fail` parks it (same file,
+heading "Late failures"). (Fulcrum rule)
+
 Mentor is not a batch processor - one objective per turn (see
 `../../fulcrum-mentor-turns/SKILL.md`). Past the build pass plus 2 fix turns on one
 step, the pattern observed is not convergence: it is Mentor guessing, and each guess mutates the
 model. The cap exists because the cost of an extra turn is not a wasted turn, it
 is an unreviewed change to a live application.
 
-On exceeding the cap: write the checkpoint, park the step with an honest status,
-report. Do not carry the overrun silently into the next step.
+On exceeding the cap: write the checkpoint, park the row with an honest status,
+report. That is a lane stop ("Lane stops" below), not a halt. Do not carry the
+overrun silently into the next dispatch.
 
 ## The escalation ceiling
 
@@ -31,8 +43,8 @@ Three rules bound every escalation, in force whoever is running it:
 - **A diagnostic step is mandatory before every fix attempt after the first
   failure.** Not a fix - an observation.
 - **At most two fix attempts** after the build turn. That is the turn cap above.
-- **Still failing after the second -> stuck twice -> halt and report to the
-  user.** Detected mechanically, by scanning the session index rather than by an
+- **Still failing after the second -> stuck twice -> lane stop, report to the
+  user** ("Lane stops" below). Detected mechanically, by scanning the session index rather than by an
   agent remembering: `../../fulcrum-loop-engine/SKILL.md`, heading "Oscillation
   detection - mechanical, not remembered". **The loop detects; this file
   decides.**
@@ -61,34 +73,113 @@ Not for a stuck bug, not for a second failed fix turn. A higher tier mostly buys
 a more expensive version of the same guess, because the missing input is
 evidence about the live system, not reasoning capacity. Escalating also
 converts a diagnosable failure into an expensive one, and the unattended session
-still ends at the same halt.
+still ends at the same stop.
 
 Tier policy is phase-based and is set at dispatch time, not adjusted reactively:
 `../../../MODEL-TIERS.md`.
 
 ## Hard stops
 
-A halt writes `.fulcrum/HALT.md` first (the file before the journal line, per
-`../../fulcrum-project-state/references/resume-and-halt.md`), then stops and
-reports. Do not work around any of these. If the halting dispatch returned
+The orchestrator writes `.fulcrum/HALT.md` first (the file before the journal line,
+per `../../fulcrum-project-state/references/resume-and-halt.md`), then stops and
+reports; a driver only reports and stops. Do not work around any of these. If the halting dispatch returned
 `session_state: open`, the orchestrator keeps the lease and `HALT.md` records the
 open `sessionId` (`../../fulcrum-project-state/references/lease-and-concurrency.md`,
 "Hold").
 
 | Trigger | Detail |
 |---|---|
-| Stuck twice after a diagnostic step | The escalation ceiling is exhausted. Two `:fail` entries for one task id in the session index is this firing mechanically |
-| Turn cap exceeded on one step | 1 build (a pass of <= 4 short turns counts as one) + 2 fix |
-| A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
-| A previously verified behaviour now fails | Regression. Continuing builds on a corrupted state |
-| A step needs the **user's own action** | Re-auth, a portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
-| **Mentor capacity stop** | The first turn of a session still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
+| A previously verified behaviour now fails, beyond one app | Regression. Continuing builds on a corrupted state. Confined to one app: "Lane stops" below |
+| A step needs the **user's own action** | A portal-only operation, an upload with no MCP path, the user setting a secret in the Portal, a sign-in-gated UI check. A user-action stop, not a halt: see "User-action stops" below. Retrying does not create a capability |
+| **Mentor capacity stop** | With no other driver in flight, the first turn of a session still refused as busy after the bounded retry in `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Creating and loading an asset". See "Mentor capacity stop" below |
 | A permission or policy denial | Confirm with **one** direct retry, then stop. Never iterate looking for a way around it |
 | The fix would weaken validation, auth, or a business rule | Park, disclose, stop. Phrase every "do not touch X" as *"do not touch X unless X is the root cause - if so, fix it and disclose prominently"* |
-| Two candidate actions would both touch Mentor concurrently | Serialise, or stop and ask |
+| **All lanes flat** | Every lane with open rows is flat or parked, at least one flat. See "Stall and no-op decisions" below |
+| **Auth lost** | An auth error on any call. There is no in-session recovery path and every lane shares the connection `[VERIFIED]`. Turns keep running server-side, so after the user reconnects, read the same runs: `../../fulcrum-mentor-turns/references/recovery.md`, heading "1. Transport-level auth expires mid-turn" |
+| **Budget** | The orchestrator's budget reached the hand-back trigger. One budget funds every lane: stop selecting everywhere, let running lanes return, record them, hand back (`../../fulcrum-loop-engine/references/iteration-budget.md`, heading "The one rule the loop owns"). This stop is that hand-back: it writes no `HALT.md`, because resuming needs no human decision |
+| **Secret exposed** | A secret value reached a prompt, a brief, a journal, a report or a committed file. A prompt is stored and replayed, so no later turn removes it; every lane keeps using what is exposed until the user rotates it. Never repeat the value in `HALT.md` |
+| **Surface drift** | The live tools differ from the latest snapshot. Skill text naming a tool or parameter can no longer be trusted, on any lane. Full re-probe before any mutating work: `../../fulcrum-mentor-turns/references/mcp-surface.md`, heading "Re-probing the surface" |
 | A step depends on an op **confirmed unavailable** with **no fallback** recorded in `tenant-profile.md` | See "Halt on an unavailable op with no fallback" below |
 | The plan for the current step does not exist in writing | Deriving a plan mid-unattended-run is the highest-risk act available |
-| **Runtime error step-change across a build step** | `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` falling inside the after window. See below |
+| **Runtime error step-change across a G1** | `app_health` `errors` / `errorPercent` higher in the after window than the before window, or `lastErrorOccurred` falling inside the after window. See below |
+
+## Lane stops
+
+**A stop whose cause lives in one app is scoped to its lane** (Fulcrum rule). It says the model of
+one defect, or the state of one app, is wrong, which says nothing about another app. Stopping every
+lane for it is the wave barrier the frontier removed. Permission denial, an unavailable op with no
+fallback and a missing plan stay engagement-wide ("Hard stops" above).
+
+| Trigger | Detail |
+|---|---|
+| Stuck twice after a diagnostic step | The escalation ceiling is exhausted. Two `:fail` entries for one task id in the session index is this firing mechanically |
+| Turn cap exceeded on one row | 1 build (a pass of <= 4 short turns counts as one) + 2 fix |
+| A mutating turn about to run and the **staleness guard did not pass** | See "the revert failure mode" below |
+| Two actions would both touch Mentor concurrently on that app | Serialise, or stop and ask |
+| A previously verified behaviour on that app now fails, confined to it | Regression. Continuing builds on a corrupted state |
+
+1. Park the row: `Status: parked`, `Verdict: fail`, `Blocked on: the user`. No `HALT.md`.
+2. Its dependents hold. A row of that lane that does not depend on it stays selectable, unless the
+   dispatch returned `session_state: open`, or the stop is about the app itself (the last three
+   above). Then the whole lane waits for the user: an open session keeps `open_session` on the lease
+   (`../../fulcrum-project-state/references/lease-and-concurrency.md`, "Hold").
+3. Report the lane, as "Honest reporting on halt" below lays out. Other lanes continue.
+4. A parked row resumes only on a user decision, recorded in `DECISIONS.md`. A `:fail` count is never
+   reset, so a twice-failed row comes back under a new id: the orchestrator rewrites its dependents'
+   `DependsOn` to the new id and closes the old row (`Status: done`, `Verdict: fail`).
+
+Nothing runnable left is not an exemption. The discriminator is `Verdict: fail`: a row parked with it
+reads as flat in "Stall and no-op decisions" below, so the last lane to stop this way halts the
+engagement. A row parked on a user action carries any other verdict and does not read flat.
+
+## Halts with parallel lanes
+
+**A halt stops the engagement, not one lane.** `HALT.md` is one file and its existence stops
+every session (`../../fulcrum-project-state/references/resume-and-halt.md`). The trigger says the
+live state, or something every lane rests on, cannot be trusted; other lanes may consume it, and
+each further turn is one more unreviewed change while nobody has looked.
+
+1. Write `HALT.md` first. From then on, no new dispatch of any kind on any lane.
+2. Do not cancel a running dispatch. A run abandoned mid-turn has no verdict and may hold unpublished
+   changes, which is worse than the turn finishing. Let it reach terminal and record its verdict.
+3. Another trigger arriving from a finishing lane goes into the same `HALT.md`, under "What was
+   tried", with its own app and task. There is never a second halt record.
+4. Report after the last running dispatch returns. A dispatch returning `session_state: open` keeps
+   its lease and `HALT.md` names its `sessionId`.
+
+**Waiting is not a halt.** These hold only the row's dependents, never another lane. The row's own
+lane continues with rows that do not depend on it:
+
+- A `parked` row, including every lane stop above and every user-action stop below.
+- A `blocked` row: a library consumer waiting on the index, for example.
+- A lease held by someone else: that lane waits, or the orchestrator reports it.
+- A parked lane (below): its rows wait as one.
+
+The test: a halt means something is wrong; a wait means something is owed. Stopping every lane to
+wait is the wave barrier the frontier removed, and it buys no safety.
+
+**Rigor changes none of this.** Stops, caps and halts fire the same at `demo`, `pilot` and
+`production`: gates are depth of evidence, not safety (`../../fulcrum-verification/SKILL.md`, heading
+"Gates and rigor"). A `demo` run takes fewer readings, so a stop that depends on a reading can fire
+later; it never fires differently.
+
+## Stall and no-op decisions
+
+**The loop detects; this file decides.** Detection:
+`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`, heading "Stall detection". Fulcrum
+rule; the threshold is unmeasured. The two-fail rule stands and fires first where it applies. The
+stall catches what it cannot see: a lane failing differently each time, returning `unproven`, or
+splitting batches with nothing closing.
+
+| Detected | Decision |
+|---|---|
+| A lane's done-count flat across 3 consecutive dispatches | **Park the lane.** Set its open rows `parked` with `Blocked on: the user`, the row it stalled on `Verdict: fail`, and report the rows, the dispatches and the last verified-good revision. Other lanes continue; rows depending on the parked lane wait with it |
+| Every lane with open rows is flat or parked, at least one flat | **Halt.** A row parked with `Verdict: fail` reads as flat. A single-app project has one lane, so its stall is a halt. All lanes parked on user actions alone is a user-action stop, not a halt |
+| Publish terminal, revision unchanged | **No-op.** The change did not land, whatever the outcome field says. The attempt failed: it enters the fix-loop under the turn cap, starting with a diagnostic step. Do not re-publish: a new revision needs a model change, and Mentor can silently ignore a prompt `[VERIFIED]` |
+
+A parked lane resumes only on a user decision, recorded in `DECISIONS.md`, because the same inputs
+would stall the same way. Never escalate tier to clear a stall: the missing input is evidence or a
+decision, not reasoning capacity.
 
 ## User-action stops
 
@@ -108,15 +199,19 @@ simply not the agent's to take. Write the checkpoint, set the `TASKS.md` row to 
   Before handing off, try an approved generated sample persona
   (`delegation.md`, heading "A UI check behind a sign-in is a user-action
   hand-off").
-- Re-auth, a portal-only operation and an upload with no MCP path follow the
-  same shape.
+- A portal-only operation and an upload with no MCP path follow the same shape.
+  Lost auth does not: every lane shares it, so it is a halt ("Hard stops" above).
 
 ## Mentor capacity stop
 
-When the first turn of a session is refused with the capacity text after the bounded
-retry in `mcp-surface.md` (3 retries, growing backoff, each wait
-verified to block): close the session, halt, and report **"Mentor capacity
-stop"**. It is not a model failure, an auth failure or a trap. The session is
+**The first capacity text anywhere stops the fan-out** (Fulcrum rule), even when the driver's retry
+then succeeded. Add no driver; let running dispatches finish; continue sequentially for the rest of
+the session. A refused row is not a failure: it goes back to `todo` and records no `:fail`. Pushing
+on after that text competes for the capacity the running lanes hold.
+
+When a first turn is refused after the bounded retry in `mcp-surface.md` (3 retries, growing backoff,
+each wait verified to block) and no other driver is in flight: close the session, halt, and report
+**"Mentor capacity stop"**. It is not a model failure, an auth failure or a trap. The session is
 not stale and no work was lost; the ask to the user is to retry later. Retrying
 past the bound consumes window for no new information.
 
@@ -127,8 +222,8 @@ said about a turn. This one fires on what the deployed app actually did, and it
 is the only stop here that can catch a change that published cleanly, verified
 against the model, and then broke the running app.
 
-**The rule.** Take an `app_health` reading bracketing the step. If, across that
-step, `errors` or `errorPercent` steps up, or `lastErrorOccurred` falls inside
+**The rule.** Take an `app_health` reading bracketing each G1 exercise, so how often
+this stop can fire follows the rigor table. If, across that window, `errors` or `errorPercent` steps up, or `lastErrorOccurred` falls inside
 the after window, **halt and report.** `[SCHEMA]` - those fields and their
 meanings are asserted by the ODC MCP tool schema, not observed in a Fulcrum run.
 
@@ -237,7 +332,7 @@ The generalisable facts:
 
 The three defences, all of which this skill mandates:
 
-- A **staleness guard before every mutating turn** - verify the session's view
+- A **staleness guard before every mutating dispatch** - verify the session's view
   of current state against an independent read (published-state `context_*`
   once indexed - the lag is variable - and the live revision via `app_revisions`), never
   against the session's own read-back; before any "Publish" turn, re-read the

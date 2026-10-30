@@ -31,7 +31,7 @@ abandoned - one twice - before the same scope landed cleanly as batched turns
 
 ## Turn economics
 
-Nominal budget per step: **1 build turn + up to 2 fix turns**, plus the
+Nominal budget per step or batch: **1 build turn + up to 2 fix turns**, plus the
 Publish turn. Granular building does not break the cap: a build pass of up to 4
 short turns in one step counts as the one build turn; past 4, split the step
 (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading "The

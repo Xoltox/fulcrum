@@ -1,14 +1,15 @@
 # Tenant profile
 
-Written once by `fulcrum-solution-init` step 3. **Every downstream skill reads this file
-instead of hardcoding a tenant fact.**
+Written by `fulcrum-solution-init` step 3, a read-only, free pass. **Every downstream
+skill reads this file instead of hardcoding a tenant fact.**
 
 Probe procedure and the rules for each row:
 `../references/tenant-capability-probe.md`.
 
-Every row carries five fields. A row missing any field is **not resolved** - mark it
-`UNRESOLVED` and say which planned step it gates. An answer of "Mentor said X" is not an
-answer.
+Every row carries five fields. A fact no free read answers is marked `first-row` with the
+planned row that will answer it; the orchestrator fills the row when that row lands.
+Any other row missing a field is **not resolved** - mark it `UNRESOLVED` and say which
+planned step it gates. An answer of "Mentor said X" is not an answer.
 
 **Probed:** \<date\>
 **Backend identifier:** \<value from row 7\>
@@ -21,7 +22,7 @@ answer.
 | Field | Value |
 |---|---|
 | Fact | Does Mentor actually read the target app? |
-| Answer | \<PASS / FAIL\> |
+| Answer | \<PASS / FAIL / deferred: Mentor creates the app, first guard runs it\> |
 | Probe | Read-only prompt against \<app\> asking Mentor to name visible screens/entities |
 | Observed | \<quote the returned summary\> |
 | Date | \<date\> |
@@ -29,7 +30,7 @@ answer.
 Pass requires the summary to **name real content from the actual app**. A read-only prompt
 correctly returns `attempted_change` false, so that field is not the signal.
 
-On FAIL: **halt.** This row does not replace the per-step guard: gate 5 of the loop (the staleness guard at the start of every Mentor dispatch) re-checks liveness on each step regardless of this row.
+On FAIL: **halt.** This row does not replace the per-dispatch guard: gate 5 of the loop (the staleness guard at the start of every Mentor dispatch) re-checks liveness on each dispatch regardless of this row.
 
 ---
 
@@ -60,17 +61,18 @@ turns and two revisions per seed step. Budget accordingly. The procedure lives i
 
 ## 2. UI blocks
 
-Probed by **attempting to reference the block**, never by asking whether it exists.
+Filled from published-state reads, or by **the first real row that references the
+block**, never by asking whether it exists and never by a throwaway build.
 
 | Block | Exists | Input properties observed (verbatim) | Probe / Observed | Date |
 |---|---|---|---|---|
-| Modal | \<yes/no/unresolved\> | \<...\> | \<...\> | \<...\> |
+| Modal | \<yes/no/first-row/unresolved\> | \<...\> | \<...\> | \<...\> |
 | BottomSheet | | | | |
 | ActionSheet | | | | |
 | Sidebar | | | | |
 | Accordion | | | | |
 | Wizard | | | | |
-| \<other block a phase-one spec needs\> | | | | |
+| \<other block a spec up to the first join needs\> | | | | |
 
 A Mentor denial with no attempted reference is **unresolved**, not "no".
 
@@ -119,9 +121,9 @@ Specs quote the confirmed tokens. No build agent guesses a format token.
 | Field | Value |
 |---|---|
 | Fact | Can a server action be marked public? |
-| Answer | \<yes / no\> |
-| Probe | Attempt to mark a trivial server action public |
-| Observed | \<took / error text verbatim\> |
+| Answer | \<yes / no / first-row\> |
+| Probe | Public action visible in `context_actions`, or the first real row that marks one public |
+| Observed | \<listed / took / error text verbatim\> |
 | Date | \<date\> |
 
 If no: exposing logic outside the app needs a REST method. That is a planned step and a
@@ -146,13 +148,13 @@ be attributed.
 
 | Field | Value |
 |---|---|
-| Ceiling | \<value\> |
-| How established | \<documented / reported / bounded escalation on a throwaway read-only turn\> |
+| Ceiling | \<value / first-row\> |
+| How established | \<documented / reported / observed on a real row\> |
 | Observed | \<...\> |
 | Date | \<date\> |
 
-An unknown ceiling means every long spec risks truncation, whose failure mode is a
-**partial build reported as success**.
+An unknown ceiling means a long spec risks truncation, whose failure mode is a **partial
+build reported as success**.
 
 ---
 
@@ -163,7 +165,7 @@ An unknown ceiling means every long spec risks truncation, whose failure mode is
 | App identifier (exact) | \<value - never the display name\> |
 | Application type | \<value\> |
 | Revision at init | \<value\> |
-| Can Mentor add screens to this application type? | \<observed answer\> |
+| Can Mentor add screens to this application type? | \<observed answer / first-row\> |
 | Confusable apps on the tenant - NOT the target | \<list, or None\> |
 | Generated sample sign-in picker present (Login screen "Log in as ..." buttons, `GetSampleUserVerificationCode`) | \<yes / no / unknown - per app, from published-state reads\> |
 | Sample-persona use approved by the user | \<yes / no / not asked - DECISIONS.md entry id\> |
@@ -186,16 +188,15 @@ read-only probe never called - do not upgrade it to "available".
 
 ---
 
-## 11. Portfolio, environments, template screen set
+## 11. Environments, template screen set
 
 Source: `env_list` (read-only). Lookup rule for this file: project `.fulcrum/` first, then
 nearest parent directory; write a new one in `.fulcrum/` only if none is found.
 
 | Field | Value |
 |---|---|
-| portfolioKey | \<value from env_list\> |
 | Environment keys | \<name = key, one per line\> |
-| New-app template screen set | \<screens present in a fresh app from the standard template, observed\> |
+| New-app template screen set | \<screens present in a fresh app from the standard template, observed / first-row\> |
 | Probe / Observed | \<...\> |
 | Date | \<date\> |
 

@@ -103,6 +103,10 @@ ask it in those words rather than "synchronous or asynchronous".
 **Is there a system of record for any of this that is not this app?** If yes, that
 entity is probably read-only here, which changes both the model and the screens.
 
+**Is there anything you already know this tenant cannot do, or that needs a licence?**
+Options: nothing known / yes, name it / not sure. Fulcrum plans no spikes, so what the
+user knows here saves a failed first row; "not sure" is a fine answer and costs nothing.
+
 ## Unblocks: seed data - readiness 10
 
 **If I showed you this working next week, what would have to already be in it for the

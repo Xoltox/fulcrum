@@ -36,23 +36,25 @@ writer per shared file removes the race and makes staleness one agent's job to f
 |---|---|---|
 | `project.md`, `plan.md`, `TASKS.md`, `DECISIONS.md`, `HANDOFF.md`, `external/*` | **the orchestrator only** | Drivers report outcomes, decisions and facts in their result; the orchestrator records them |
 | `JOURNAL.md` | the orchestrator; each working session writes **only its own index row** | Drivers never edit the index, `InFlight` or `Tasks` |
-| `journal/<session-id>.md` | the orchestrator, which mints the session id and creates the file | A driver appends rows only to the session file whose path its brief names |
-| `RUN-IDS.md` | whoever issued the run (a driver, or the orchestrator acting as one) | Append only |
-| `lease.<app>.json` | **the orchestrator only** (Fulcrum rule): taken before a Mentor dispatch, released when it returns `session_state: closed`; held (with `open_session`) when it returns `session_state: open` | Drivers and pollers never write it; no per-poll refresh |
-| `HALT.md` | whoever stopped the run | Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
+| `journal/<session-id>.md` | the orchestrator, which mints the session id and creates the file | A driver appends rows only to the session or lane file whose path its brief names |
+| `RUN-IDS.md` | whoever issued the run (a driver, or the orchestrator acting as one) | Append only. With parallel lanes a driver appends to its lane file ("Lane files") |
+| `lease.<app>.json` | **the orchestrator only** (Fulcrum rule): one per app a dispatch holds, taken before a Mentor dispatch, released when it returns `session_state: closed`; held (with `open_session`) when it returns `session_state: open` | Drivers and pollers never write it; no per-poll refresh |
+| `HALT.md` | **the orchestrator only** | A driver reports and stops. Clearing it: `resume-and-halt.md`, heading "Resuming past a halt" |
+| `demo-script.md` | the agent running the demo script row, that path only | Skill `fulcrum-demo` owns the format; G2 at `demo` reads it |
 | `tenant-profile.md` | `../../fulcrum-solution-init/SKILL.md`, or the orchestrator recording a newly observed tenant fact | - |
 | `checkpoints/<agent-label>.md` | that agent | - |
 | `evidence/render/<task-id>/<UTC-stamp>/*` | `fulcrum-renderer`, only the folder its brief names | The orchestrator links the folder from the session journal line; nobody edits evidence after the run |
 | `design/*` | `fulcrum-capturer` in the design loop's capture and gate phases (only the paths its brief names: a shared dispatch the app-wide `tokens.md`, `theme.css`, `data.md`; a screen dispatch only its `screens/<SID>.md`); the orchestrator after. `design/reference/*` and `design/user-shots/*` are the orchestrator's only: it copies the image source, or a renderer capture out of `evidence/render/`, into `reference/`, and files a user's tier-B screenshot under `user-shots/` | Drivers, renderer and verifier never write it |
 
 A **driver** (a delegated agent running turns) writes nothing outside appended rows in
-the session journal file its brief names, its `RUN-IDS.md` lines and, if it stops the
-run, `HALT.md`. It never mints session ids, never edits the `JOURNAL.md` index or
-`TASKS.md`, and never writes the lease. When
+the session journal file its brief names, its `RUN-IDS.md` lines (with parallel lanes,
+its lane files, "Lane files" below). It never mints session ids, never edits the `JOURNAL.md` index or
+`TASKS.md`, and never writes the lease or `HALT.md`: a driver reports and stops. When
 there is no delegation, the orchestrator is its own driver and the table still holds.
 
-**Reconcile at every wave close.** Before starting the next wave or ending the
-session, the orchestrator reads the wave's index rows, their session files where a
+**Reconcile at every wave close.** There is no wave barrier, so a wave close is a
+checkpoint: a join row is about to run, no dispatch is in flight, or the session is
+ending. The orchestrator reads the index rows, their session files where a
 row is not enough, and the new `RUN-IDS.md` lines, then rewrites `TASKS.md` (status,
 verdict), `project.md` (newly created app identifiers) and `HANDOFF.md` PART 2 to
 match, and commits. Check while doing it: every run id has an outcome line or is named
@@ -64,17 +66,19 @@ changed" is how the stale files above were produced.
 (a session-checkpoint file at the repo root, a commit message, a chat summary) becomes
 a competing source of truth - in the field it was updated instead of `.fulcrum/` and
 ended a full revision ahead of it. `[VERIFIED]` Where we are lives in `TASKS.md` plus
-the last `JOURNAL.md` row; the next step and its preconditions in `HANDOFF.md` PART 2
-(full profile); anything waiting on the user in the `TASKS.md` "Blocked and parked
+the last `JOURNAL.md` row; the frontier per lane and its preconditions in `HANDOFF.md`
+PART 2 (full profile); anything waiting on the user in the `TASKS.md` "Blocked and parked
 rows" table with `Blocked on: the user`. An ephemeral `checkpoints/<agent-label>.md`
 is fine, but its durable content moves into those files at wave close.
 
 ## project.md
 
-`<!-- fulcrum-schema: project v3 -->`
+`<!-- fulcrum-schema: project v4 -->`
 
 v2 adds `profile`. A v1 file is read as `profile: full`. v3 adds the optional
-`design` field; a v2 file is read as v3 without it.
+`design` field; a v2 file is read as v3 without it. v4 adds the required `Rigor`
+field. An older file has no value, and none may be assumed: ask on resume, then
+rewrite it as v4.
 
 Rewritten. Identity and settings only - no history, no task state.
 
@@ -84,6 +88,7 @@ Rewritten. Identity and settings only - no history, no task state.
 | `created` | Timestamp of scaffold. |
 | `mode` | `guided` \| `expert` |
 | `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
+| `Rigor` | `demo` \| `pilot` \| `production`. Third setting, orthogonal to mode and posture. Asked at init in every mode, never defaulted, never inferred; missing on resume: ask. Changing it is a user decision. It never changes posture. What each value owes: `../../fulcrum-verification/SKILL.md`, heading "Gates and rigor". |
 | `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
 | `design` | Optional. `.fulcrum/design/manifest.md` when the engagement runs the design loop (`../../fulcrum-design-loop/SKILL.md`); on the full profile a list, one `.fulcrum/design/<app>/manifest.md` per app the loop runs for. Present -> the loop engine runs rung 6 on screen rows as the design variant (render-compare). Omit otherwise. |
@@ -109,10 +114,13 @@ discovery interview's output, `DOMAIN.md` is the domain source of truth derived 
 
 ## TASKS.md
 
-`<!-- fulcrum-schema: TASKS v2 -->`
+`<!-- fulcrum-schema: TASKS v3 -->`
 
 v2 adds the `code`, `infra` and `external` turn types; columns and order are
-unchanged from v1. A v1 file is read as v2 with no other change.
+unchanged from v1. A v1 file is read as v2 with no other change. v3 adds `DependsOn`,
+`Batchable`, `Risk` and `Gate`, in the positions below. A v1 or v2 file has none of
+them: treat its rows as a chain in ID order, Batchable no, Risk std, and migrate on
+the next rewrite. Reading it any other way runs rows in an order nobody declared safe.
 
 Rewritten. The single answer to "what is open right now". A markdown table, because a
 human reviews it as a diff in a pull request; the column contract is what keeps it
@@ -125,18 +133,24 @@ Exactly these columns, in this order:
 | 1 | `Done` | `[ ]` or `[x]`. Terminal state only. |
 | 2 | `ID` | `T-<NNN>`, zero-padded, assigned once, **never reused** even after deletion. A reused ID makes a journal line ambiguous forever, and silently corrupts the oscillation count in the session index. |
 | 3 | `Task` | One imperative line. No newlines, no pipes - escape a literal pipe as `\|`. |
-| 4 | `App` | App identifier. This is the lease key; a wrong value here books the wrong lock. For `Turn: external` rows, the system stem from `external/<system>.md`. |
-| 5 | `Turn` | `build` \| `fix` \| `inspect` \| `publish` \| `seed` \| `verify` \| `manual` \| `code` \| `infra` \| `external` |
-| 6 | `Verify` | Required proof rungs, comma-separated rung numbers from `../../fulcrum-verification/SKILL.md`, heading "The proof ladder" - e.g. `1,3,6`. `-` is valid for `inspect`, `manual`, `code`, `infra` and `external` rows; for the last three the session-file outcome line names the evidence (test run, build output, listing). |
-| 7 | `Status` | `todo` \| `active` \| `blocked` \| `done` \| `parked` |
-| 8 | `Verdict` | `-` \| `pass` \| `fail` \| `unproven` |
-| 9 | `Traps` | Reference file stems from `../../fulcrum-engine-traps/references/`, comma-separated, or `-`. |
-| 10 | `Step` | Plan step id from `plan.md`, e.g. `P2.04`. The traceability join. |
+| 4 | `App` | App identifier. This is the lane and the lease key; a wrong value here books the wrong lock. Gate rows carry the literal `solution`: no lane, no lease. For `Turn: external` rows, the system stem from `external/<system>.md`. A row for one declared producer and consumer pair writes `<producer>+<consumer>`, one lease per identifier (`lease-and-concurrency.md`, heading "Several apps in one session"). |
+| 5 | `DependsOn` | Comma-separated task IDs, or `-`. Only true data dependencies. A false edge turns a parallel frontier into a chain; a missing one lets a consumer run before its contract. |
+| 6 | `Batchable` | `yes` \| `no`. Batch rules: `../../fulcrum-loop-engine/references/frontier-and-batching.md`, heading "Dispatch shape". |
+| 7 | `Risk` | `std` \| `high`. High: auth, data model change on populated data, integrations, money or PII, anything touching a prior verified feature. |
+| 8 | `Turn` | `build` \| `fix` \| `inspect` \| `publish` \| `seed` \| `verify` \| `manual` \| `code` \| `infra` \| `external` |
+| 9 | `Verify` | Proof rungs owed at G3, comma-separated rung numbers from `../../fulcrum-verification/SKILL.md`, heading "The proof ladder" - e.g. `1,3,6`. Written at every rigor; run only where the rigor table owes G3, except that `verify` and `fix` rows run theirs at every rigor. Rung 1 is a Mentor read-back, so it never sits on a `verify` row. `-` is valid for `inspect`, `manual`, `code`, `infra` and `external` rows; for the last three the session-file outcome line names the evidence (test run, build output, listing). |
+| 10 | `Status` | `todo` \| `active` \| `blocked` \| `done` \| `parked` |
+| 11 | `Verdict` | `-` \| `pass` \| `fail` \| `unproven`. `pass`: all gates owed so far ran and passed, so a `demo` row at `G0` is `pass`. `unproven`: an owed gate did not run or returned `untested`; the row stays `todo`. A gate failure after a row closed lives on a `fix` row, not on this one. |
+| 12 | `Gate` | Highest gate actually run: `-` \| `G0` \| `G1` \| `G2` \| `G3`. A row is never recorded above the gate it ran. |
+| 13 | `Traps` | Reference file stems from `../../fulcrum-engine-traps/references/`, comma-separated, or `-`. |
+| 14 | `Step` | Plan step id from `plan.md`, e.g. `P2.04`. The traceability join. |
 
-**Turn types.** The first six are Mentor work against an ODC app. The rest are not:
+**Turn types.** The first five are Mentor work against an ODC app; `inspect` is a Mentor
+read and takes the lease. The rest are not:
 
 | Turn | Means | Lease |
 |---|---|---|
+| `verify` | Proof with no Mentor rung, run at every rigor. Emitted only for joins, G2 and owed G3 | none |
 | `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none |
 | `code` | Repository code the agent writes outside Mentor - an External Logic library's source, a script, a test harness | none |
 | `infra` | Infrastructure or environment work - gateway, connector, CI, local tooling | none |
@@ -146,8 +160,12 @@ Before v2, field projects forced code and infrastructure work into `manual`, whi
 told every reader the user had to do it. `[VERIFIED]` Only Mentor turns take a lease;
 the lease is the one-Mentor-session-per-app lock, not a general mutex.
 
-**Columns stay contract values.** `Status`, `Verdict` and `Turn` take only the values
-above - no "done (partial: ...)", no "read-only", no "mentor". `Traps` takes only
+**Who may change the proof columns.** Drivers cannot edit `Verify`, `Risk` or `Gate`,
+because the orchestrator alone writes this file. A builder that can edit its own
+acceptance can always pass it.
+
+**Columns stay contract values.** `Status`, `Verdict`, `Gate`, `Batchable`, `Risk`
+and `Turn` take only the values above - no "done (partial: ...)", no "read-only", no "mentor". `Traps` takes only
 registry stems; an incident description goes in the session file, and a new trap is
 reported as engine-traps feedback (see "DECISIONS.md" below for what does not go
 there either). A cell that needs prose means the task should be split, or the prose
@@ -156,15 +174,26 @@ belongs in the journal.
 `Done` and `Status` are not redundant: `Done` is the reviewer's one-glance signal,
 `Status` distinguishes the four not-done states that need different next actions.
 `[UNVERIFIED]` `[x]` with `Status: done` and `Verdict: -` is malformed - a finished
-task always carries a verdict, and `unproven` is a legal, honest one.
+task always carries a verdict. `unproven` is not finished: the row stays `todo` and
+Select re-proves it.
+
+**Done, for `DependsOn`, means `Status: done` and `Verdict: pass`.** `unproven` and
+`fail` are not done. An id with no row reads as done.
+
+`blocked` means waiting on something that is not a row (an external system, the
+search index). A row waiting on a row stays `todo` with the id in `DependsOn`. Selection
+reads the graph: `../../fulcrum-loop-engine/references/frontier-and-batching.md`.
 
 **Task entries are Mentor-turn-shaped, not tickets.** Every row names the app it
 touches, the kind of turn it is, the proof it owes, and the traps that apply. A row
-that cannot fill columns 4-6 is not yet a task; it is a plan item, and it belongs in
-`plan.md` until it is decomposed.
+that cannot fill `App`, `Turn` and `Verify` is not yet a task; it is a plan item, and
+it belongs in `plan.md` until it is decomposed.
 
-**Row lifecycle.** Rows for the current phase stay in the table. At a phase boundary,
-remove rows with `Status: done`. Nothing is lost: their creation, their run ids and
+**Row lifecycle.** Rows for an open phase stay in the table. A phase is a derived
+label, not a gate. When a phase's rows are closed, remove those with `Status: done`
+and `Verdict: pass`, unless one is still owed a gate. The final G2 row is never removed:
+it is how a reader knows the build closed. An id in `DependsOn` with no row
+therefore reads as done. Nothing is lost: their creation, their run ids and
 their outcomes are already in `JOURNAL.md` and `RUN-IDS.md`. Without the removal the
 file grows without bound and stops being readable in one go, which is the one property
 it exists to have.
@@ -193,7 +222,7 @@ Exactly these columns, in this order:
 | 2 | `Start` | Timestamp of the session's first write. |
 | 3 | `End` | Timestamp the session closed, or `-` while open. |
 | 4 | `State` | `open` \| `clean` \| `halted` \| `aborted`. `open` means the row was never closed - the session is live or it crashed. There is no `crashed` value; a crash is indistinguishable from a live session in the file alone, and claiming otherwise invents a fact. |
-| 5 | `Tasks` | Task ids touched, comma-separated, each with its terminal outcome for **this session**: `T-003:pass,T-004:fail,T-007:unproven`. Written as each task reaches a terminal state, not at close. |
+| 5 | `Tasks` | Task ids touched, comma-separated, each with its terminal outcome for **this session**: `T-003:pass,T-004:fail,T-007:unproven`. Written as each task reaches a terminal state, not at close. An id repeats when it lands twice in one session. |
 | 6 | `InFlight` | Task ids with a `started` line and no outcome, comma-separated, or `-`. |
 | 7 | `Lines` | Count of action lines in the session file. Tells a reader what opening it costs. |
 | 8 | `Note` | One clause - halt reason, budget exhaustion, operator interrupt - or `-`. |
@@ -213,8 +242,8 @@ consumer. `[UNVERIFIED]`
 task been attempted before, and how did it go" - that is the oscillation query itself,
 and a pointer forces opening one session file per candidate session, which is exactly
 the cost the split removes. The list is bounded in practice because a session is
-bounded by its context budget; a row naming more than a dozen tasks is a mis-sized
-session, not a reason to change the schema.
+bounded by its context budget; a row naming more than a dozen tasks per lane is a
+mis-sized session, not a reason to change the schema.
 
 ### Index write ordering
 
@@ -244,7 +273,7 @@ difference. Resolve it against the lease, never by guessing:
 
 | Lease | Inference | Action |
 |---|---|---|
-| Live lease held by that session id | The session is running now | Wait or halt. Never take. `../../../AGENTS.md`: one Mentor session per app. |
+| Live lease held by that session id | The session is running now, or died inside its TTL | Wait or stop the lane. Never take. `../../../AGENTS.md`: one Mentor session per app. Dead: adopt it (`lease-and-concurrency.md`, heading "Resuming after a dead session"). |
 | No lease, or an expired one whose holder's dispatch is known dead (no return, budget exceeded) | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
 
 ### Index growth - the arithmetic
@@ -276,21 +305,24 @@ One line per event, pipe-delimited, fixed field order:
 <timestamp> | <session-id> | <task-id or -> | <run-id or -> | <action> | <outcome>
 ```
 
+- `task-id` - one id, or on a batch a comma-separated list, no spaces.
 - `session-id` - the same `s-<6 hex>` the filename carries. **Redundant on purpose.**
   A self-describing line survives the file being moved, quoted into a prompt, handed to
   a subagent as a fragment, or concatenated - and the rotation rule above concatenates.
   Ten characters a line is a cheaper premium than a merged archive nobody can attribute.
-- `action` - a short verb phrase: `dispatch build turn`, `poll`, `publish`,
-  `acquire lease`, `break expired lease`, `release lease`, `hold lease`, `halt`, `resolve halt`,
-  `withdraw`.
+- `action` - a short verb phrase: `session started`, `dispatch build turn`, `poll`,
+  `publish`, `acquire lease`, `adopt lease`, `break expired lease`, `release lease`, `hold lease`, `lane check`,
+  `halt`, `resolve halt`, `withdraw`. `lane check`'s outcome is `<app> done <n>`, the
+  input to stall detection (`../../fulcrum-loop-engine/references/oscillation-and-fix-loop.md`,
+  heading "Stall detection").
 - `outcome` - `started`, `ok`, `failed: <reason>`, `blocked: <reason>`, or a value.
 
 **Three ids, three different things. Do not confuse them.** A `session-id` is the
 orchestrating agent's working session - one cold-start-to-stop span, and one file here.
 The orchestrator mints it; drivers write lines carrying it but never mint one.
-A **Mentor session id** is the ODC-side session opened against an app and is
-written to this file only as the outcome of a `hold lease` line (a dispatch returned
-`session_state: open`). A **run id** is one Mentor or publish run inside that Mentor
+A **Mentor session id** is the ODC-side session opened against an app. It is required
+here as the outcome of a `session started` line, one per Mentor session, and again on
+`hold lease` when a dispatch returned `session_state: open`. A **run id** is one Mentor or publish run inside that Mentor
 session, and is field 4 here and in `RUN-IDS.md`. One working session may open several
 Mentor sessions and many runs.
 
@@ -380,8 +412,9 @@ One line per event, pipe-delimited, fixed field order:
 <timestamp> | <session-id> | <task-id> | <app> | <op> | <run-id> | <publication-key> | <revision> | <outcome>
 ```
 
-- `task-id` - the join key back to `TASKS.md`. Without it a resuming session that
-  finds an unpolled run cannot tell which row it belongs to.
+- `task-id` - the join key back to `TASKS.md`; on a batch a comma-separated list, no
+  spaces. Without it a resuming session that finds an unpolled run cannot tell which
+  row it belongs to.
 - `op` - `create-asset` | `prompt` | `publish` | `extlib` | `deploy` | another tool
   name for any other long-running start.
 - `run-id` - the id the start call returned. For `create-asset`, the returned
@@ -407,10 +440,32 @@ a publish as:
 ```
 
 The terminal `outcome` uses the `publish_status` outcome vocabulary from the same
-heading. Before this slot existed, projects mixed run ids, publication keys,
+heading. A Publish in a multi-asset session yields one publication key per asset: one
+`accepted` and one terminal line per key, each with that asset's `<app>`. Before this
+slot existed, projects mixed run ids, publication keys,
 revisions, deployment and build keys and Mentor session ids on free-text lines and
 the publish outcome was lost. `[VERIFIED]` Other keys (`deploymentKey`, `buildKey`,
 Mentor session id) go in the session-file line, not here.
+
+## Lane files
+
+Fulcrum rule, for a project with more than one lane. Two drivers appending to one
+file is a read-then-write on each side, so one driver's line can vanish with no
+error, and a lost run id is an unpollable run. One writer per file holds at lane
+level too.
+
+- For each dispatch the orchestrator names `journal/<session-id>.<lane>.md` and
+  `RUN-IDS.<lane>.md` in the brief, in place of the shared files. `<lane>` is the
+  app identifier; for a pair, the producer's. Same line formats, same `session-id`.
+- The driver appends only there. The orchestrator is then the only writer of
+  `journal/<session-id>.md` and `RUN-IDS.md`.
+- When the dispatch returns, the orchestrator appends the lane lines to the shared
+  files, in order, whole lines, then deletes the lane files. A crash during this
+  leaves duplicate lines, which is harmless (`journal/<session-id>.md`,
+  "Crash-idempotency").
+- A lane file that still exists at session start is an unfolded dispatch: read it as
+  part of the shared file (`resume-and-halt.md`).
+- A single-app project has one driver at a time and may name the shared files.
 
 ## HANDOFF.md
 
@@ -504,4 +559,5 @@ neither wrote the file. `[VERIFIED]` Contents and clearing: `resume-and-halt.md`
 
 ## lease.<app>.json
 
-Not committed. One per app. See `lease-and-concurrency.md`.
+Not committed. One per app, including each app of a multi-asset dispatch. See
+`lease-and-concurrency.md`.

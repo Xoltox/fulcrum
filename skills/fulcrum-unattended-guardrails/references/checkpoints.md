@@ -50,7 +50,9 @@ already in flight.
 
 ## Discipline
 
-- The orchestrator supplies the path. The agent does not invent one.
+- The orchestrator supplies the path, one per dispatch. The agent does not
+  invent one. Parallel lanes never share a checkpoint: last-writer-wins loses
+  the other lane's handles.
 - **Overwrite in place.** Do not append an ever-growing log - that file becomes a
   read cost for whoever resumes.
 - Keep it short enough to read in one go. A page, not a transcript.
@@ -69,6 +71,12 @@ so a resuming agent knows whether to wait or to investigate:
 - **Mentor capacity stop** - the attempts made and the session that was closed
   (`halt-conditions.md`, heading "Mentor capacity stop"). Resume by retrying the
   first turn later with a fresh session; do not treat it as a defect.
+- **Lane stop** - the parked row, its attempts, the dependents it holds and any open
+  `sessionId` (`halt-conditions.md`, heading "Lane stops"). Resume only on a user
+  decision.
+- **Parked lane** - the stall that parked it, its rows and the last verified-good
+  revision (`halt-conditions.md`, heading "Stall and no-op decisions"). Resume
+  only on a user decision.
 - **Halt** - every other hard stop, with the last verified-good revision.
 
 ## Two-part handoff structure

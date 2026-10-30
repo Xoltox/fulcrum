@@ -2,16 +2,19 @@
 
 This is the only place in the Fulcrum family that defines question-asking
 discipline. `expert` mode does not use this file - the user invokes skills
-directly and no routing questions are asked. Mode definitions themselves:
-`../../../CONVENTIONS.md`, heading "Mode and posture" - not restated here.
+directly and no routing questions are asked, with one exception: `Rigor` is asked
+in every mode. Definitions: `../../../CONVENTIONS.md`, heading "Mode and posture" -
+not restated here.
 
 ## What this router asks about, and what it never asks about
 
-The router's questions are scoped to **routing and mode** only:
+The router's questions are scoped to **routing, mode and Rigor** only:
 
 - Is there source material, or should this start from an interview?
 - Does an app already exist that the user means for this engagement?
 - `guided` or `expert`, on first run only.
+- `Rigor`: `demo`, `pilot` or `production`, on first run on every path, and on resume
+  when `project.md` lacks it.
 - Micro profile or full path, when detection row 0's signals match - proposed with
   a recommendation, never picked for the user (`detection-procedure.md`, heading
   "Proposing the micro profile").
@@ -36,15 +39,16 @@ dispatch to, or does it change what gets built? The former is this router's.
 ## The batching rule
 
 Never ask one question per turn. Batch related questions together - this
-router's own question set is short (mode, source material, ambiguous ladder
-row), so in practice one batch of at most three questions covers the whole
+router's own question set is short (mode, `Rigor`, source material, ambiguous
+ladder row), so in practice one batch of at most four questions covers the whole
 first-run case. Reserve a second batch only for a genuine conflicting-signal
 case detection could not resolve on its own.
 
 ## Every question carries options and a recommendation
 
 Never ask an open question the user must answer from nothing. State the
-choices and, where one exists, a one-clause recommendation.
+choices and, where one exists, a one-clause recommendation. `Rigor` has none: a
+recommended rigor is a default by another name, and it is never defaulted.
 
 **Example - mode, first run:**
 
@@ -56,6 +60,16 @@ choices and, where one exists, a one-clause recommendation.
 >   assumptions and record them rather than asking.
 >
 > Which do you want?
+
+**Example - rigor, first run or a project that lacks it:**
+
+> How much proof should this build carry? It sets how deeply each change is checked,
+> not whether the safety rules apply - those hold at every level.
+> - **demo** - a happy path that must show well; checks scoped to the demo script.
+> - **pilot** - real users on a small scale; every change that carries risk is proven.
+> - **production** - live use; every change that alters the app is proven.
+>
+> Which is this?
 
 **Example - small ask, micro profile:**
 
@@ -73,7 +87,7 @@ choices and, where one exists, a one-clause recommendation.
 
 > No `.fulcrum/` and no app; you handed over one design for one app with N screens.
 > - **design loop** - I capture the design into a per-screen spec, build it through
->   Mentor one step at a time and compare each published screen against it.
+>   Mentor and compare each published screen against it.
 >   *Recommended: one app, N screens, one design.*
 > - **full** - a planned, specced build from the design as source material. Better
 >   if it will grow past one app or about six screens.
@@ -112,7 +126,7 @@ asking whether it exists.
 
 ## After the batch
 
-Play back what was decided in one line before dispatching - "Guided mode,
-scaffolding from `docs/brd.md` via `fulcrum-solution-init`" - so the user can
+Play back what was decided in one line before dispatching - "Guided mode, pilot
+rigor, scaffolding from `docs/brd.md` via `fulcrum-solution-init`" - so the user can
 correct a misread before a subagent starts spending calls on it. Then dispatch
 per the ladder in `../SKILL.md`; this file's job ends at the handoff.

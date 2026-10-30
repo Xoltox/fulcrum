@@ -5,7 +5,8 @@ session start. **Append-only.** Never edit a line, never delete one, never inser
 the middle. Correct a wrong line by appending a later line with the action `withdraw`.
 
 Written by exactly one session, so it never merge-conflicts. The append discipline is
-what keeps a crashed file readable and correctly ordered.
+what keeps a crashed file readable and correctly ordered. Parallel drivers append to
+lane files, never here (`../references/file-schemas.md`, heading "Lane files").
 
 Create this file **before** appending the session's row to `../JOURNAL.md`, and both
 before the first dispatch. Schema: `../references/file-schemas.md`, heading
@@ -25,7 +26,8 @@ One line per event:
 
 The `started` line is written **before** the wait. The outcome line is written after.
 A `started` with no outcome is the signal that work may still be in flight, and it is
-what the index row's `InFlight` column mirrors.
+what the index row's `InFlight` column mirrors. On a batch `<task-id>` is a
+comma-separated list, no spaces.
 
 The `session-id` repeats the filename on purpose - a self-describing line survives the
 file being moved, quoted, handed to a subagent as a fragment, or concatenated by the
@@ -34,6 +36,7 @@ index rotation rule.
 ```
 2026-09-28T13:02:55Z | s-7b22af | -     | -        | open session | ok
 2026-09-28T13:03:10Z | s-7b22af | T-003 | -        | acquire lease | ok: ordering_app
+2026-09-28T13:04:20Z | s-7b22af | T-003 | -        | session started | ok: 6f0c1d2e
 2026-09-28T13:05:02Z | s-7b22af | T-003 | r-8f21c4 | dispatch build turn | started
 2026-09-28T13:06:32Z | s-7b22af | T-003 | r-8f21c4 | poll | running
 2026-09-28T13:08:05Z | s-7b22af | T-003 | r-8f21c4 | dispatch build turn | ok: model updated
@@ -47,12 +50,13 @@ index rotation rule.
 
 ## Actions in use
 
-`open session`, `close session`, `acquire lease`, `break expired lease`,
-`release lease`, `dispatch <turn type> turn`, `poll`, `publish`, `verify rung <n>`,
-`recover`, `withdraw`, `halt`, `resolve halt`
+`open session`, `close session`, `session started`, `acquire lease`, `adopt lease`,
+`break expired lease`, `release lease`, `dispatch <turn type> turn`, `poll`, `publish`, `verify rung <n>`,
+`recover`, `withdraw`, `halt`, `resolve halt`, `hold lease`, `lane check`
 
 Lease lines are the orchestrator's (it alone writes the lease; there is no
-`refresh lease`). A driver appends only to the session file its brief names.
+`refresh lease`). A driver appends only to the session file its brief names. `session started` is
+required once per Mentor session, its outcome the Mentor `sessionId`.
 
 Extend the list as needed; keep each action a short verb phrase and reuse an existing
 one before inventing a synonym. Two words for one event makes the file unsearchable.

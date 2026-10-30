@@ -10,7 +10,7 @@ improvise them and no user has to ask their harness to build them.
 | Role | Tier | Tool classes | Job |
 |---|---|---|---|
 | `fulcrum-poller` | `poller` | `run-read`, `blocking-wait` | Wait on one Mentor run, drain it, report in 3 lines |
-| `fulcrum-mentor-driver` | `workhorse` | `mentor-drive`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller` | Drive Mentor turns for one app per a written plan step (one dispatch per step, one session inside it); ends each mutating step with its Publish turn |
+| `fulcrum-mentor-driver` | `workhorse` | `mentor-drive`, `attachment-upload`, `run-read`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped`, `spawn-poller` | Drive Mentor turns for one app, or one declared producer and consumer pair, per a written plan (one dispatch per batch or solo row, one session inside it); ends each mutating dispatch with its one Publish turn and returns per-row verdicts |
 | `fulcrum-verifier` | `workhorse` | `published-read`, `file-read`, `http-probe`, `blocking-wait` | Verify the live app against stated claims, blind to how it was built. Cannot render: judges rungs 6-7 from `fulcrum-renderer` evidence, else `untested`; on the design loop, compares render captures against reference images by image inspection |
 | `fulcrum-renderer` | `workhorse` | `browser-automation`, `published-read`, `blocking-wait`, `file-read`, `file-write-scoped` | Render published screens (anonymous, approved sample persona, or user session) and record evidence; never types credentials, never gives the verdict |
 | `fulcrum-capturer` | `deep-reasoning` (capture), `workhorse` (gate, set in the brief) | `file-read`, `file-write-scoped`, `design-source-read` | Capture one design source into the design loop's per-screen spec under `.fulcrum/design/`; in gate mode, grade a capture blind. Never drives Mentor, never publishes, never uses a browser |
@@ -52,7 +52,7 @@ the end. Edit the role first, then mirror the body into each adapter.
 | `published-read` | `context_*`, `app_info`, `app_revisions`, `app_logs`, `app_traces`, `app_health`, `env_list`, `env_app`, `publish_status`, `publish_logs`, `auth_status` |
 | `blocking-wait` | A wait that actually suspends for the requested time (verified, see `../HARNESS-NOTES.md`, "Waiting") |
 | `file-read` | Read and search files; includes image inspection (looking at an image file) where a role's job needs it (verifier, capturer) |
-| `file-write-scoped` | Write only the paths named in the brief (the driver: append to the session journal file and RUN-IDS; the renderer: its evidence folder only; the capturer: the `.fulcrum/design/` paths its brief names only; never the lease, the `JOURNAL.md` index or TASKS) |
+| `file-write-scoped` | Write only the paths named in the brief (the driver: append to the journal file and run-id log its brief names, shared or lane files; the renderer: its evidence folder only; the capturer: the `.fulcrum/design/` paths its brief names only; never the lease, the `JOURNAL.md` index or TASKS) |
 | `browser-automation` | Open and navigate a page, read a DOM snapshot and page text, screenshot, click, hover, press keys, type and fill forms, upload, read console/network output. Never type a password, token, API key or other secret (a Fulcrum rule, not a tool restriction); data-changing interactions only when an assertion requires it, in Development only |
 | `spawn-poller` | Start exactly one nested `fulcrum-poller` |
 | `http-probe` | Outbound HTTP to the app's own endpoints |

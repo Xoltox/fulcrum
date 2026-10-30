@@ -6,32 +6,36 @@ Fixed, and short on purpose. A cold session reads these and nothing else before 
 acts.
 
 1. **`HALT.md`** - if the file exists, stop here. See "The halt record" below.
-2. **`project.md`** - identity, apps, `mode`, `posture`, tier overrides.
+2. **`project.md`** - identity, apps, `mode`, `posture`, `Rigor`, tier overrides.
+   Current schema: `project v4`. An older marker has no `Rigor`; a newer one: stop and
+   report (`file-schemas.md`, heading "project.md"). `Rigor` missing: ask before any
+   dispatch. Never assume a value: it decides how much proof the user bought.
 3. **`HANDOFF.md`** - PART 1 RULES, then PART 2 BRIEF. Absent in the micro profile
    (`micro-profile.md`); read the `plan.md` "Standing rules" section instead.
 4. **`TASKS.md`** - the current truth. Where it disagrees with the BRIEF, it wins.
 5. **The last row of `JOURNAL.md`** - the session index. It alone answers where the
    last session stopped and what was in flight. Open `journal/<session-id>.md` only
    when that row is not enough.
-6. **`lease.<app>.json`** for the app about to be touched.
+6. **`lease.<app>.json`** for every app in `InFlight` or about to be touched.
 
 Do not read `plan.md`, `DECISIONS.md` or `runs/*` on a normal start. Read `plan.md`
 when a task's `Step` needs resolving, `DECISIONS.md` when about to reverse or
 re-litigate something, and a run file only when diagnosing that run.
 
-## Crash recovery - the four signals of interrupted work
+## Crash recovery - the five signals of interrupted work
 
 A crash leaves recoverable evidence precisely because state is written before the
 wait, never after the result (`../SKILL.md`, heading "Write ordering - state before
-the wait, never after the result"). Check all four; any one of them means work was in
-flight.
+the wait, never after the result"). Check all five, once per lane in flight; any one
+of them means work was in flight on that lane. A lane that shows none stays selectable.
 
 | Signal | Meaning | Action |
 |---|---|---|
-| A `TASKS.md` row with `Status: active` | A turn was dispatched | Find its run in `RUN-IDS.md` by task ID |
+| A `TASKS.md` row with `Status: active` | A turn was dispatched | Find its run in `RUN-IDS.md` by task ID. No run and live revision unchanged: back to `todo`. No run and live revision moved: a turn landed unrecorded, so read the app back in a driver dispatch; criteria met, record at that revision and continue to its gates; not met, back to `todo` |
 | A `JOURNAL.md` row with `State: open`, or a `started` line in its session file with no matching outcome | The wait was entered and never returned | Same |
-| A `RUN-IDS.md` `started` line with no later line for that run id | A run may still be executing | **Poll that same run to a terminal state. Never start a competing turn on it.** |
-| A lease held by a holder that is not you | Another agent may be live | `lease-and-concurrency.md` |
+| A `RUN-IDS.md` `started` line with no later line for that run id | A run may still be executing | **Poll that same run to a terminal state; polling needs no lease. Never start a competing turn on it.** |
+| A lease held by a holder that is not you | Another agent may be live, or a dead session left it | `lease-and-concurrency.md`, heading "Resuming after a dead session" |
+| A lane file (`journal/<session-id>.<lane>.md`, `RUN-IDS.<lane>.md`) still exists | A dispatch was never folded in | Read it as part of the shared file, apply the signals above, then fold it (`file-schemas.md`, heading "Lane files") |
 
 Then, and only then:
 
@@ -40,8 +44,10 @@ Then, and only then:
   from a stale model advances the revision while silently reverting completed work.
   `[VERIFIED]`
 - **Re-prove anything carrying `Verdict: unproven`.** That value exists to be
-  distrusted. A `done` row with `unproven` is work that happened but was never shown
-  to work; treat it as unfinished, not as finished-with-a-caveat.
+  distrusted. A `todo` row with `unproven` is work that happened but was never shown
+  to work: Select picks it as a re-prove dispatch, proof only, no Mentor turn.
+- **Leave a `parked` row parked.** A lane stop or a user-action stop ends only on a
+  user decision. Other lanes resume as normal.
 - Append a recovery line to the new session's `journal/<session-id>.md`, naming what
   was found in flight, and close the crashed session's index row as `aborted`.
   Without it the interruption leaves no trace and the next anomaly looks unexplained.
@@ -73,13 +79,14 @@ have the file and not be halted.
 
 **A halt written only in prose is not a halt.** "HALTED" in a journal note, a
 `project.md` line or a report to the user leaves no `HALT.md`, so the next session
-resumes past it. Whoever halts writes the file first, then the `halt` journal line,
+resumes past it. The orchestrator writes the file first, then the `halt` journal line,
 then closes its index row as `halted`, then reports. `[VERIFIED]` - two field projects
 halted in prose only. A user-action stop is not a halt: it is a `parked` `TASKS.md` row
 with `Blocked on: the user` (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`,
-heading "User-action stops").
+heading "User-action stops"). Nor is a lane stop: the row parks, its dependents
+hold and other lanes continue, with no `HALT.md` (same file, heading "Lane stops").
 
-It is written by whatever stopped the run, under the conditions in
+Only the orchestrator writes it: a driver reports and stops. The conditions are in
 `../../fulcrum-unattended-guardrails/references/halt-conditions.md`. That skill owns
 *when* to halt; this one owns only the record.
 

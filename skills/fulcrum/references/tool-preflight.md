@@ -37,13 +37,14 @@ Run these before the procedure below. Tool facts live in
    Names alone miss parameter and deprecation drift. On any difference, stop and
    run the re-probe in
    `../../fulcrum-mentor-turns/references/mcp-surface.md#re-probing-the-surface` before
-   trusting skill text that names a tool or parameter. (An executable drift script is
-   a roadmap follow-up.)
+   trusting skill text that names a tool or parameter. Mid-engagement this is a halt
+   (`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading "Hard
+   stops"). (An executable drift script is a roadmap follow-up.)
 
 ## The procedure
 
-1. **List the ops this engagement's next phase actually needs.** Read
-   `plan.md` / the next `TASKS.md` row, not the whole tool surface.
+1. **List the ops this engagement's next work actually needs.** Read
+   `plan.md` / the current `TASKS.md` frontier, not the whole tool surface.
 2. **Consult `tenant-profile.md` first.** If a needed op already has a row in
    its tool-availability section, use that answer - do not re-probe it.
 3. **Probe only what the profile does not already answer**, and only read-only
@@ -64,5 +65,5 @@ Run these before the procedure below. Tool facts live in
 This is a lookup against an existing profile plus, at most, a handful of new
 read-only probes for ops the profile has not yet answered - not a re-run of
 the full tenant capability probe every session. If the profile is stale per
-`tenant-capability-probe.md` rule 5, re-probe the affected rows only, not the
-whole file.
+`tenant-capability-probe.md`, rule "Refresh on a stale profile", re-read the
+affected rows only, not the whole file.

@@ -1,7 +1,8 @@
 # The micro profile
 
 A lighter `.fulcrum/` for a small engagement: **one app, about five or fewer steps,
-no BRD or other source material to triage.** The full profile (brief, tenant probe,
+no BRD or other source material to triage.** One app means one lane: the frontier is a
+chain, and speed comes from batching, not fan-out. The full profile (brief, tenant probe,
 specs, `HANDOFF.md`, build-pattern log) is sized for a multi-app, multi-phase build
 and is overhead here. The signal is a small app that the "plan must exist on disk" pre-flight
 would push into `fulcrum-solution-init`, where the user instead hand-writes a one-page
@@ -20,9 +21,9 @@ ordinary ladder.
 
 | File | Micro profile | Why |
 |---|---|---|
-| `project.md` | **mandatory** | Identity, app, mode, posture - the router reads mode from it |
+| `project.md` | **mandatory** | Identity, app, mode, posture, `Rigor` - the router reads mode from it |
 | `plan.md` | **mandatory**, from `../templates/plan-micro.md` | Satisfies the guardrails pre-flight "plan on disk"; the `Step` join target |
-| `TASKS.md` | **mandatory** | Current truth; the loop engine selects from it |
+| `TASKS.md` | **mandatory**, schema v3 like the full profile | Current truth; the loop engine selects from it. `DependsOn`, `Batchable`, `Risk` and `Gate` are filled here too, or the rows read as an unbatched chain |
 | `JOURNAL.md` + `journal/<session-id>.md` | **mandatory** | Resume and oscillation queries read the index; the session file holds the `started` lines crash recovery needs |
 | `RUN-IDS.md` | **mandatory** | An unrecorded run id is unpollable after a crash, at any scale |
 | `DECISIONS.md` | created at the first decision | The profile confirmation and the create-vs-shell choice are decisions, so in practice it exists from the start |
@@ -32,19 +33,25 @@ ordinary ladder.
 | `tenant-profile.md` | read if one is found (lookup rule in `../../fulcrum-solution-init/templates/tenant-profile.md`, section 11); not probed for in full, but procedure step 4 records the environment keys in its section 11 | The session-start tool preflight still runs; a driver's brief carries the environment keys; record any tenant fact learned in the profile, not in `DECISIONS.md` |
 | `brief.md`, `DOMAIN.md` (the root brief file solution-init scaffolds), `HANDOFF.md`, specs, build-pattern log, `runs/`, `checkpoints/` | not used | The plan's Acceptance and Steps sections replace the brief and the specs; `TASKS.md` plus the last `JOURNAL.md` row is the resume point |
 
+Micro has one lane, so a driver appends to the shared session file and `RUN-IDS.md`
+directly; lane files do not apply (`file-schemas.md`, heading "Lane files"). Rigor gates
+apply unchanged, as rows: one join row, one final G2 row and, at `demo`, one demo script
+row (`../templates/plan-micro.md`). Gate rows do not count toward the five steps.
+
 Keep the session-file split even when the engagement is small. A single combined
 per-action log was the field workaround, and it lost the index row that answers
 "what was in flight" in one read. Two short files cost less than one reconstruction.
 
 ## Procedure
 
-1. The router has proposed micro and the user confirmed. Ask, in the same batch, the
-   app-creation choice: Mentor creates the app, or the user makes a shell from the
+1. The router has proposed micro and the user confirmed. Ask, in the same batch,
+   `Rigor` (`demo`, `pilot` or `production`; asked in every mode, never defaulted) and
+   the app-creation choice: Mentor creates the app, or the user makes a shell from the
    standard template for Fulcrum to attach (`assetRefs`). Neither is the default -
-   `../../fulcrum-solution-init/SKILL.md`, step 2. Record both answers in
+   `../../fulcrum-solution-init/SKILL.md`, step 2. Record all three answers in
    `DECISIONS.md`.
 2. Write `project.md`, then `plan.md` from `../templates/plan-micro.md` with the user,
-   then `TASKS.md` rows for the steps, then empty `JOURNAL.md` and `RUN-IDS.md`.
+   then `TASKS.md` rows for the steps and gate rows, then empty `JOURNAL.md` and `RUN-IDS.md`.
 3. For every external system the plan names, write `external/<system>.md` from
    `../templates/external-system.md`, or park the consuming step until it exists.
 4. Run the session-start tool preflight (`../../fulcrum/references/tool-preflight.md`),

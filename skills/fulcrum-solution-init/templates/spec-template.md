@@ -13,7 +13,7 @@ The spec must be **self-sufficient**. The build agent reads this file and nothin
 
 ## Step \<NN\> - \<short title\>
 
-**Phase:** \<phase number and name\>
+**Phase label:** \<phase number and name\>
 **App:** \<exact target app identifier from tenant-profile.md\>
 **Scope:** \<one sentence: what exists when this step is done\>
 
@@ -21,8 +21,8 @@ The spec must be **self-sufficient**. The build agent reads this file and nothin
 think belongs here and does not. This section prevents scope creep more effectively than
 any instruction to avoid it.\>
 
-**Depends on:** \<step numbers whose output this step reads. State what it reads, not just
-the number.\>
+**Depends on:** \<step numbers whose output this step reads, matching the row's `DependsOn`.
+State what it reads, not just the number.\>
 
 ---
 

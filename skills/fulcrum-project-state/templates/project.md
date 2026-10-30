@@ -7,7 +7,7 @@ Schema: `../references/file-schemas.md`, heading "project.md".
 
 ---
 
-<!-- fulcrum-schema: project v3 -->
+<!-- fulcrum-schema: project v4 -->
 
 # Project - \<solution name\>
 
@@ -29,11 +29,14 @@ Do not re-derive these. Confusably named apps on the tenant are listed in
 |---|---|
 | `mode` | `guided` \| `expert` |
 | `posture` | `collaborative` \| `directive` |
+| `Rigor` | `demo` \| `pilot` \| `production` - asked at init, never defaulted, never inferred |
 | `profile` | `full` \| `micro` - confirmed by the user; `../references/micro-profile.md` |
 | `design` | Optional: `.fulcrum/design/manifest.md` on the design loop only (full profile: a list, one `.fulcrum/design/<app>/manifest.md` per app run through it); delete the row otherwise |
 
 `collaborative` is the default. Definitions, the orthogonality rule, the failure
 mechanism and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture".
+`Rigor` has no default; what each value owes: `../../fulcrum-verification/SKILL.md`,
+heading "Gates and rigor".
 
 ## Tier overrides
 

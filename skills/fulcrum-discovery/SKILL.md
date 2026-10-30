@@ -21,14 +21,14 @@ Owned here: the interview, the sufficiency judgement, and the brief. Nothing els
 | Assessing an app that already exists against requirements | `../fulcrum-gap-analysis/SKILL.md` |
 | Anything Mentor, publish, or verification | the respective sibling skill |
 
-**Not the app-creation question.** Whether Mentor creates the app or the user makes a
-shell is asked by `../fulcrum-solution-init/SKILL.md` step 2, or by the micro profile;
-never here, so the user is asked once.
+**Not the app-creation or `Rigor` question.** Asked by the router, by
+`../fulcrum-solution-init/SKILL.md` step 2, or by the micro profile; never here, so the
+user is asked once.
 
 **Stop at the brief.** Do not name phases, do not size steps, do not propose an app
 split. Deciding the shape of the build during the interview freezes a decomposition
-before the tenant probe has run, and `fulcrum-solution-init` will then either re-do it
-or inherit it unexamined. `[UNVERIFIED]` - design decision, not a field observation.
+before anyone has looked at the tenant, and `fulcrum-solution-init` will then either
+re-do it or inherit it unexamined. `[UNVERIFIED]` - design decision, not a field observation.
 
 ## Interaction requirement
 
@@ -155,7 +155,7 @@ Each row exists because something in this repo needs it. Questions:
 | Roles, and which roles reach which screen  -  read versus write, separately | Role list and per-screen assignment are distinct findings (`../fulcrum-gap-analysis/references/inventory.md`). Unstated per-screen access produces role inversion  -  a user writing their own outcome (`../fulcrum-gap-analysis/SKILL.md`)  -  and a new screen can ship an unasked-for default role requirement nobody can detect without the intent written down (`../fulcrum-engine-traps/references/access-security-and-settings.md`, entry 1) |
 | Entities, their key attributes, and every relationship - including two distinct references from one entity to the same entity | Relationship shape is the thing a brief most often omits, and the two-FKs-to-one-entity case is legal and commonly mis-modelled (`../fulcrum-engine-traps/references/static-entities.md`) |
 | Which value sets are fixed and enumerable | Fixed sets are static entities, not text; the distinction is a model change versus data entry later (`../fulcrum-project-state/templates/DECISIONS.md`, record D-002) |
-| Integration points, each with direction and payload | Integrations are named at decomposition (`../fulcrum-solution-init/SKILL.md`, step 4) and carry their own trap class (`../fulcrum-engine-traps/references/rest-and-integration.md`) |
+| Integration points, each with direction and payload, plus anything the user already knows the tenant can or cannot do | Integrations are named at decomposition (`../fulcrum-solution-init/SKILL.md`, step 4) and carry their own trap class (`../fulcrum-engine-traps/references/rest-and-integration.md`). Fulcrum plans no spikes, so an unknown is asked here or tried on the first real row |
 | What rows must exist before a screen can be demonstrated working | Seed precedes any screen that reads it, and seeding is its own multi-turn phase (`../fulcrum-seed-data/SKILL.md`; `../fulcrum-solution-init/SKILL.md`, step 5 "Data before screens") |
 | Per screen: read-only or transactional | A spec must state "display only" explicitly or the build agent hardcodes text (`../fulcrum-solution-init/templates/spec-template.md`, FUNCTIONAL BEHAVIOR), and a transactional screen demands the interaction-persistence rung (`../fulcrum-verification/SKILL.md`, proof ladder rung 7) |
 | Persona and scope, and whether single-role is an assumption | The brief's required first content; a wrong persona mis-shapes every entity (`../fulcrum-solution-init/references/source-triage.md`) |

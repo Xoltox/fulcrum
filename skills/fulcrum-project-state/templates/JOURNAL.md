@@ -42,4 +42,5 @@ Session index. Detail for any row: `journal/<Session>.md`.
 `State`: `open`, `clean`, `halted`, `aborted`
 `Tasks`: `<task-id>:<pass|fail|unproven|->`, comma-separated, written as each task
 reaches a terminal state - **not** at session close, so a crashed attempt still shows.
+An id repeats when it lands twice in one session: `T-004:fail,T-004:fail`.
 `-` means "not applicable or not yet known". Never leave a cell empty.

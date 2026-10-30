@@ -96,17 +96,17 @@ fresh-context switch; runs in a session share Mentor's memory. Fresh context
 means close the session, start a new one, attach again
 (`references/mcp-surface.md`, heading "Sessions and context").
 
-- **One driver dispatch per plan step, one session per step** (Fulcrum rule).
-  Inside that dispatch and session the driver runs the guard, the consult
-  turn (if the step has one), build turn(s), fix turn(s) and the Publish
-  turn. Consult and build never split across dispatches, or the review's
-  corrections are silently discarded.
-- **A step's session ends with the step.** A fresh session's `assetRefs` with
-  no revision works on the latest `[SCHEMA]`, so the next step's guard
-  proves the previous step landed (published), not session staleness. The
-  only carry-over is a resume of the *same* step: a dispatch stopped on its
-  budget hands back an open `sessionId` (`on_exit: keep-open`) and the next
-  dispatch of that step resumes it. When to start fresh within a step:
+- **One driver dispatch per batch or solo row, one session per dispatch, one
+  Publish per dispatch** (Fulcrum rule). Inside it the driver runs the guard,
+  the consult turn (if the dispatch has one), build turn(s), fix turn(s) and
+  the Publish turn. Consult and build never split across dispatches, or the
+  review's corrections are silently discarded.
+- **A session ends with its dispatch.** A fresh session's `assetRefs` with
+  no revision works on the latest `[SCHEMA]`, so the next dispatch's guard
+  proves the previous one landed (published), not session staleness. The
+  only carry-over is a resume of the *same* row or batch: a dispatch stopped
+  on its budget hands back an open `sessionId` (`on_exit: keep-open`) and the
+  next dispatch resumes it. When to start fresh within a dispatch:
   `references/sessions.md`.
 - **One session per app at a time; two sessions never build one app**
   (user-confirmed). One session may hold several assets. Close a finished
@@ -129,9 +129,9 @@ lost; `[UNVERIFIED]` on the 2026-10-30 surface, inferred, not tested].
 
 ### The guard
 
-Every step's first turn is a **cheap, read-only invariant check** against
-the step's **own verified ground truth** (never a figure copied from a
-handoff), phrased so a mismatch halts - e.g. "how many aggregates does
+Every dispatch's first turn is a **cheap, read-only invariant check** against
+the dispatch's **own verified ground truth** (never a figure copied from a
+handoff), phrased so a mismatch stops - e.g. "how many aggregates does
 screen `<X>` have, and does a widget named `<Y>` exist? If not `<N>` / YES,
 say so and STOP."
 
@@ -139,7 +139,7 @@ say so and STOP."
   start fresh.** A revision-number check does not substitute.
 - **On mismatch (including a read-back that errors) in a session holding
   unpublished changes, never close it** - close discards that work. Either
-  send the Publish turn (only if the step's own build verified) or halt with
+  send the Publish turn (only if the dispatch's own build verified) or stop with
   `on_exit: keep-open` and report `unpublished_changes: yes`.
 - Each sibling screen gets its **own** check. A wrong count may be a
   read-back error rather than staleness - **the response is the same.**
@@ -181,8 +181,8 @@ its verdict on that read.
 ## 7. Publish sequencing
 
 **Publish is its own planned turn:** a `mentor_prompt` whose message is
-"Publish", polled at the mutating cadence. **Every mutating step ends with
-its Publish turn** - the plan's publish points are per step. Events, keys and
+"Publish", polled at the mutating cadence. **Every mutating dispatch ends with
+one Publish turn** - a batch shares it. Events, keys and
 status fields: `references/mcp-surface.md`, heading "Publishing".
 
 - **Mentor's offers to publish are never accepted inline.** An unattended
@@ -217,5 +217,5 @@ status fields: `references/mcp-surface.md`, heading "Publishing".
 
 Auth expiry, lost sessions, the capacity throttle, failed publishes, abandoned
 prompts: `references/recovery.md` - read before treating an interrupted turn as
-failed. Budget per step: 1 build turn (or a build pass of up to 4 short turns,
+failed. Budget per step or batch: 1 build turn (or a build pass of up to 4 short turns,
 which counts as one) + up to 2 fix turns, plus the Publish turn; disclose overages (`references/granularity.md`, "Turn economics").

@@ -25,8 +25,8 @@ however interesting.
 | 6 | Screen inventory, one line each | Yes | Sizing |
 | 7 | Per screen: read-only or transactional | Yes | Spec FUNCTIONAL BEHAVIOR; proof rung selection |
 | 8 | Fixed value sets | No | Static-entity modelling |
-| 9 | Integration points, direction and payload | No | Decomposition; may become a whole phase |
-| 10 | Rows that must exist to demonstrate a screen | No | Seed phase sizing |
+| 9 | Integration points, direction and payload; known tenant limits | No | Decomposition; may become a whole lane |
+| 10 | Rows that must exist to demonstrate a screen | No | Seed step sizing |
 | 11 | One observable acceptance statement per screen | No | Acceptance checklists |
 | 12 | Smallest demoable slice | No | Phase-one scope |
 | 13 | Assets that exist, and who uploads them | No | Asset gates |
@@ -71,9 +71,9 @@ no basis for them and the interview format makes declining feel unhelpful.
 
 | Do not ask | Why | Who decides instead |
 |---|---|---|
-| How many apps this should be | Requires the tenant probe and entity ownership analysis | `fulcrum-solution-init`, step 4 |
+| How many apps this should be | Requires entity ownership analysis | `fulcrum-solution-init`, step 4 |
 | Which parts are agents versus workflows versus server actions | Platform knowledge the user does not have | `fulcrum-solution-init`, step 4 |
-| Which UI blocks or widgets to use | Tenant-varying; the probe answers it | The tenant profile |
+| Which UI blocks or widgets to use | Tenant-varying; a read or the first real row answers it | The tenant profile |
 | How long it will take, or how many steps | Sizing is derived from the plan, not promised before it | `fulcrum-solution-init`, step 5 |
 | Screen layout in pixel detail | Better captured from a mockup than from speech; asking invites invention | A design source, or the build |
 | Anything already answered in supplied material | Reads as inattention and spends budget for nothing | Read the material first |

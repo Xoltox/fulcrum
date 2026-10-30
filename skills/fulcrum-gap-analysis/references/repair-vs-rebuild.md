@@ -27,8 +27,8 @@ integration. For each area with findings, choose:
 - Coverage in the area is near zero while artifact count is high - a shell that looks
   built and does nothing.
 - Repair would take more build turns than a rebuild. Estimate both in turns, using the
-  right-sizing test in `../../fulcrum-solution-init/SKILL.md`, heading "5. Phase and step
-  sizing", and write the estimate down. An unstated estimate is how a rebuild gets
+  right-sizing test in `../../fulcrum-solution-init/SKILL.md`, heading "5. Task graph and
+  step sizing", and write the estimate down. An unstated estimate is how a rebuild gets
   chosen for aesthetic reasons.
 
 State the consequence either way. Repair's consequence is that existing defects and
