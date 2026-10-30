@@ -132,8 +132,8 @@ exposed endpoint's raw response, or an in-app probe. See
 ## 7. No model-layer path to live row data `[SCHEMA]`
 
 **Failure mode.** There is no model-layer SQL path to live row values on any
-tenant (the canonical fact is in `CONVENTIONS.md`, "No model-layer path to live row
-data").
+tenant (`../../fulcrum-verification/references/diagnostic-endpoint.md`, heading "Why
+there is no model-layer path").
 Mentor only has model/schema visibility, yet it will still *answer* a
 question about live data - plausibly, confidently, with no error - and if
 pressed can fabricate a value instead of refusing.
@@ -233,6 +233,9 @@ rejected `[SINGLE-OBSERVATION]`. Beyond that, move the work server-side.
   across apps. Waiting decides nothing. **The user adding the dependency in Studio and
   publishing was the only unblock** `[SINGLE-OBSERVATION]`.
 - **Plan it:** publish producers early, and keep a `manual` row ready, batched per
-  consumer app. Studio work moves the consumer's revision, so re-read it before the next
-  Mentor change. Mentor has also hinted a library needs a version number before others
+  consumer app. That row writes the Studio hand-off lease on the consumer, because a
+  Mentor session opened meanwhile would build the app alongside the user
+  (`../../fulcrum-project-state/references/lease-and-concurrency.md`, heading "Studio hand-off - `holder: user`").
+  Studio work moves the consumer's revision, so re-read it before the next Mentor change.
+  Mentor has also hinted a library needs a version number before others
   can reference it; untested `[UNVERIFIED]`, see entry 11.

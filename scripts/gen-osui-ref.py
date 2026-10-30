@@ -10,6 +10,9 @@ no network call.
         https://github.com/OutSystems/outsystems-ui <clone dir>
     python -I scripts/gen-osui-ref.py <tag> <clone dir> [--out <dir>] [--date YYYY-MM-DD]
 
+Needs Python 3.10 or later: write_text takes newline= from 3.10. The tag must look
+like v3.0.0, because it becomes part of the output file names.
+
 Keep the clone outside this repository. It writes osui-<tag>-blocks.md and
 osui-<tag>-theme.md to --out, by default skills/fulcrum-design-loop/references.
 
@@ -28,6 +31,7 @@ import datetime
 import json
 import pathlib
 import re
+import sys
 
 DEFAULT_OUT = (
     pathlib.Path(__file__).resolve().parent.parent
@@ -125,7 +129,7 @@ def block_line(key, block, enums_used):
         default = param_default(param)
         type_name = to_ascii(str(param.get("typeRef") or param.get("type") or ""))
         parts.append(f"{param['name']}{star}:{type_name}" + (f"={default}" if default else ""))
-    slots = [to_ascii(s["name"] if isinstance(s, dict) else s) for s in block.get("slots", [])]
+    slots = [to_ascii(s["name"]) for s in block.get("placeholders", [])]
     line = f"- `{key}`"
     if parts:
         line += ": " + ", ".join(parts)
@@ -334,6 +338,10 @@ def main():
         help="date stamped in the extract header; default today, UTC",
     )
     args = parser.parse_args()
+    if sys.version_info < (3, 10):
+        parser.error("needs Python 3.10 or later")
+    if not re.fullmatch(r"v\d+\.\d+\.\d+", args.tag):
+        parser.error(f"tag must look like v3.0.0, got {args.tag!r}")
 
     write_ascii(args.out / f"osui-{args.tag}-blocks.md", blocks_doc(args.clone, args.tag, args.date))
     write_ascii(args.out / f"osui-{args.tag}-theme.md", theme_doc(args.clone, args.tag, args.date))

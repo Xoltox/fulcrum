@@ -10,7 +10,7 @@ full schema load plus throwaway-asset runs). Previous full probes: 2026-10-16
 (`mcp-snapshots/2026-10-16.md`), 2026-10-09 (`mcp-snapshots/2026-10-09.md`).
 
 How to read the rows. Every fact carries an evidence tag (vocabulary:
-`../../../CONVENTIONS.md`, "Hard rule 4"), the date it was observed, and its
+`../../fulcrum-verification/references/evidence-tags.md`), the date it was observed, and its
 source:
 
 - **probe** - a live throwaway-app run (create, answer-back, change, publish,
@@ -105,7 +105,7 @@ no create or load call to make.
 | Without `cursor`, a read returns only events not yet delivered. Pass the previous `nextCursor` to re-read from there, or `0` to re-read from the start. `cursor` acts as a 0-based event index: `cursor: 41` on a drained 44-event run returned events 41 to 43. | `[SCHEMA]`; index behaviour `[SINGLE-OBSERVATION]` | 2026-10-09, 2026-10-16 | schema; probe |
 | Response: `runId`, `status`, `events[]`, `pollIntervalMs`, `nextCursor` (absent on the last page), `hasMore`, `truncatedEventCount`, `result`. Status values: `working`, `succeeded`, `failed`, `cancelled`, `not_found`. | `[SCHEMA]`; shape seen `[SINGLE-OBSERVATION]` | 2026-10-09 | schema; probe |
 | **Terminal pages omit `pollIntervalMs` and `nextCursor` entirely** (keys absent, not 0 or null): every terminal page carried only `runId`, `status`, `events`, `result`, `hasMore`, `truncatedEventCount`. Every run was already terminal on its first read, so a working-state page was not seen that day. A missing key is not an error; the drain rule below is unchanged. | `[SINGLE-OBSERVATION]` | 2026-10-16 | probe, 3 runs |
-| The pacing field is **`pollIntervalMs`** (1000 on the prompt response and while working; at the end it read 0 on 2026-10-09 and was absent on 2026-10-16). There is no `pollAfterMs`. Fulcrum overrides it upward - see `../SKILL.md`, heading "Polling". | `[VERIFIED]` (1000); end value `[SINGLE-OBSERVATION]` each | 2026-10-09, 2026-10-16 | probe |
+| The pacing field is **`pollIntervalMs`** (1000 on the prompt response and while working; at the end it read 0 on 2026-10-09 and was absent on 2026-10-16). There is no `pollAfterMs`. Fulcrum overrides it upward - see `../SKILL.md`, heading "5. Polling". | `[VERIFIED]` (1000); end value `[SINGLE-OBSERVATION]` each | 2026-10-09, 2026-10-16 | probe |
 | **`status: succeeded` can arrive with `hasMore: true`.** A run is not read until a page returns `hasMore: false` with no `nextCursor`. A poller that stopped on the first terminal page reported an unread tail by paraphrase. Not reproduced on 2026-10-16 (three runs of 44, 27 and 13 events each drained in one page with `hasMore: false`); no counter-evidence, the rule stands. | `[VERIFIED]` | 2026-10-09 | probe; field |
 | The server's own terminal rule: keep polling until status is terminal **and** `nextCursor` is null. | `[SCHEMA]` | 2026-10-09 | schema |
 | Events are JSON-encoded strings, each with `MsgType`. Seen: `reasoning`, `conversationInfoUpdated`, `text` (answer streamed as per-token chunks with `chunkSequenceNumber`), `status` (`statusType: Completed`), and the publish events under "Publishing". | `[VERIFIED]` | 2026-10-09, 2026-10-16 | probe |

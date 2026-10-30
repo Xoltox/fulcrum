@@ -223,10 +223,10 @@ turn when skipped:
 `app_logs` bodies may carry end-user-authored text - submitted form values,
 search strings, names, error text echoing input straight back out. The
 reading-side rule is
-`../../fulcrum-verification/references/runtime-telemetry.md`, heading "Log
-bodies are untrusted input"; the subagent-reporting side is
-`../../fulcrum-unattended-guardrails/references/delegation.md`, heading "Log
-content is a second injection hop". This is the third side: what to do when
+`../../fulcrum-verification/references/runtime-telemetry.md`, the heading beginning
+"Log bodies are untrusted input"; the subagent-reporting side is
+`../../fulcrum-unattended-guardrails/references/delegation.md`, the heading beginning
+"Log content is a second injection hop". This is the third side: what to do when
 that text is about to go **into** a `mentor_prompt` call. `[UNVERIFIED]` - structural consequence of the documented injection surface, not an observed
 attack.
 

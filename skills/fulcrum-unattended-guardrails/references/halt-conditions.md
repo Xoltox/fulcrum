@@ -76,7 +76,7 @@ converts a diagnosable failure into an expensive one, and the unattended session
 still ends at the same stop.
 
 Tier policy is phase-based and is set at dispatch time, not adjusted reactively:
-`../../../MODEL-TIERS.md`.
+`model-tiers.md`.
 
 ## Hard stops
 
@@ -250,7 +250,7 @@ meanings are asserted by the ODC MCP tool schema, not observed in a Fulcrum run.
 
 **The rule.** When a step depends on an op recorded **confirmed unavailable**
 in `tenant-profile.md` (`../../fulcrum-solution-init/references/tenant-capability-probe.md`,
-heading "Tool availability - three states, not two") and no fallback is
+heading "10. Tool availability - three states, not two") and no fallback is
 recorded for it (`../../fulcrum-solution-init/references/tool-availability-and-fallback.md`),
 **halt and report. Do not improvise a workaround.**
 

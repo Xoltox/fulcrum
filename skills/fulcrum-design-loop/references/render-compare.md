@@ -13,7 +13,7 @@ Render-compare is rung 6, so it runs when the gates owe it. Read `Rigor` from
 
 | Rigor | Runs | Screens covered |
 |---|---|---|
-| `production` | After each screen row's publish, as its G3 | That screen |
+| `production` | After each screen row's publish, as its G3 | That screen; on an `image` row, each screen of the row, one verdict each (`design-spec-format.md`, heading "Image lane rows") |
 | `pilot` | At each batch's G1 | Every screen that batch published |
 | `demo` | At the join's G1 | Screens the happy path reaches. The rest stay at `G0`, which is expected, and the report lists them as not compared |
 

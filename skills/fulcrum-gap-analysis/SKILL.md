@@ -9,7 +9,7 @@ requires: ODC MCP surface for model inventory (context_entities, context_screens
 
 The app exists. Someone wants to know how it compares to the requirements it was
 supposed to satisfy, and what to do about the difference. Run on the
-**deep-reasoning** tier (see `../../MODEL-TIERS.md`) - classification is the whole
+**deep-reasoning** tier (see `../fulcrum-unattended-guardrails/references/model-tiers.md`) - classification is the whole
 value, and a misclassification manufactures work.
 
 ## Boundary
@@ -55,8 +55,7 @@ sources and the wording for an unknowable provenance: `references/provenance.md`
 
 ## Five finding classes - classify every finding into exactly one
 
-Four come from `../../CONVENTIONS.md`, heading "Gap analysis never assumes how the app
-got there". The fifth is this skill's addition.
+Four come from the Fulcrum authoring contract. The fifth is this skill's addition.
 
 | Class | Means | Defect by default? |
 |---|---|---|
@@ -113,8 +112,6 @@ into Gap.
 Write the report from `templates/gap-report-template.md`.
 
 ## Every coverage figure states its denominator
-
-From `../../CONVENTIONS.md`, heading "A coverage figure must state its denominator".
 
 - Write "**3 of 5 named sub-requirements present** (60%)". Never a bare percentage.
 - Two reviewers working from the same itemised evidence must land on the same number.

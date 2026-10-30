@@ -65,14 +65,14 @@ that still has `hasMore: true` `[VERIFIED]`. So:
 
 ## The wait must actually block
 
-Waiting is a capability (canonical preference order:
-`../../../CONVENTIONS.md`, the heading beginning "Canonical facts"). A wait mechanism that returns immediately turns a poll loop into a
-back-to-back hammer on Mentor with no cadence at all (the observed wait history is in `../../../HARNESS-NOTES.md`, heading "Claude Code CLI - the wait at subagent depth"); this has been seen at
+Waiting is a capability (preference order:
+`../../fulcrum-unattended-guardrails/SKILL.md`, heading "Session-start checklist", item 3). A wait mechanism that returns immediately turns a poll loop into a
+back-to-back hammer on Mentor with no cadence at all (the observed wait history is in `HARNESS-NOTES.md` in the Fulcrum repo); this has been seen at
 subagent depth more than once `[VERIFIED]`. Before the first poll in any
 agent, verify the chosen wait suspends for the requested time (time one
 short wait). If it does not, pick another mechanism; if none blocks, stop and
 report. Which mechanisms block where is a harness observation and belongs in
-`../../../HARNESS-NOTES.md`, never in a skill.
+`HARNESS-NOTES.md` in the Fulcrum repo, never in a skill.
 
 ## Pointing at this skill is not a brief
 
@@ -132,5 +132,5 @@ than guess at intent:
 That other catalog records per-poll telemetry, so it may hold data this rule
 does not. If its cadence is ever shown to win on measured cost-to-wall-clock
 for the mutating case, this rule is the one to change - update it in
-`../SKILL.md`, in `../../../CONVENTIONS.md`, and in the sibling skills that
+`../SKILL.md`, in the authoring contract, and in the sibling skills that
 defer to it.

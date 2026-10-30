@@ -2,8 +2,8 @@
 
 Five classes. Every finding gets exactly one. Only **Gap** is a defect by default.
 
-Four classes come from `../../../CONVENTIONS.md`, heading "Gap analysis never assumes how
-the app got there". **Unfalsifiable requirement** is this skill's addition.
+Four classes come from the Fulcrum authoring contract. **Unfalsifiable requirement** is
+this skill's addition.
 
 ## Decision order - run it top to bottom, stop at the first yes
 

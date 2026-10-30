@@ -40,7 +40,6 @@ directly. Otherwise, load `skills/fulcrum`.
 | Need to see a published screen render, signed out or signed in, or prove who can reach it | `skills/fulcrum-render-check` |
 | Seeding, resetting, or debugging sample/demo data | `skills/fulcrum-seed-data` |
 | Writing the demo script, checking demo readiness, or planning a scripted in-app tour | `skills/fulcrum-demo` |
-| Writing the demo script, checking demo readiness, or planning a scripted in-app tour | `skills/fulcrum-demo` |
 | Running many steps unattended, delegating to subagents, or defining stop/escalate rules | `skills/fulcrum-unattended-guardrails` |
 
 ## Non-negotiables

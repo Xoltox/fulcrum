@@ -26,7 +26,7 @@ permitted action is to **wait and report**, and only when both hold:
 - the **phase is long**, so the parent would otherwise carry the whole run's
   poll traffic in its own context. Every poll is a request and a response, both
   persisting in the issuer's context (`../../fulcrum-mentor-turns/SKILL.md`,
-  "Polling"), so an expensive parent polling for itself burns the window it
+  "5. Polling"), so an expensive parent polling for itself burns the window it
   needs for the actual work.
 
 The nested agent does not call `mentor_start_session`, `mentor_request_upload`,
@@ -36,7 +36,7 @@ state upward.
 
 **It buys nothing** when the poller tier is already cheap relative to the
 parent, or when the harness offers a native wait primitive that costs no context
-at any agent depth (`../../../HARNESS-NOTES.md`). Prefer the primitive. Nest
+at any agent depth (`HARNESS-NOTES.md` in the Fulcrum repo). Prefer the primitive. Nest
 only to isolate cost - never for convenience, parallelism, or continuation.
 
 The evidence covers one harness. It is a cost-isolation escape hatch, not a
@@ -245,7 +245,7 @@ Non-negotiable in every subagent brief:
    fresh agent with a lean brief that points at its findings file.
 3. **The checkpoint file path**, supplied by the orchestrator, plus the
    instruction to write it continuously. The agent does not invent a path.
-4. **The model tier**, set explicitly (`../../../MODEL-TIERS.md`). Never rely on
+4. **The model tier**, set explicitly (`model-tiers.md`). Never rely on
    inheritance - inheritance is what makes a tier policy silently untrue.
 5. **Scope boundaries** - what to read, what **not** to read, what is already
    summarised in the brief and must not be re-read.

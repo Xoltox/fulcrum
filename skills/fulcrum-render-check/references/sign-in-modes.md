@@ -3,8 +3,9 @@
 Detail for `../SKILL.md`, heading "Sign-in modes - in order of preference".
 Source for mode b: one read-only published-state investigation of one
 generated app plus a tenant-wide action search (2026-10-16). Facts read from
-the model are `[SINGLE-OBSERVATION]`; nothing below was exercised in a
-browser, so behaviour claims are `[UNVERIFIED]` until a render confirms them.
+the model are `[SINGLE-OBSERVATION]`. Clicking a persona button to sign in has
+since run live in field renders on more than one build `[VERIFIED]`; a behaviour
+claim with no render behind it stays `[UNVERIFIED]`.
 
 ## a. Anonymous
 
@@ -54,7 +55,8 @@ Look for, in this order:
 2. `IsInDevStage` (a function), and folders named `SampleUsers` /
    `SampleData`.
 3. On the Login screen (`context_graph` rooted at it): a screen action
-   `LoginAs` with inputs `SampleUsername` / `SamplePassword`, a data action
+   `LoginAs` with inputs `SampleUsername` / `SamplePassword` (generated) or
+   `Email` / `Landing` (built from the recipe), a data action
    `GetShowLoginAs`, buttons labelled "Log in as ...". The per-button naming
    in other apps is `[UNVERIFIED]`.
 
@@ -67,7 +69,8 @@ been replaced: confirm on the rendered Login screen before relying on it.
   from the hardcoded one, including Dev after a domain change or in a copy of
   the app on another tenant.
 - Needs the built-in identity provider enabled for the app.
-- Absent from hand-built apps and from apps whose Login screen was replaced.
+- Absent from hand-built apps, from apps whose Login screen was replaced, and
+  from a Mentor-created app until the recipe builds it.
 - The generator default may cover fewer personas than the buttons on the
   screen (later edits can add buttons that rely on a separate seeding
   action). A persona button that fails sign-in is an observation, not a

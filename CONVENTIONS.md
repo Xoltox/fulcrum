@@ -24,7 +24,8 @@ scripted agent loop. Therefore:
   - Wrong: "screenshot with Playwright"
   - Right: "capture with a browser automation capability (browser MCP tool
     preferred when available; a headless driver such as Playwright otherwise)"
-- **Never name a model.** Use the tier vocabulary in `MODEL-TIERS.md`
+- **Never name a model.** Use the tier vocabulary in
+  `skills/fulcrum-unattended-guardrails/references/model-tiers.md`
   (`deep-reasoning`, `workhorse`, `poller`). Only `MODEL-TIERS.md` maps tiers to
   concrete model names, and it does so for more than one vendor.
 - **MCP tool names are allowed** when referring to ODC MCP operations
@@ -111,25 +112,9 @@ is not ready to write.
 
 ## Hard rule 4 - mark evidence strength
 
-Tag any claim that is not directly observed:
-
-- `[VERIFIED]` - observed live, more than once, in the source build.
-- `[SINGLE-OBSERVATION]` - seen once; real but not generalised.
-- `[UNVERIFIED]` - inferred or reported but never confirmed. Say so plainly.
-- `[TENANT]` - belongs in `tenant-profile.md`; skill must defer to the probe.
-- `[SCHEMA]` - asserted by the vendor's own MCP tool documentation, not observed
-  live. Stronger than inference: the vendor is describing its own system.
-  Weaker than observation: documentation drifts from behaviour, and a schema
-  states intent, not what a given tenant actually does. Keep it distinct -
-  collapsing it into `[VERIFIED]` launders documentation as field evidence,
-  which is exactly what this rule exists to prevent. Promote to `[VERIFIED]`
-  only on a live observation.
-
-Default to `[VERIFIED]` only when the source corpus shows repeat occurrence.
-Do not launder a single observation into a general rule.
-
-Rows labelled "Fulcrum rule" state Fulcrum policy, not platform evidence, and carry no
-evidence tag.
+Tag any claim that is not directly observed. The tags and what each means live once
+in `skills/fulcrum-verification/references/evidence-tags.md`, an installed file, because
+agents read and write them at run time. Never restate them in a skill.
 
 ## Skill file layout
 
@@ -162,7 +147,8 @@ names, tool classes only (`run-read`, `mentor-drive`, `published-read`,
 `browser-automation`).
 `agents/<harness>/` adapters may use that harness's names, tools and models.
 Skills reference roles **by role name only** (`fulcrum-poller`,
-`fulcrum-mentor-driver`, `fulcrum-verifier`, `fulcrum-renderer`), never by adapter path.
+`fulcrum-mentor-driver`, `fulcrum-verifier`, `fulcrum-renderer`, `fulcrum-capturer`), never
+by adapter path.
 
 ### Frontmatter - portable subset only
 
@@ -190,8 +176,12 @@ made one of them unresolvable.
 
 - Link by **relative path**: `see ../fulcrum-verification/SKILL.md`, or
   `references/aggregates.md`.
-- **Never use `§`-numbered anchors.** Every `§` reference in the source corpus
+- **Never use `§`-numbered anchors.** Every such reference in the source corpus
   was dangling because the target files had no numbered headings.
+- **Root documents are not installed.** `install.sh` and `INSTALL.md` copy `skills/`
+  and agent adapters only, so a skill or role never links to a root document: the link
+  is dead on every install. An authoring pointer is a plain mention with no path.
+  Content an agent needs at run time lives in a skill reference and is linked there.
 - Prefer naming a heading verbatim over citing a line number. Line numbers rot.
 
 ## Canonical facts - use these exact values
@@ -241,7 +231,8 @@ availability is in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
 - Every session after init: `workhorse` tier orchestrator.
 - All poll loops and wait states: `poller` tier.
 - Tiers are resolved per install, and may be overridden per project. See
-  `MODEL-TIERS.md` for the resolution order and the local-override contract.
+  `skills/fulcrum-unattended-guardrails/references/model-tiers.md` for the resolution
+  order and `MODEL-TIERS.md` for the local-override contract.
 
 **Subagent depth - one level, with a single narrow exception:**
 
@@ -261,7 +252,8 @@ availability is in `skills/fulcrum-mentor-turns/references/mcp-surface.md`.
 
 **Delegation posture is a default, not an advanced mode.** Aggressive
 orchestration is how this skill set is meant to run, so it belongs on the
-always-visible surface (`AGENTS.md`) and not only inside the guardrails skill.
+always-visible surface (`AGENTS.md`) and not only inside the guardrails skill, whose
+`SKILL.md` is the installed statement.
 - Full rationale and the vendor mapping live in `MODEL-TIERS.md`. A flat
   single-tier policy appears in the source corpus as a budget-exhaustion
   artifact - record it as history, never as the rule.
@@ -331,55 +323,9 @@ Overlap causes mis-triggering. One topic, one owner:
 ## Mode and posture
 
 Three settings, **three orthogonal axes**: mode, posture and rigor. Never collapse them
-into one dial. An expert user may want `collaborative`; a `guided` user may want
-`directive`; a `demo` may run under either posture. Every combination is legal and must
-be honoured as written.
-
-**Mode - `guided` | `expert`.** Governs who decides and how much is asked of the user.
-
-| | `guided` | `expert` |
-|---|---|---|
-| Entry | The router runs automatically and interviews the user | The user invokes skills directly |
-| On ambiguity | Block and ask. Offer a small number of options with a recommendation | Proceed under a stated assumption and record it in `DECISIONS.md` |
-| Assumptions | Surfaced to the user as they are made | Recorded, not narrated |
-| Narration | Says what is about to happen and why, in plain language | Terse |
-| Parameters and tiers | Defaults | Overridable per project |
-
-**Posture - `collaborative` | `directive`.** Governs how the harness model talks to
-Mentor.
-
-| | `collaborative` (default) | `directive` |
-|---|---|---|
-| Turn shape | Consult Mentor for the idiomatic ODC approach first, review its proposal against the trap registry in `skills/fulcrum-engine-traps/`, correct only the specific traps, then build | Instruct Mentor exactly what to build |
-
-**`collaborative` is the default at every tier.**
-
-**The failure mechanism.** `directive` posture is a bet that the harness model's ODC
-platform knowledge exceeds Mentor's. That bet loses more often as the harness model
-gets cheaper. A model issuing strict build instructions on weak platform knowledge
-invents non-idiomatic structures Mentor would never have chosen; those pass validation
-and publish clean, then surface later as traps. Mentor is the better source of
-platform idiom. Fulcrum is the better source of trap avoidance and verification.
-`collaborative` posture is what makes that division of labour operational.
-
-**`directive` is an explicit user opt-in and is NEVER auto-selected by tier**, model,
-or budget. Same principle as the non-negotiable "never escalate model tier to break a
-stuck bug" in `AGENTS.md`: posture is a user decision, never a machine one. A cheaper
-tier is a reason to lean harder on `collaborative`, not a licence to switch.
-
-**Rigor - `demo` | `pilot` | `production`.** Governs depth of evidence: which gates run
-and how often. Recorded as `Rigor` in `.fulcrum/project.md`. The gates and the rigor
-table live once, in `skills/fulcrum-verification/SKILL.md`, heading "Gates and rigor";
-never restate them.
-
-**Rigor is asked at init in every mode, never defaulted, never inferred.** Missing on
-resume: ask. Changing it is a user decision. The failure mechanism: a guessed rigor sets
-proof depth for the whole build, so a demo pays for production proof, or a production
-build ships on demo evidence, and nothing in the run says the setting was a guess.
-
-**Rigor never changes posture.** `directive` stays an explicit user opt-in, at `demo`
-too. Rigor is depth of evidence, not safety: it relaxes no safety rule. The list of what
-holds at every rigor lives with the table.
+into one dial. Their definitions, the opt-in rule and the rigor rules live once, in
+`skills/fulcrum/references/mode-and-posture.md`, an installed file, because agents need
+them at run time. Never restate them.
 
 **All three settings are recorded in `.fulcrum/project.md`** - see
 `skills/fulcrum-project-state/SKILL.md`, heading "Mode and posture" - never in the
@@ -393,11 +339,6 @@ so a per-skill mode fork is unaffordable and would breach the skill file layout 
 above. Mode is an **interaction contract owned by the router** (`fulcrum`), not a
 second code path in every skill. A skill states its procedure once; the router decides
 what to ask before dispatching into it.
-
-**Economics.** `collaborative` trades one cheap consult turn for fewer expensive fix
-turns. `[UNVERIFIED]` This is a design prediction, not a measurement - no run has been
-instrumented to compare the two postures' total turn cost. Do not cite it as a
-finding.
 
 ## Tone
 

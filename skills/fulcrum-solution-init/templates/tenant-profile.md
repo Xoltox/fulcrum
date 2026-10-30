@@ -30,7 +30,7 @@ planned step it gates. An answer of "Mentor said X" is not an answer.
 Pass requires the summary to **name real content from the actual app**. A read-only prompt
 correctly returns `attempted_change` false, so that field is not the signal.
 
-On FAIL: **halt.** This row does not replace the per-dispatch guard: gate 5 of the loop (the staleness guard at the start of every Mentor dispatch) re-checks liveness on each dispatch regardless of this row.
+On FAIL: **halt.** This row does not replace the per-dispatch guard: gate 5 of the loop (the staleness guard at the start of every Mentor dispatch with an attached asset) re-checks liveness on each dispatch regardless of this row.
 
 ---
 
@@ -190,7 +190,7 @@ build reported as success**.
 
 Three states only - never a plain yes/no. Full rules:
 `../references/tool-availability-and-fallback.md` and
-`../references/tenant-capability-probe.md`, heading "Tool availability - three
+`../references/tenant-capability-probe.md`, heading "10. Tool availability - three
 states, not two". `Unknown` is correct and expected for a mutating op that a
 read-only probe never called - do not upgrade it to "available".
 

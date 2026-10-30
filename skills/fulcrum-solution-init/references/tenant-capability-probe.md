@@ -43,6 +43,12 @@ not a control. `[SINGLE-OBSERVATION]`
 `attempted_change` false. So that field cannot distinguish a healthy read-only turn from
 a dead one.
 
+**One driver dispatch.** The orchestrator never calls Mentor, so at init this gate is one
+driver dispatch under the lease, with no `TASKS.md` row: task id `-`, run id recorded
+before the wait. Scaffold `project.md`, `JOURNAL.md`, the session file and `RUN-IDS.md`
+first (`../SKILL.md`, step 7): write ordering holds for a read-only turn too, because a
+crash mid-turn must still leave a record.
+
 **The gate.** Send a cheap read-only prompt against the real target app asking Mentor to
 name what it can see - screens, entities, or both. Pass only if the returned summary
 **names real content that exists in that app**. Concretely:
@@ -57,11 +63,11 @@ first staleness guard; a session that starts on a dead backend burns budget prod
 every status field reads healthy.
 
 **No target app yet.** When Mentor will create the app, there is nothing real to name at
-init. Record the gate as deferred; it runs on the first staleness guard that has an app
-to read, and a fail there halts the same way.
+init. Record the gate as deferred; a creating dispatch has no guard, so it runs on the
+first dispatch with an attached asset, and a fail there halts the same way.
 
-After init, the orchestrator never runs this gate and it has no turn of its own: it is folded into loop gate 5, the
-staleness guard that opens every driver dispatch
+After init this gate has no turn of its own: it is folded into loop gate 5, the
+staleness guard that opens every driver dispatch with an attached asset
 (`../../fulcrum-loop-engine/references/iteration-contract.md`, heading "Phase 2 -
 Precondition"). That guard asks about named screens and widgets of the real app, so an
 answer that names real content passes liveness too; a generic or no-app answer is this

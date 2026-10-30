@@ -6,8 +6,8 @@ a connector, a service built by someone else in the same engagement. `<system>` 
 short lowercase stem, e.g. `bpm-claims`, used verbatim wherever the system is named
 (plans, specs, `TASKS.md` `App` column for `Turn: external` rows).
 
-The system itself is built outside Fulcrum - `../../../CONVENTIONS.md`, the
-skill-boundaries table, row "Out of family". **This file must exist,
+The system itself is built outside Fulcrum - `../../fulcrum/SKILL.md`, heading
+"Boundary", row "Out of family". **This file must exist,
 with every section filled or marked unresolved, before the first ODC step that
 consumes the system starts.** A brief, spec or diagnosis prompt copies endpoint, auth
 scheme and log paths from here, never from memory or from a chat message.

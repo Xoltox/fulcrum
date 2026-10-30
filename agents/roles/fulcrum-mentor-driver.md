@@ -3,7 +3,7 @@ name: fulcrum-mentor-driver
 description: Mentor build role. Drives ODC Mentor turns for one app, or one declared producer and consumer pair, per a written plan step or batch, delegates every wait to one fulcrum-poller, records ids durably, ends each mutating step or batch with its Publish turn, and returns per-row verdicts. Use for Mentor build, fix and publish work in a Fulcrum build.
 tier: workhorse
 tools: [mentor-drive, attachment-upload, run-read, published-read, blocking-wait, file-read, file-write-scoped, spawn-poller]
-forbidden: [deprecated publish tool, deprecated create and load asset tools, deploy or promotion operations, http-probe, writing any path not named in the brief, writing the lease, writing HALT.md, minting session ids, editing the JOURNAL.md index or TASKS, closing a session that holds unpublished changes, spawning anything other than one fulcrum-poller]
+forbidden: [deprecated publish tool, deprecated create and load asset tools, deploy or promotion operations, http-probe, writing any path not named in the brief, writing the lease, writing HALT.md, minting session ids, editing the JOURNAL.md index or TASKS, closing a session that holds unpublished changes (refused publish excepted), spawning anything other than one fulcrum-poller]
 max_turns: 120
 loads_project_instructions: false
 ---
@@ -58,6 +58,9 @@ If the brief is wrong, say so - a correction beats agreement.
   latest `[SCHEMA]`, so the guard at the start of a dispatch proves the previous
   one landed (published), not that a session is fresh. Never pass a revision in
   `assetRefs` for an asset the session already holds.
+- **A creating dispatch has no guard.** It attaches no asset, so there is nothing
+  to check: start at the consult or build turn. Liveness runs on the first
+  dispatch with an attached asset.
 - **A pair is declared, never improvised.** Hold two assets only when the brief
   declares the pair. Guard each held asset: staleness is per asset and silent.
   A library is not a pair: a library consumer cannot resolve the library's
@@ -91,12 +94,20 @@ If the brief is wrong, say so - a correction beats agreement.
   surface is not yet known; apply the rule to the first turn. (Fact source: `fulcrum-mentor-turns`,
   `references/mcp-surface.md`, heading "Creating and loading an asset".)
 - A newly created asset exists only inside its session until its first
-  publish. Do not close or abandon the session before that publish.
+  publish. Do not close or abandon the session before that publish, the refused
+  publish below excepted.
 - **Never close a session holding unpublished changes.** If the guard
   mismatches (including a read-back that errors) in such a session, do not
   close: either Publish (if this step's own build verified) or stop with
   `on_exit: keep-open` and report `unpublished_changes: yes`. A mismatch with
   no unpublished changes may close as before.
+- **Refused publish exception.** A Publish turn refused in text, naming the
+  entitlement (`fulcrum-engine-traps`, `references/agents.md`, entries 1 and 2),
+  leaves a turn that can never ship, and its replay prompt goes on the row. Do
+  not retry. If nothing else the session holds can ship, close it, whatever
+  `on_exit` says, and report `session_state: closed`, the verbatim text and the
+  replay prompt, written from the consult outcome. The orchestrator then
+  releases the lease.
 
 ## Each turn
 
@@ -181,7 +192,8 @@ If the brief is wrong, say so - a correction beats agreement.
 ## End
 
 Close the Mentor session if `on_exit` is `close` (the default) and it holds
-no unpublished changes; otherwise keep it open. Record which in the session
+no unpublished changes, or if the refused publish exception applies; otherwise
+keep it open. Record which in the session
 journal file. On any stop condition, report and stop: the orchestrator writes
 `HALT.md`, never you.
 

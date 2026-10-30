@@ -153,11 +153,16 @@ Stated so you do not assume otherwise. `ROADMAP-capabilities.md`, heading "Open 
 These hold even if no skill file is ever loaded (from `AGENTS.md`):
 
 - Never publish from a Mentor session whose model state you have not just verified - a stale model reverts completed work while the revision number still advances.
-- One Mentor session at a time **per app** (concurrency across different apps is allowed; the ceiling is unpublished and may change server-side). `[VERIFIED]` Mentor can only handle one prompt at a time per session: a `mentor_prompt` call issued while a prior prompt is still running is silently ignored, not rejected with an error.
+- One Mentor session at a time **per app** (concurrency across different apps is allowed; the ceiling is unpublished and may change server-side). The plan is a task graph: the loop runs the whole runnable frontier in parallel, one driver per app, and the slowest lane gates nobody. `[SCHEMA]` Mentor handles one prompt at a time per session: a `mentor_prompt` call issued while a prior prompt is still running is silently ignored, not rejected with an error.
+- `Rigor` (`demo`, `pilot`, `production`) is asked of the user, never defaulted or inferred, and it changes depth of evidence, never safety or posture.
+- Do not plan a spike or probe row to test a platform capability. Ask at intake or try it on the first real row, which fails fast: spikes consume hours, publish throwaway revisions, and prove what that row would prove anyway.
 - Aggressive orchestration is the default, not an advanced option: delegate poll loops and read-only inspection to subagents; keep judgement and verification verdicts in the orchestrator. Mutating work is depth 1 always.
 - One subagent depth level, with one exception: the Mentor-driver role may spawn exactly one nested poller that only waits and reports.
 - The orchestrator never calls Mentor, issues the "Publish" turn, polls `publish_status`, calls REST, or runs gate scripts itself - it dispatches.
 - Zero validation errors and a clean publish prove nothing about rendering or logic.
+- A schema that loads is not a tool that dispatches - tool availability is checked by read-only calls, not assumed, and the result is recorded in `tenant-profile.md`.
+- A halt record is never resumed past without a new human decision.
+- Project state lives in `.fulcrum/` in the project repository, never in the installed skills.
 - Stuck twice on the same problem means stop and report. Never escalate model tier to break a stuck bug.
 - Disclose overruns and deviations. Never absorb them silently.
 - Citing a Fulcrum skill means applying a named rule from it - never attribute a standard, benchmark, or conclusion to Fulcrum that its text does not state.
@@ -169,7 +174,7 @@ These hold even if no skill file is ever loaded (from `AGENTS.md`):
 
 ## Model tiers
 
-Three vendor-neutral tiers, mapped to whatever models your harness gives you access to. See `MODEL-TIERS.md` for the full policy, resolution order, and measured cost evidence.
+Three vendor-neutral tiers, mapped to whatever models your harness gives you access to. `MODEL-TIERS.md` has the vendor mapping and measured cost evidence; `skills/fulcrum-unattended-guardrails/references/model-tiers.md` has the policy and resolution order.
 
 | Tier | Job | What it is for |
 |---|---|---|
@@ -185,7 +190,7 @@ All skills are bound by the authoring contract in `CONVENTIONS.md`. Read it befo
 
 Two headline rules:
 
-- **Harness agnostic.** No vendor model names (use tier vocabulary from `MODEL-TIERS.md`), no harness tool names, no harness-specific frontmatter in skill bodies.
+- **Harness agnostic.** No vendor model names (use the tier vocabulary), no harness tool names, no harness-specific frontmatter in skill bodies.
 - **Platform truth by default.** Every rule is general ODC/Mentor truth, not incident history from one build. Tenant-varying facts go through `tenant-profile.md`, never hardcoded. Rules state their failure mechanism.
 
 <details>
@@ -194,7 +199,7 @@ Two headline rules:
 - **Hard rule 1 - harness agnostic.** Never name a harness-specific tool as the required instrument; say what capability is needed and let the agent map it. Never name a model - use tier vocabulary. ODC MCP tool names (`mentor_start_session`, `mentor_request_upload`, `mentor_prompt`, `mentor_get_run`, `mentor_get_event`, `publish_status`, `env_app`, `app_revisions`, `context_*`) are allowed since they are the ODC surface itself, written bare with no harness-specific prefix. No harness-specific frontmatter (`allowed-tools`, slash-command syntax, `$ARGUMENTS`) in a skill body. Harness quirks go in `HARNESS-NOTES.md`, never in a skill.
 - **Hard rule 2 - platform truth by default.** Strip all project nouns; keep the consequence, drop the anecdote. Tenant-varying facts live in `tenant-profile.md`, read, asked, or recorded on the first real row, and skills reference the profile rather than hardcoding the answer.
 - **Hard rule 3 - state the mechanism, not just the ban.** A rule that cannot state what breaks is not ready to write.
-- **Hard rule 4 - mark evidence strength** on any claim that is not directly observed: `[VERIFIED]`, `[SINGLE-OBSERVATION]`, `[UNVERIFIED]`, `[TENANT]`.
+- **Hard rule 4 - mark evidence strength** on any claim that is not directly observed: `[VERIFIED]`, `[SINGLE-OBSERVATION]`, `[UNVERIFIED]`, `[TENANT]`, `[SCHEMA]`.
 - **Skill file layout:** `SKILL.md` thin (target under 200 lines) plus `references/*.md` loaded on demand, and `templates/` where applicable.
 - **Frontmatter** is a portable subset only: `name`, `description`, `version`, `requires`. No `allowed-tools`, `license`, `compatibility`, or `metadata:` block.
 - **Cross-references** are relative paths (`../fulcrum-verification/SKILL.md`), never section-number anchors.
@@ -214,7 +219,7 @@ fulcrum/
   skills/
     fulcrum/
       SKILL.md                    # Router and entry point
-      references/                 # Detection procedure, guided-mode interaction, tool preflight
+      references/                 # Detection procedure, guided-mode interaction, tool preflight, mode and posture
     fulcrum-discovery/
       SKILL.md
       references/                 # Question bank, observable requirements, sufficiency/stopping
@@ -246,7 +251,7 @@ fulcrum/
       references/                 # Per-construct trap detail: aggregates, repeaters, dates, etc.
     fulcrum-verification/
       SKILL.md
-      references/                 # Proof instruments, visual verification, diagnostic patterns, runtime telemetry
+      references/                 # Proof instruments, visual verification, diagnostic patterns, runtime telemetry, evidence tags
     fulcrum-render-check/
       SKILL.md
       references/                 # Sign-in modes, evidence and report
@@ -257,7 +262,7 @@ fulcrum/
       SKILL.md                    # Demo script format, readiness, scripted tour
     fulcrum-unattended-guardrails/
       SKILL.md
-      references/                 # Halt conditions, budgeting, checkpoints, delegation rules
+      references/                 # Halt conditions, budgeting, checkpoints, delegation rules, model tiers
   agents/
     README.md                     # Agent roles: why, tool classes, harness mapping
     roles/                        # Harness-neutral role specs: poller, mentor driver, verifier, renderer, capturer
@@ -284,9 +289,9 @@ fulcrum/
 
 1. **Find your skills directory.** Claude Code reads from `~/.claude/skills/`. Other harnesses commonly use `~/.agents/skills/` by convention - check your harness's own docs if unsure.
 2. **Copy all fourteen skill directories in whole**, not just their `SKILL.md` files: `fulcrum`, `fulcrum-discovery`, `fulcrum-solution-init`, `fulcrum-design-loop`, `fulcrum-gap-analysis`, `fulcrum-project-state`, `fulcrum-loop-engine`, `fulcrum-mentor-turns`, `fulcrum-engine-traps`, `fulcrum-verification`, `fulcrum-render-check`, `fulcrum-seed-data`, `fulcrum-demo`, `fulcrum-unattended-guardrails`. Almost all carry a `references/` directory beside `SKILL.md`, and some a `templates/` directory - a skill missing its `references/` is broken even though it looks installed.
-3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`). `--dry-run` prints what it would do without changing anything. It is additive only - it never deletes anything already in the target directory. `--hooks` also copies the opt-in trigger hook and prints its settings snippet; it never edits a settings file.
+3. **Or run the installer.** `install.sh [target-dir] [--dry-run]` at the repo root copies `skills/` into `target-dir` (defaults to `~/.claude/skills`) and the Claude Code agents into `~/.claude/agents` (`--no-agents` skips them). `--dry-run` prints what it would do without changing anything. It never deletes anything, but it can overwrite: a skill file that differs is skipped unless `--force`, a marked agent file that differs is overwritten by a plain run, including a local `model:` edit. `--hooks` also copies the opt-in trigger hook and prints its settings snippet; it never edits a settings file.
 4. **Verify the install.** Confirm each of the fourteen directories exists at the target path, whole, and that your agent's skill listing (or equivalent discovery mechanism) picks them up.
-5. **Update later** by re-running step 2 or 3 against a newer tag - both are safe to re-run and only add or overwrite files this repo ships.
+5. **Update later** by re-running step 2 or 3 against a newer tag. Both touch only files this repo ships, and both can replace your edits to them: step 2 overwrites anything copied, and step 3 needs `--force` for skill files that changed, so read its `--dry-run` list first.
 
 > [!NOTE]
 > A manual install gets no install interview. The interview is what decides which model serves which tier (`deep-reasoning`, `workhorse`, `poller`) and whether your harness supports per-subagent model assignment - installing by hand means you must make those calls yourself. Read `MODEL-TIERS.md` for what to decide and the resolution order, then record your answers in a `MODEL-TIERS.local.md` file beside the installed skills - never edit the answers into the skill files themselves or into `MODEL-TIERS.md`.

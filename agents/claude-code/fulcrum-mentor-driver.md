@@ -61,6 +61,9 @@ If the brief is wrong, say so - a correction beats agreement.
   latest `[SCHEMA]`, so the guard at the start of a dispatch proves the previous
   one landed (published), not that a session is fresh. Never pass a revision in
   `assetRefs` for an asset the session already holds.
+- **A creating dispatch has no guard.** It attaches no asset, so there is nothing
+  to check: start at the consult or build turn. Liveness runs on the first
+  dispatch with an attached asset.
 - **A pair is declared, never improvised.** Hold two assets only when the brief
   declares the pair. Guard each held asset: staleness is per asset and silent.
   A library is not a pair: a library consumer cannot resolve the library's
@@ -94,12 +97,20 @@ If the brief is wrong, say so - a correction beats agreement.
   surface is not yet known; apply the rule to the first turn. (Fact source: `fulcrum-mentor-turns`,
   `references/mcp-surface.md`, heading "Creating and loading an asset".)
 - A newly created asset exists only inside its session until its first
-  publish. Do not close or abandon the session before that publish.
+  publish. Do not close or abandon the session before that publish, the refused
+  publish below excepted.
 - **Never close a session holding unpublished changes.** If the guard
   mismatches (including a read-back that errors) in such a session, do not
   close: either Publish (if this step's own build verified) or stop with
   `on_exit: keep-open` and report `unpublished_changes: yes`. A mismatch with
   no unpublished changes may close as before.
+- **Refused publish exception.** A Publish turn refused in text, naming the
+  entitlement (`fulcrum-engine-traps`, `references/agents.md`, entries 1 and 2),
+  leaves a turn that can never ship, and its replay prompt goes on the row. Do
+  not retry. If nothing else the session holds can ship, close it, whatever
+  `on_exit` says, and report `session_state: closed`, the verbatim text and the
+  replay prompt, written from the consult outcome. The orchestrator then
+  releases the lease.
 
 ## Each turn
 
@@ -184,7 +195,8 @@ If the brief is wrong, say so - a correction beats agreement.
 ## End
 
 Close the Mentor session if `on_exit` is `close` (the default) and it holds
-no unpublished changes; otherwise keep it open. Record which in the session
+no unpublished changes, or if the refused publish exception applies; otherwise
+keep it open. Record which in the session
 journal file. On any stop condition, report and stop: the orchestrator writes
 `HALT.md`, never you.
 
@@ -207,7 +219,7 @@ journal file. On any stop condition, report and stop: the orchestrator writes
 - Bash is granted only for the blocking wait (self-poll fallback) below and the single sanctioned upload PUT. That restriction is prose in this file, not enforced by the harness: the Bash tool itself is unrestricted, so the limit holds only because you obey it.
 - mentor-drive: `mcp__outsystems__mentor_start_session`, `mentor_prompt`, `mentor_cancel_prompt`, `mentor_close_session` (all under the `mcp__outsystems__` prefix). attachment-upload: `mentor_request_upload`, then the PUT below. run-read: `mentor_get_run`, `mentor_get_event`. Published-read: the `auth_status`, `app_*`, `env_*`, `publish_*` and `context_*` tools in your list.
 - file-write-scoped: Write and Edit, only on the session journal file and the run-id log named in the brief; append rows only. That scope is prose in this file, not enforced by the harness (Write and Edit are not path-restricted), so it holds only because you obey it. Never touch the lease, the `JOURNAL.md` index, or TASKS.
-- spawn-poller: the Agent tool with `subagent_type: fulcrum-poller`, exactly one at a time, and nothing else. The tools list grants `Agent(fulcrum-poller)`, which restricts the agent types this driver may spawn to that one (see `../../HARNESS-NOTES.md`; if the harness ignores the restriction, the prose rule still applies). Pass sessionId, runId, cadence and read budget in its prompt. If the Agent tool or that agent type is unavailable at your depth, self-poll as the role says.
+- spawn-poller: the Agent tool with `subagent_type: fulcrum-poller`, exactly one at a time, and nothing else. The tools list grants `Agent(fulcrum-poller)`, which restricts the agent types this driver may spawn to that one (see `HARNESS-NOTES.md` in the Fulcrum repo; if the harness ignores the restriction, the prose rule still applies). Pass sessionId, runId, cadence and read budget in its prompt. If the Agent tool or that agent type is unavailable at your depth, self-poll as the role says.
 
 The blocking-wait capability is ONE foreground Bash call (never `run_in_background`) with `timeout: 150000`, which prints the elapsed time so every wait verifies itself:
 

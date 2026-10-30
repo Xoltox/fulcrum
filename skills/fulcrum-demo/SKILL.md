@@ -4,7 +4,7 @@ description: Use when the user says "write the demo script", "prepare the demo",
 version: "1.0.0"
 requires: >
   Brief and plan in the project repo; a finished or near-finished build to read
-  step results against; a browser automation capability for the readiness walk.
+  step results against; a browser automation capability on the renderer.
 ---
 
 # fulcrum-demo
@@ -27,12 +27,11 @@ Emitted by solution-init at `demo` rigor only: `Turn: code`, `App: solution`
 "Gate rows"). Final G2 at `demo` reads this file: each step is one claim
 (`../fulcrum-verification/references/gates-and-rigor.md`, heading "G2 - blind
 pass"). The writer needs only the brief, the plan and the published structure;
-it does not drive Mentor.
+it drives no Mentor and no browser.
 
 ## Format
 
-Short: one persona block per role the path crosses, 5 to 10 steps total. A step
-a verifier cannot judge from the screen is not a claim, so it does not belong.
+Short: one persona block per role the path crosses, 5 to 10 steps total.
 
 ```
 # Demo script
@@ -40,44 +39,45 @@ Rigor: demo   Revision: <per app, filled at the final pass>
 
 ## Persona: <role name>
 Sign-in: <mode from tenant-profile.md / sign-in-modes.md; sample persona name>
-Seed needed: <rows that must exist before step 1>
 
-| # | Persona | Action | Seed it reads | Expected visible result |
-|---|---|---|---|---|
-| 1 | Customer | Open the order list | 3 Orders, one per status | Three rows, status badges differ |
-| 2 | Customer | Submit a new order | none | Success message; list now shows 4 rows |
-| 3 | Manager | Open the approval queue | the order from step 2 | The new order is listed, Pending |
+| # | App | Screen | Persona | Action | Seed it reads | Changes data | Expected visible result |
+|---|---|---|---|---|---|---|---|
+| 1 | OrderDesk | OrderList | Customer | Open the order list | 3 Orders, one per status | no | Three rows, status badges differ |
+| 2 | OrderDesk | NewOrder | Customer | Submit order `DEMO-1` | Customer Ann | yes, `DEMO-`; reset: delete them | Success message; list shows 4 rows |
+| 3 | OrderDesk | ApprovalQueue | Manager | Open the approval queue | The 1 Pending seeded Order | no | Two rows, `DEMO-1` Pending |
 ```
 
 Rules:
 - Derive from the brief and plan, never from the build: a path written from
-  what got built hides what was dropped. Steps follow the user's story, not
-  the screen inventory.
+  what got built hides what was dropped.
 - Every step names the seeded data it reads and the exact text, count or state
-  that proves it. "Looks right" is not a result. A step with no seed row behind
+  that proves it. A step with no seed row behind
   it renders an empty state in front of the audience, passes validation and
   publish clean, and is found live.
-- Expected results are visible on the screen. A claim that only a server log
-  shows is out of scope; G2 at `demo` cannot judge it.
-- A step that mutates data names the reset: an idempotent re-seed or a
-  reload that restores the start state, so the path can run twice.
+- Expected results are visible on the screen: G2 at `demo` cannot judge a
+  server log.
+- `App` and `Screen` are what a renderer assertion needs, per app. `Changes
+  data` is `no`, or `yes` with the record prefix and the reset that lets the
+  path run twice. Renderers act only under the prefix, never on a seeded row,
+  so a step without one comes back `untested`.
 
 ## Readiness checklist
 
-Run once, when the plan claims "demoable" for the first time, not only at the
-end: demo-readiness defects (cold-start timeouts, first load after a new
-session needing a refresh, slow sign-in, display-only buttons, a reset that
-leaves extra rows) were all found at the very end of a field build, after the
-slot reserved for them was never reached. `[SINGLE-OBSERVATION]` Check:
+The demo row has no browser, so the orchestrator adds these as assertions to
+the renderer brief of the join's G1, with the script's data permission and
+prefix. No new gate: demo-readiness defects (cold-start timeouts, a first load
+needing a refresh, slow sign-in, display-only buttons, a reset that leaves
+extra rows) were all found at the very end of a field build, after the slot
+reserved for them was never reached. `[SINGLE-OBSERVATION]`
 
-1. Sign-in works through the recipe, per persona, from a cold browser session.
+1. Sign-in works, per persona, through the `Risk: high` row built from the
+   recipe, from a cold browser session.
    The sample-persona block is hidden outside Dev by design, so confirm which
    stage the demo runs in; a demo outside Dev needs another sign-in mode.
-2. Seed alignment: the rows each step reads exist, with the names and counts
-   the script states, after the reset path. Run the loader twice; the counts
-   must not change.
-3. Both roles when the path crosses them: one pass per persona, signing in
-   fresh each time. A reused browser session carries the prior identity.
+2. Seed alignment: the rows each step reads show the script's names and
+   counts, after the reset path.
+3. Both roles when the path crosses them, signing in fresh each time: a reused
+   browser session carries the prior identity.
 4. Warm-up: the first call after idle to each backend module. A cold first
    call can time out and show a false error banner that a second call clears.
 5. Every button on the path does something. A display-only control on the
@@ -94,13 +94,13 @@ A scripted tour is NOT an AI agent: no model call, no entitlement. It is a
 client-side step-through that highlights real elements, one step at a time,
 generated from the demo-script steps.
 
-- Asked, never defaulted. Ask once when the demo script row is planned; the
-  answer is a user decision recorded in `DECISIONS.md`.
+- Asked once when the demo script row is planned, never defaulted; recorded in
+  `DECISIONS.md`.
 - Runs as ordinary rows at the polish phase on the app lane, after the screens
   it points at are final. A tour built before the screens are stable highlights
   elements that later turns rename or remove, and it fails silently.
-- Hidden outside Dev by the same gate as the sample sign-in block, checked in
-  the client and not only in the layout. See `../fulcrum-engine-traps/references/sample-signin.md`.
+- Hidden outside Dev by the sample sign-in block's server-side gate, one If
+  around all of it: `../fulcrum-engine-traps/references/sample-signin.md`.
 - Tour rows are never `Risk: high` and never hold the demo: the demo script
   stands without them, and a failed tour row is reported and skipped.
 - The mechanics (how a highlight attaches to a widget, how steps advance) are

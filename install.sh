@@ -17,7 +17,9 @@
 #   --no-agents         Skip installing agent definitions.
 #   --force-agents      Also overwrite same-named agent files that were not
 #                       generated from this repo (hand-made ones). Without
-#                       this flag those are skipped with a warning.
+#                       this flag those are skipped with a warning. Files with
+#                       the marker are overwritten either way, a local
+#                       model: edit included; --no-agents keeps them.
 #   --force             Also overwrite installed skill files that differ from
 #                       the source (ones you edited, or ones from an older
 #                       Fulcrum version). Without this flag they are skipped
@@ -45,8 +47,7 @@
 # touches only files whose names match the ones this repo ships, and
 # overwrites such a file only if it carries the marker line
 # "Generated from agents/roles/" (or --force-agents is given). A destination
-# that is the very same file as the source (a link made by link-skills.ps1)
-# is skipped. All agent conflicts are worked out and printed before anything
+# that is the very same file as the source (a link) is skipped. All agent conflicts are worked out and printed before anything
 # is written.
 #
 # Agent definitions load at session start: restart your session after

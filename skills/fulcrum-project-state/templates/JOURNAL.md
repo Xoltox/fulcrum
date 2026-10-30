@@ -31,7 +31,7 @@ Session index. Detail for any row: `journal/<Session>.md`.
 - **Resume** - read the last row. `State`/`End` say whether it closed; `InFlight` names
   tasks that may have mutated the app with no recorded outcome.
 - **Oscillation** - match a task id across the `Tasks` column. Two `:fail` entries for
-  one task is "stuck twice means stop and report" (`../../../AGENTS.md`) firing
+  one task is "stuck twice means stop and report" (`../../fulcrum-unattended-guardrails/SKILL.md`) firing
   mechanically. The example above shows exactly that, and the halt that followed.
 - **`State: open`** - live session or crashed session; the file cannot tell. Resolve
   against the lease, per `../references/file-schemas.md`, heading "Reading a row that

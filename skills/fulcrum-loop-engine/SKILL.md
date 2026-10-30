@@ -52,8 +52,8 @@ prohibitions - categorical"). Detail and a walkthrough: `references/iteration-co
 
 ## Posture changes the shape of phase 3
 
-Definitions and the opt-in rule: `../../CONVENTIONS.md`, heading "Mode and
-posture". Read `posture` from `.fulcrum/project.md`.
+Definitions and the opt-in rule: `../fulcrum/references/mode-and-posture.md`.
+Read `posture` from `.fulcrum/project.md`.
 
 **`collaborative` (the default)** - phase 3 is two turns, one consult per batch,
 not one per row:
@@ -95,12 +95,12 @@ per dispatch and orchestrator gates run between dispatches - then
 A batch failing inside its dispatch gets one fix turn, then splits per row. Any gate failure after the
 driver returned leaves closed rows `done` and opens one `fix` row. On exhausting the ceiling,
 or on a second recorded `:fail`: stop the inner loop, write the honest verdict, hand to guardrails:
-a lane stop. Never escalate model tier (`../../AGENTS.md`). Procedure: `references/oscillation-and-fix-loop.md`, including "Late failures".
+a lane stop. Never escalate model tier. Procedure: `references/oscillation-and-fix-loop.md`, including "Late failures".
 
 ## Oscillation detection - mechanical, not remembered
 
-`../../AGENTS.md`: "Stuck twice on the same problem means stop and report."
-That is now checkable by scanning one file.
+"Stuck twice on the same problem means stop and report" is checkable by scanning
+one file.
 
 **The scan.** Read `.fulcrum/JOURNAL.md`, the session index. Column 5, `Tasks`,
 carries inline per-task outcomes (`T-003:pass,T-004:fail`), written as each task
@@ -169,7 +169,7 @@ with no verdict. Procedure: `references/iteration-budget.md`.
 ## Mode changes what the loop asks between iterations
 
 The router (`fulcrum`) owns interaction; mode is not a branch inside this skill
-(`../../CONVENTIONS.md`, heading "Mode and posture"). The loop marks only **where**
+(`../fulcrum/references/mode-and-posture.md`). The loop marks only **where**
 the decision points are. All four sit at phase 7, never mid-iteration.
 
 | Decision point | `guided` | `expert` |

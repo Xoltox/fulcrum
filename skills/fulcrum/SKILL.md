@@ -9,8 +9,7 @@ requires: filesystem read access to the project repository to detect `.fulcrum/`
 
 Read this first on any harness without skill auto-triggering. It performs no
 Mentor turn, no verification, no planning, and defines no state-file schema of
-its own - see `../../CONVENTIONS.md`, "Skill boundaries - stay in your lane",
-row `fulcrum`. It detects, then dispatches.
+its own. It detects, then dispatches.
 
 **Its defining property: it detects, it does not interrogate.** Do not ask the
 user "what is your situation?" - look at the filesystem and the tenant and work
@@ -30,7 +29,7 @@ it out. Asking the user to self-classify is the thing this skill replaces.
 | One design source for one app -> a published app | `../fulcrum-design-loop/SKILL.md` |
 | Demo script, demo readiness, a scripted tour | `../fulcrum-demo/SKILL.md` |
 | **Out of family:** external systems (another vendor's server, a workflow engine, a third-party API) | Built **outside Fulcrum**, under the user's own process. Fulcrum owns only the contract file `.fulcrum/external/<system>.md` (`../fulcrum-project-state/templates/external-system.md`), which must exist before the ODC step that consumes the system starts |
-| What `mode`, `posture` and `Rigor` mean, and the opt-in rule | `../../CONVENTIONS.md`, heading "Mode and posture" |
+| What `mode`, `posture` and `Rigor` mean, and the opt-in rule | `references/mode-and-posture.md` |
 
 ## The detection ladder
 
@@ -45,7 +44,7 @@ including every conflicting-signal case: `references/detection-procedure.md`.
 | No `.fulcrum/`, no app, source material present (BRD, Figma/Stitch export, mockups, screenshots) | `../fulcrum-solution-init/SKILL.md` |
 | No `.fulcrum/`, an app already exists | `../fulcrum-gap-analysis/SKILL.md` |
 | `.fulcrum/` present, `HALT.md` present | **STOP. Report. Ask a human.** Never auto-resume - see below. |
-| `.fulcrum/` present, an open task per the `JOURNAL.md` index | resume -> `../fulcrum-loop-engine/SKILL.md` |
+| `.fulcrum/` present, an open task in `TASKS.md` | resume -> `../fulcrum-loop-engine/SKILL.md` |
 | `.fulcrum/` present, all tasks closed, the final G2 row among them at `Verdict: pass` | Report status. Offer the next phase in `plan.md`, or gap analysis if none remains. |
 
 **Micro is proposed, never picked.** The signals say the engagement looks small; only
@@ -64,9 +63,9 @@ existing app".
 the step that consumes it does not start until `.fulcrum/external/<system>.md`
 exists. Building that system is out of family; recording its contract is not.
 
-**Detection is cheap by construction.** Resume answers from the last row of
-`.fulcrum/JOURNAL.md` alone - never open a session file to decide where to
-route. See `../fulcrum-project-state/references/resume-and-halt.md`, heading
+**Detection is cheap by construction.** The last row of `.fulcrum/JOURNAL.md` says
+how the last session ended; `TASKS.md` says whether a task is open. Never open a session
+file to route. See `../fulcrum-project-state/references/resume-and-halt.md`, heading
 "Read order on every session start".
 
 ## HALT.md is absolute - state the mechanism
@@ -90,8 +89,8 @@ full signal table in `../fulcrum-project-state/references/resume-and-halt.md`,
 heading "Crash recovery - the five signals of interrupted work". This router
 does not diagnose a crash itself:
 
-- `State: clean` in the last row -> clean stop. Route by the ladder above as
-  if starting fresh at that point.
+- `State: clean`, `aborted`, or `halted` with `HALT.md` cleared, in the last row
+  -> no session in flight. Route by the ladder above from that point.
 - `State: open` in the last row -> possible crash or a run still executing.
   Hand off to `../fulcrum-loop-engine/SKILL.md` to resume at its phase 4 (poll the
   recorded run, which needs no lease; lane resume: `../fulcrum-project-state/references/lease-and-concurrency.md`,
@@ -107,8 +106,8 @@ it does not. Full procedure: `references/tool-preflight.md`.
 ## Mode and Rigor: read them, or establish them once
 
 Mode (`guided` | `expert`) and `Rigor` (`demo` | `pilot` | `production`) live in
-`.fulcrum/project.md`. Their meaning is owned by `../../CONVENTIONS.md`, heading
-"Mode and posture" - not restated here.
+`.fulcrum/project.md`. Their meaning is owned by `references/mode-and-posture.md`
+- not restated here.
 
 - **Present:** read them, do not ask. Expect schema `project v4`: `references/detection-procedure.md`, heading "The project.md marker".
 - **Mode absent** (first run): ask once, in the first question batch, with the

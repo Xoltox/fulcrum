@@ -58,8 +58,10 @@ time, and a background loader then silently undoes decisions made in the app
 - Loaders are create-only. An update path is allowed only to fill a missing
   link, never to overwrite a field a user may have changed.
 - Aged seed shows nonsense in time-based figures (negative durations, ratios
-  over 100%) until re-seeded; schedule a documented re-seed before any KPI
-  check, and treat such a figure as aging before treating it as a formula bug.
+  over 100%) until re-seeded; schedule a documented reset and re-seed before any
+  KPI check, and treat such a figure as aging before treating it as a formula
+  bug. A create-only re-run cannot re-date a row and the anchor is write-once, so
+  only a reset that deletes the anchor does (heading "Reset ordering").
 
 ## Seeding from a file
 
@@ -111,6 +113,8 @@ If a reset/teardown action is attempted:
 - A single reset orchestrator deletes **children before parents** - the
   exact reverse of the load order - then calls the load orchestrator to
   re-seed.
+- Delete the anchor row too, or the re-seed brings the rows back on the old
+  dates and the aged figures stay wrong.
 - Leave static entities untouched; they are not part of the delete/reload
   cycle (see SKILL.md, Static entities).
 - Treat a reset action's own publish as unproven until it publishes clean

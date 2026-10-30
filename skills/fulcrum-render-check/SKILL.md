@@ -85,13 +85,13 @@ caveats: `references/sign-in-modes.md`.
 | Mode | Use for | Detect | Never |
 |---|---|---|---|
 | a. Anonymous | Screens meant public; proving a screen is NOT public (expect a redirect to Login or InvalidPermissions) | Always available | Treat a redirect as a pass when access was expected |
-| b. Generated sample personas | Signed-in renders in **Dev only**, on apps that kept the generated Login screen | Published-state reads for the generated actions and the "Log in as ..." buttons | Enable without the user's recorded decision |
+| b. Generated sample personas | Signed-in renders in **Dev only**, on apps with the generated or recipe-built sign-in | Published-state reads for the generated actions and the "Log in as ..." buttons | Enable without the user's recorded decision |
 | c. User hand-off | Any signed-in render mode b cannot cover | The user signs in in the shared browser, or confirms an existing session | Type a credential, or script around a blocked one |
 | d. None | - | Neither b nor c available | Report anything but `untested` with the reason |
 
 **Mode b is a user-policy choice.** The first click on a persona registers a
-real identity-provider user and grants it a role `[SINGLE-OBSERVATION]`
-(read from the model, not exercised). Ask once per project; the orchestrator
+real identity-provider user and grants it a role `[VERIFIED]`
+(ran live in field renders). Ask once per project; the orchestrator
 records the answer in `DECISIONS.md`. Absent a recorded yes, mode b is off.
 (Fulcrum rule)
 

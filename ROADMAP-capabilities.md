@@ -321,7 +321,7 @@ None of these has run. Until one does, the matching text stays `[UNVERIFIED]`.
 - **Full MCP re-probe - done 2026-10-16** (snapshot
   `skills/fulcrum-mentor-turns/references/mcp-snapshots/2026-10-16.md`; rows in
   `mcp-surface.md`). Not tested on it, open as follow-ups: `portfolioKey` omission;
-  one asset per session; closing a session before the first publish; reload-by-prompt
+  closing a session before the first publish; reload-by-prompt
   discarding unpublished changes; the capacity throttle; a second prompt while one
   runs; `mentor_cancel_prompt`; idle session garbage collection; a working-state
   `mentor_get_run` page (pacing and cursor fields while working); `succeeded` with

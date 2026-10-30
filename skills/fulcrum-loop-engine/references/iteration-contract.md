@@ -43,7 +43,7 @@ anything mutates.
 | 2 | Oscillation | Scan `JOURNAL.md` column 5 for `<task-id>:fail` | Two or more -> hand to guardrails: a lane stop, the row parks and other lanes continue. `oscillation-and-fix-loop.md` |
 | 3 | Budget | Does the remaining call budget cover a whole iteration? | Hand back now, at this phase boundary. `iteration-budget.md` |
 | 4 | Lease | Mentor turns only: the orchestrator (sole lease writer) acquires `lease.<app>.json` for every app the dispatch holds before the dispatch, `ttl_seconds` sized to the dispatch's wall-clock budget plus margin. `verify`, `code`, `infra`, `external` and `manual` rows take no lease and skip this gate and gate 5; `inspect` rows are Mentor reads and take it (`../../fulcrum-project-state/references/file-schemas.md`, heading "TASKS.md", "Turn types") | A live lease held by another holder: that lane waits or stops, never take (`../../fulcrum-project-state/references/lease-and-concurrency.md`) |
-| 5 | Staleness | Mentor turns only: cheap read-only invariant check against verified prior state, one per dispatch, covering each held asset, run as the first turn of the one driver dispatch | Mismatch, no unpublished changes -> close the Mentor session, open a fresh one. Unpublished changes held -> never close: Publish (if the step's own build verified) or a lane stop, `keep-open` (`../../fulcrum-mentor-turns/SKILL.md`, heading "The guard") |
+| 5 | Staleness | Mentor turns only: cheap read-only invariant check against verified prior state, one per dispatch, covering each held asset, run as the first turn of the one driver dispatch. A creating dispatch attaches no asset, so it has no guard | Mismatch, no unpublished changes -> close the Mentor session, open a fresh one. Unpublished changes held -> never close: Publish (if the step's own build verified) or a lane stop, `keep-open` (`../../fulcrum-mentor-turns/SKILL.md`, heading "The guard") |
 | 6 | External system | A row consuming an external system: `.fulcrum/external/<system>.md` exists | Missing -> the row is not ready; the orchestrator records the system first (`../../fulcrum-project-state/references/file-schemas.md`, heading "external/<system>.md") |
 
 Gate order is deliberate: the cheap, purely local gates run before the ones that
@@ -57,9 +57,11 @@ the answer-back cadence. A fresh session attaching the asset with no revision wo
 `[SCHEMA]`, so a passing guard proves the previous step landed
 (published); it is not a session-staleness test. Gate 5 is also the per-dispatch
 Mentor liveness check (`../../fulcrum-solution-init/references/tenant-capability-probe.md`,
-heading "0. Mentor liveness gate"): a guard answer that names the app's real
-screens and widgets proves Mentor is live; a generic or no-app answer is a
-liveness fail and halts.
+heading "0. Mentor liveness gate - run before anything else"): a guard answer that
+names the app's real screens and widgets proves Mentor is live; a generic or no-app
+answer is a liveness fail and halts. A creating dispatch attaches no asset, so it has
+no invariant to check and no gate 5 turn: liveness runs on the first dispatch with an
+attached asset.
 
 The lease is not a substitute for gate 5, and gate 5 is not a substitute for
 re-reading the live revision. They fail differently: the lease misses another
@@ -85,7 +87,7 @@ the wait, never after the result"):
 3. Set each `TASKS.md` row of the dispatch to `Status: active`, then append the
    session-file `started` lines and set the ids in the index row's `InFlight`.
 4. Dispatch - **one driver dispatch per batch or solo row**, covering the
-   gate 5 guard, consult (if any), build, fix and one Publish turn in one
+   gate 5 guard (none on a creating dispatch), consult (if any), build, fix and one Publish turn in one
    Mentor session. Lanes dispatch in parallel as sibling depth 1 agents. Brief
    inputs: the rows, `assetRefs` (no revision on a held asset), held assets,
    attachments, `sessionId` (only to resume an open session a previous dispatch
@@ -117,7 +119,7 @@ loses the one thing the consult turn was bought for: Mentor's platform idiom.
 
 ## Phase 4 - Poll
 
-Cadence is `../../fulcrum-mentor-turns/SKILL.md`, heading "Polling" - 45 s for
+Cadence is `../../fulcrum-mentor-turns/SKILL.md`, heading "5. Polling" - 45 s for
 answer-back turns and 90 s for model-mutating turns **with a discardable
 poller**; a 90 s floor for everything without one. Never carry the 45 s rate
 into an undelegated loop.
@@ -234,7 +236,7 @@ gate; running lanes carry on.
 Read the index rows, session files and new `RUN-IDS.md` lines, then
 rewrite `TASKS.md`, `project.md` and `HANDOFF.md` PART 2 to match, using the
 checklist in `../../fulcrum-project-state/references/file-schemas.md`, heading
-"Write ownership" ("Reconcile at every wave close").
+"Write ownership - who writes which file" ("Reconcile at every wave close").
 
 A phase is a derived label, not a gate. When a phase's rows are all closed,
 additionally: remove its `Status: done` `Verdict: pass` rows from `TASKS.md`,

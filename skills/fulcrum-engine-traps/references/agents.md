@@ -30,7 +30,8 @@ never as a standing yes or no.
 
 **Failure mode.** The Publish turn answers in text and nothing goes live:
 `mcp-surface.md`, heading "Publishing", row "A refused publish has no key". It is not a
-build result and not transient, so a retry repeats it.
+build result, and an immediate retry repeats it. Refusal has changed over time (entry 1),
+so record the date; a later row may try again.
 
 **Tell it apart.** A text refusal for ordinary validation errors looks the same. Read the
 error text: it is this entry only when it names the feature (entry 1). Anything else is a
@@ -52,20 +53,27 @@ service action, but its publish was refused, so it proves nothing.
 depends on it: "Create agent shell `<Name>` in Studio, publish it once, send the asset
 key." Publish matters: an unpublished asset is unreachable from another session
 (`mcp-surface.md`, heading "Creating and loading an asset"). Then attach by `assetRefs`.
+Whether Studio publishes an agent on a tenant that refused one is `[UNVERIFIED]`: if
+Studio also refuses, the row stays `parked`; tell the user and quote the text.
 
 ## 4. Studio cannot pick up an unpublished harness turn `[SINGLE-OBSERVATION]`
 
 User-confirmed: Studio can publish an agent change, but cannot see a harness turn that
 was never published. So Studio cannot rescue a refused publish, and that turn's work is
-gone with the session.
+gone with the session. That Studio publishes on a tenant that refused the harness publish
+is `[UNVERIFIED]`.
 
 - **Keep each agent turn small**, one change, so a refusal costs one prompt to redo.
 - **Keep the exact prompt on the row** as a replay work order, quoted in `Task`.
   `TASKS.md` allows one line and no raw pipes there, which also keeps the turn small.
 - **On refusal, the user replays it** in Studio Mentor, publishes from Studio, and
-  reports the revision. Replay has never been run `[UNVERIFIED]`: do not promise an
+  reports the revision. That `manual` row writes the Studio hand-off lease, since a
+  sibling row must not open a Mentor session on the agent meanwhile
+  (`../../fulcrum-project-state/references/lease-and-concurrency.md`, heading "Studio hand-off - `holder: user`"). Replay has never been run `[UNVERIFIED]`: do not promise an
   identical result. Read the revision and re-inventory before the next Mentor change,
   because Studio work moves the baseline.
+- **Studio also refuses:** the row stays `parked`, `Blocked on: the user`. Release the
+  lease, tell the user and quote the text. Nothing an agent can do changes it.
 
 ## 5. Agent rows never block other lanes (Fulcrum rule)
 
@@ -94,8 +102,10 @@ so read the property, do not assume either.
 
 **Second cause, same code.** Blank input from a refresh path flooded the log.
 
-**Brief:** "Quote agent-level `Messages` verbatim. It must carry a User message or bind
-to the `Messages` input, because a System-only value fails every call."
+**Brief:** "Quote agent-level `Messages` verbatim. It must bind to the `Messages` input,
+because a System-only value fails every call." Binding is the fix that worked. A value
+that carries its own User message is `[UNVERIFIED]`: the one agent holding both was never
+published or called.
 Guard empty input before every call. Never call an agent from a data action, an
 aggregate or a screen refresh: they fire with no user input, repeatedly. A background
 caller needs the same guard.

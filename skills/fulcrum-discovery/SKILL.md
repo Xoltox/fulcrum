@@ -104,7 +104,7 @@ says otherwise. Every requirement line carries a `Confidence` value:
 | `undecided` | No answer. Names who decides and what it blocks. Never a requirement. |
 
 This is a **different namespace** from the `[VERIFIED]`/`[UNVERIFIED]` evidence tags in
-`../../CONVENTIONS.md`, heading "Hard rule 4 - mark evidence strength". Those grade
+`../fulcrum-verification/references/evidence-tags.md`. Those grade
 Fulcrum's claims about the platform; these grade a requirement's provenance. Do not mix
 them in one line.
 
@@ -143,7 +143,7 @@ summarise the interview back at length; the brief is the summary.
 `guided` runs this as a conversation, start to finish. `expert` invokes it to fill one
 named hole in an existing document: interview only that hole, append only those lines
 and their decision records, and never rewrite the surrounding document. Both settings
-and their rules are owned by `../../CONVENTIONS.md`, heading "Mode and posture".
+and their rules are owned by `../fulcrum/references/mode-and-posture.md`.
 
 ## What to elicit, and why each item
 

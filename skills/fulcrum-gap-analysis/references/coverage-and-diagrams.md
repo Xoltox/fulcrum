@@ -1,7 +1,6 @@
 # Coverage figures and the three diagrams
 
-From `../../../CONVENTIONS.md`, heading "A coverage figure must state its denominator":
-a bare percentage is a judgement wearing the costume of a measurement.
+A coverage figure must state its denominator: a bare percentage is a judgement wearing the costume of a measurement.
 
 ## Rules for every number in the report
 

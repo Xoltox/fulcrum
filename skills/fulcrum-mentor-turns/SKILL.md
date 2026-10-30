@@ -26,12 +26,11 @@ dispatches; subagents drive turns and absorb poll traffic. Poll undelegated
 only when the harness gives no subagent, at the slower cadence below.
 
 **The sequence:** start a session, then prompt (describe a new asset, or
-attach one with `assetRefs`), then read the run until drained; call sequence,
-params and the deprecated create and load tools are in `references/mcp-surface.md`,
-heading "Creating and loading an asset". A new asset exists only inside its
-session until its first publish - **publish once early**, before that session
-can close (section 7). The first turn can be refused under capacity: bounded
-retry in the same heading.
+attach one with `assetRefs`), then read the run until drained; params:
+`references/mcp-surface.md`, heading "Creating and loading an asset". A new asset
+exists only inside its session until its first publish - **publish once early**
+(section 7). The first turn can be refused under capacity: bounded retry in the
+same heading.
 
 ## 1. Turn granularity - the headline rule
 
@@ -66,18 +65,17 @@ stop, not a halt.
 
 ## 3. Prompt scaffolds
 
-Measured-working templates, phrasings that measurably failed, and quoting
-untrusted `app_logs` text: `references/prompt-scaffolds.md`. Load before
-authoring any non-trivial turn.
+Templates, failed phrasings and quoting untrusted `app_logs` text:
+`references/prompt-scaffolds.md`. Load before authoring any non-trivial turn.
 
 ## 3a. Posture - `collaborative` vs `directive`
 
-Defined in `../../CONVENTIONS.md`, heading "Mode and posture". `collaborative`
+Defined in `../fulcrum/references/mode-and-posture.md`. `collaborative`
 (default): a read-only **consult turn**, a **review** against
 `../fulcrum-engine-traps/SKILL.md` correcting only the trap(s) tripped, then
 the **build turn** in the same session (section 4). `directive` drops the
 consult. An accepted Mentor proposal is a decision (`Decider: mentor`).
-Economics stay `[UNVERIFIED]`. Mechanics: `references/posture.md`.
+Mechanics: `references/posture.md`.
 
 ## 4. Sessions, conversation and the staleness guard
 
@@ -100,7 +98,8 @@ means close the session, start a new one, attach again
   `references/sessions.md`.
 - **One session per app at a time; two sessions never build one app**
   (user-confirmed). One session may hold several assets. Close a finished
-  session - but **never close a session holding unpublished changes** ("The guard").
+  session - but **never close a session holding unpublished changes** ("The guard"),
+  the refused publish in section 7 excepted.
 - **Never pass `assetRefs` revision on a held asset:** reads then fail with
   internal errors `[SINGLE-OBSERVATION]`.
 
@@ -119,9 +118,9 @@ lost; `[UNVERIFIED]` on the 2026-10-30 surface, inferred, not tested].
 
 ### The guard
 
-Every dispatch's first turn is a **cheap, read-only invariant check** against
-the dispatch's **own verified ground truth** (never a figure copied from a
-handoff), phrased so a mismatch stops - e.g. "how many aggregates does
+Every dispatch with an attached asset opens with a **cheap, read-only invariant
+check** against the dispatch's **own verified ground truth** (never a figure copied
+from a handoff), phrased so a mismatch stops - e.g. "how many aggregates does
 screen `<X>` have, and does a widget named `<Y>` exist? If not `<N>` / YES,
 say so and STOP."
 
@@ -133,12 +132,13 @@ say so and STOP."
   `on_exit: keep-open` and report `unpublished_changes: yes`.
 - Each sibling screen gets its **own** check. A wrong count may be a
   read-back error rather than staleness - **the response is the same.**
+- **A creating dispatch has no asset, so no guard.** Liveness runs on the first
+  dispatch with an attached asset.
 
 ## 5. Polling
 
 **Every poll is a request *and* a response, and both persist in the context
-of whoever issued them.** Token cost, not wall clock, is what the cadence
-optimises. **With a discardable poller:** **45 s** for turns where Mentor
+of whoever issued them.** **With a discardable poller:** **45 s** for turns where Mentor
 *answers*; **90 s** for turns that *change the model*, including the Publish
 turn. **With no delegation:** the orchestrator polls in its own context at a
 **90 s floor for everything** - never carry 45 s into an undelegated loop.
@@ -150,7 +150,7 @@ turn. **With no delegation:** the orchestrator polls in its own context at a
   arrive before that. A poller reports only after the last page and **never
   paraphrases a page it did not read.**
 - **Verify the wait blocks** before the first poll - a wait that returns
-  immediately hammers Mentor with no cadence (`../../HARNESS-NOTES.md`).
+  immediately hammers Mentor with no cadence.
 - **A brief must restate these rules:** paste the block in
   `references/polling.md`, heading "Pointing at this skill is not a brief".
 - **Precedence:** if another catalog prescribes different cadences, this one
@@ -190,12 +190,14 @@ status fields: `references/mcp-surface.md`, heading "Publishing".
   must equal the publication's `applicationRevision` (the gate; `Workflow`
   and library exceptions in `references/mcp-surface.md`, "Publishing").
 - **Several assets held: gate each key.** One Publish run made two
-  publications; Publish covers held assets with changes (inferred, tagged
-`[UNVERIFIED]`, `references/mcp-surface.md`, "Publishing").
+  publications (`references/mcp-surface.md`, "Publishing").
 - **Never publish while the previous publish is non-terminal.** A failure
   with an `OS-*` build code is the build's result: surface it.
   `indeterminate: true` means re-poll or check the deployed inventory.
   Neither is a reason to re-publish.
+- **Refused publish:** the turn can never ship and its replay prompt goes on the
+  row, so the driver may close the session, and the lease is released, when nothing
+  else held can ship (`../fulcrum-engine-traps/references/agents.md`, entries 2 and 4).
 - Never trust Mentor's prose about a publish - confirm the revision, then
   prove the change per `../fulcrum-verification/SKILL.md`; `context_*` lags a
   publish by about 2 minutes to more than 25, so gates reading it are
@@ -205,7 +207,5 @@ status fields: `references/mcp-surface.md`, heading "Publishing".
 
 ## 8. Recovery and turn economics
 
-Auth expiry, lost sessions, the capacity throttle, failed publishes, abandoned
-prompts: `references/recovery.md` - read before treating an interrupted turn as
-failed. Budget per step or batch: 1 build turn (or a build pass of up to 4 short turns,
-which counts as one) + up to 2 fix turns, plus the Publish turn; disclose overages (`references/granularity.md`, "Turn economics").
+Auth expiry, lost sessions, capacity, failed publishes, abandoned prompts: `references/recovery.md`, before treating an interrupted turn as failed.
+Budget per step or batch, and disclosing overages: `references/granularity.md`, "Turn economics".

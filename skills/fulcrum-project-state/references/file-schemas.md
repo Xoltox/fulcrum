@@ -59,7 +59,7 @@ row is not enough, and the new `RUN-IDS.md` lines, then rewrites `TASKS.md` (sta
 verdict), `project.md` (newly created app identifiers) and `HANDOFF.md` PART 2 to
 match, and commits. Check while doing it: every run id has an outcome line or is named
 in some row's `InFlight`; no `TASKS.md` row is `active` without an open session; a
-`halted` row has a `HALT.md` and vice versa. A reconciliation skipped "because nothing
+`HALT.md` has a `halted` row, and a `halted` row with no `HALT.md` has its resolving `DECISIONS.md` record. A reconciliation skipped "because nothing
 changed" is how the stale files above were produced.
 
 **No resume point outside `.fulcrum/`.** An orchestrator checkpoint written elsewhere
@@ -87,13 +87,13 @@ Rewritten. Identity and settings only - no history, no task state.
 | `solution` | Name of the solution, as the user calls it. |
 | `created` | Timestamp of scaffold. |
 | `mode` | `guided` \| `expert` |
-| `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture". Not restated here. |
+| `posture` | `collaborative` \| `directive`. Definitions, the orthogonality rule and the opt-in rule: `../../fulcrum/references/mode-and-posture.md`. Not restated here. |
 | `Rigor` | `demo` \| `pilot` \| `production`. Third setting, orthogonal to mode and posture. Asked at init in every mode, never defaulted, never inferred; missing on resume: ask. Changing it is a user decision. It never changes posture. What each value owes: `../../fulcrum-verification/SKILL.md`, heading "Gates and rigor". |
 | `profile` | `full` \| `micro`. The user confirms micro when the router proposes it; `micro-profile.md`. |
 | `apps` | Table: app identifier, asset type, role in the solution, target environment. |
 | `design` | Optional. `.fulcrum/design/manifest.md` when the engagement runs the design loop (`../../fulcrum-design-loop/SKILL.md`); on the full profile a list, one `.fulcrum/design/<app>/manifest.md` per app the loop runs for. Present -> the loop engine runs rung 6 on screen rows as the design variant (render-compare). Omit otherwise. |
 | `browser` | Optional. The render preflight result for this project: state (`callable` \| `unavailable` \| `unknown`), the browser tool set found (e.g. the MCP server prefix), the capabilities it covers, and the date. Per project, because the harness and its browser can differ between projects. Written per `../../fulcrum-render-check/SKILL.md`, heading "Preflight - once per project". |
-| `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` -> a concrete model, per `../../../MODEL-TIERS.md`, heading "Resolution - how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override - an empty section reads as a decision and pins nothing. |
+| `tier overrides` | Optional. `deep-reasoning` / `workhorse` / `poller` -> a concrete model, per `../../fulcrum-unattended-guardrails/references/model-tiers.md`, heading "Resolution - how a tier becomes a concrete model". A project override is rank 1 there, so writing one here wins over the machine-local file. Omit the section entirely when there is no override - an empty section reads as a decision and pins nothing. |
 
 `project.md` carries no run outcome, gate verdict or halt status: those are in
 `RUN-IDS.md`, `TASKS.md` and `HALT.md`, and a copy here was the line found stale in
@@ -119,8 +119,18 @@ discovery interview's output, `DOMAIN.md` is the domain source of truth derived 
 v2 adds the `code`, `infra` and `external` turn types; columns and order are
 unchanged from v1. A v1 file is read as v2 with no other change. v3 adds `DependsOn`,
 `Batchable`, `Risk` and `Gate`, in the positions below. A v1 or v2 file has none of
-them: treat its rows as a chain in ID order, Batchable no, Risk std, and migrate on
-the next rewrite. Reading it any other way runs rows in an order nobody declared safe.
+them: read its rows as a chain in ID order per `App`, Batchable no, Risk std, and migrate
+on the next rewrite. Reading it any other way runs rows in an order nobody declared safe.
+
+Migrating v2 to v3 (v1 is read as v2 first):
+
+| Item | On the first rewrite |
+|---|---|
+| `DependsOn` | Open rows only: the previous open row of the same `App`, or `-`. Never an edge across apps: nobody declared one, and it turns parallel lanes back into a chain. |
+| `Batchable`, `Risk` | `no`, `std`. |
+| `Gate` | `-` on every row. A row is never recorded above a gate it is shown to have run. |
+| `verify` row naming rung 1 | Becomes `inspect`: rung 1 is a Mentor read-back, so the row takes the lease. |
+| Join and final G2 rows | Add them. `guided`: ask first. `expert`: add them and journal it. |
 
 Rewritten. The single answer to "what is open right now". A markdown table, because a
 human reviews it as a diff in a pull request; the column contract is what keeps it
@@ -151,7 +161,7 @@ read and takes the lease. The rest are not:
 | Turn | Means | Lease |
 |---|---|---|
 | `verify` | Proof with no Mentor rung, run at every rigor. Emitted only for joins, G2 and owed G3 | none |
-| `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none; a Studio hand-off writes `holder: user` (`lease-and-concurrency.md`, heading "Studio hand-off") |
+| `manual` | A step only the user can take (Portal-only operation, asset upload, setting a secret, a sign-in-gated check). Normally `parked` with `Blocked on: the user` | none; a Studio hand-off writes `holder: user` (`lease-and-concurrency.md`, heading "Studio hand-off - `holder: user`") |
 | `code` | Repository code the agent writes outside Mentor - an External Logic library's source, a script, a test harness | none |
 | `infra` | Infrastructure or environment work - gateway, connector, CI, local tooling | none |
 | `external` | Building, deploying or changing an external system or integration target (`external/<system>.md`) | none |
@@ -233,8 +243,8 @@ recorded outcome. One row, no session file.
 
 **Query 2, oscillation detection.** Match a task id across column 5 of the whole index:
 every session that touched `T-004`, with that session's outcome, in one scan. Two
-`T-004:fail` occurrences is the "stuck twice means stop and report" non-negotiable in
-`../../../AGENTS.md` firing **mechanically**, rather than depending on an agent
+`T-004:fail` occurrences is the "stuck twice means stop and report" rule in
+`../../fulcrum-unattended-guardrails/SKILL.md` firing **mechanically**, rather than depending on an agent
 remembering it has been here before. `../../fulcrum-loop-engine/SKILL.md` is the main
 consumer. `[UNVERIFIED]`
 
@@ -273,12 +283,12 @@ difference. Resolve it against the lease, never by guessing:
 
 | Lease | Inference | Action |
 |---|---|---|
-| Live lease held by that session id | The session is running now, or died inside its TTL | Wait or stop the lane. Never take. `../../../AGENTS.md`: one Mentor session per app. Dead: adopt it (`lease-and-concurrency.md`, heading "Resuming after a dead session"). |
+| Live lease held by that session id | The session is running now, or died inside its TTL | Wait or stop the lane. Never take: one Mentor session per app. Dead: adopt it (`lease-and-concurrency.md`, heading "Resuming after a dead session"). |
 | No lease, or an expired one whose holder's dispatch is known dead (no return, budget exceeded) | The session crashed | Recover per `resume-and-halt.md`. Treat every `InFlight` id as possibly-mutated: the app may have changed with no recorded outcome. |
 
 A `holder: user` lease belongs to no session, so it answers neither row: read it as "user
 in Studio" for that app, whatever its age (`lease-and-concurrency.md`, heading "Studio
-hand-off").
+hand-off - `holder: user`").
 
 ### Index growth - the arithmetic
 

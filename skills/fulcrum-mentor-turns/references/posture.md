@@ -2,7 +2,7 @@
 
 Owns **how a turn is shaped** under each posture. Posture's definition, its
 orthogonality with mode, and the rationale for `collaborative` being the
-default are owned by `../../../CONVENTIONS.md`, heading "Mode and posture" - read that first. This file does not restate policy, only mechanics.
+default are owned by `../../fulcrum/references/mode-and-posture.md` - read that first. This file does not restate policy, only mechanics.
 
 ## `collaborative` (default) - three moves inside one step
 
@@ -10,7 +10,7 @@ default are owned by `../../../CONVENTIONS.md`, heading "Mode and posture" - rea
    instructing anything - what entities, screens and actions it would create
    for the stated outcome. Read-only: it changes nothing, so it polls at the
    answer-back cadence (`../SKILL.md`, section 5). Scaffold:
-   `prompt-scaffolds.md`, heading "Consult turn".
+   `prompt-scaffolds.md`, heading "What worked", entry "Consult turn".
 2. **Review.** Read Mentor's proposal against
    `../../fulcrum-engine-traps/SKILL.md`. Correct **only** the specific
    trap(s) it trips.
@@ -51,7 +51,7 @@ later - it reads a model shape nothing in the repo accounts for.
 Consult turns are answer-back (cheaper cadence); build turns mutate (slower
 cadence) - `../SKILL.md`, section 5. `[UNVERIFIED]` The claim that one cheap
 consult turn buys fewer expensive fix turns overall is a design prediction,
-not a measurement: `../../../CONVENTIONS.md` tags it `[UNVERIFIED]` and no run
+not a measurement: `../../fulcrum/references/mode-and-posture.md` tags it `[UNVERIFIED]` and no run
 has been instrumented to compare posture cost end to end. Keep the tag as
 written. Do not upgrade it, and do not cite the trade as a finding.
 

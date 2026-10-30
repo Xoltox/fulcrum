@@ -4,7 +4,7 @@ Detail for `../SKILL.md`, heading "The procedure". Each row is something a
 render does that looks like an app defect, or a browser limit that makes an
 assertion undrivable. Report the observation and the limit; the orchestrator
 judges. Tool and parameter names are one browser's; the capability is what
-matters (`../../../HARNESS-NOTES.md` for per-harness detail).
+matters (`HARNESS-NOTES.md` in the Fulcrum repo for per-harness detail).
 
 ## Looks like a defect, is not
 
@@ -50,7 +50,7 @@ matters (`../../../HARNESS-NOTES.md` for per-harness detail).
   it through the click capability by a stable selector. A page script that
   clicks is a change to interaction, not a measurement: report that the
   control was not reachable by the capability and stop that assertion unless the
-  brief allows it.
+  brief grants a script click by name.
 - **Viewport floor.** One browser clamped width to about 500 px
   `[SINGLE-OBSERVATION]`. Record the width actually reached; never label a
   capture as a phone width the browser did not give.

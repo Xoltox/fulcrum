@@ -96,7 +96,8 @@ you have and which capabilities above it covers. Do nothing else.
 
 Page scripts are for read-only measurement only (sizes, computed style,
 image natural width, resource timing, the OutSystems UI version). Never set
-values, submit forms, read storage or cookies, or call endpoints.
+values, submit forms, read storage or cookies, or call endpoints. Only a
+brief's named grant goes further: an in-page file build, or a script click.
 
 **OutSystems UI version**, when the brief asks, on the first page that renders. Take
 the first that answers, and report the value and which source gave it:
@@ -109,7 +110,7 @@ the OutSystems model, so use real keystrokes for a field an action will read;
 a file input can report success and still hold no file, so an upload
 assertion is `untested` unless the brief grants an in-page file build; a
 control missing from a snapshot is found by read-only DOM query, and a script
-click is not allowed; the viewport may clamp near 500 px, so record the width
+click needs the brief's grant; the viewport may clamp near 500 px, so record the width
 reached. Detail and recipes: `fulcrum-render-check`, `references/harness-limits.md`.
 
 ## Sign-in

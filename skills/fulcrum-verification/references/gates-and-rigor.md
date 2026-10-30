@@ -157,7 +157,7 @@ Stops: `../../fulcrum-unattended-guardrails/references/halt-conditions.md`, head
 
 ## Changing rigor
 
-What rigor is and who changes it: `../../../CONVENTIONS.md`, heading "Mode and posture".
+What rigor is and who changes it: `../../fulcrum/references/mode-and-posture.md`.
 
 After a change, recorded `Gate` values stand: none is raised without evidence. On a
 raise, list the rows now below the required gate and run what they owe. On a lower

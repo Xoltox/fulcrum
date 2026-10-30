@@ -8,7 +8,7 @@ requires: ODC MCP server authenticated; Mentor enabled on the tenant; filesystem
 # ODC solution init
 
 Phase zero of an ODC engagement. Everything downstream reads what this phase writes.
-Run once per project, on the **deep-reasoning** tier (see `../../MODEL-TIERS.md`); every
+Run once per project, on the **deep-reasoning** tier; every
 session after runs **workhorse**: spend the expensive thinking once, so later sessions execute.
 
 ## When to use
@@ -35,8 +35,6 @@ graph, sizing, the scaffold, the handoff structure. Everything else belongs to a
 | Loader idempotence, natural keys, static entity identifiers | `../fulcrum-seed-data/SKILL.md` |
 | Stop conditions, fix-turn caps, delegation depth, model tier policy | `../fulcrum-unattended-guardrails/SKILL.md` |
 | No source material exists at all - nothing written, no designs, no mockups | `../fulcrum-discovery/SKILL.md` |
-
-Cross-reference these; never restate their rules beyond a one-line pointer.
 
 ## Procedure
 
@@ -104,7 +102,8 @@ asked at intake or marked `first-row`, for the first real row that needs it. Two
   returned `succeeded` with a summary saying no application was selected.
   `[SINGLE-OBSERVATION]` The gate: a cheap read-only prompt returns a summary **naming
   real content from the actual app**. `attempted_change` is false on a healthy read-only
-  turn too, so that field is not the signal.
+  turn too, so that field is not the signal. It is one driver dispatch, so scaffold the
+  `.fulcrum/` state files (step 7) before it.
 
 Checklist, probe prompts, evidence format: `references/tenant-capability-probe.md`; fill
 `templates/tenant-profile.md`.
@@ -163,11 +162,11 @@ Copy `templates/spec-template.md` per step.
 ### 7. Scaffold the repo and the handoff
 
 The handoff document is **two parts**: stable **RULES** that accumulate, and a **BRIEF**
-replaced wholesale every session. Never a growing narrative of past steps - that is what
-the append-only build log is for. Scaffold: the derived brief, the plan, `TASKS.md`,
-`specs/`, a per-step build-pattern log, a run-id log, `tenant-profile.md`, the handoff.
+replaced wholesale every session. Scaffold: `project.md` (`mode`, `posture`, `profile`,
+`Rigor`), the derived brief, the plan, `TASKS.md`, `JOURNAL.md`, `DECISIONS.md`, `RUN-IDS.md`,
+`specs/`, a build-pattern log, `tenant-profile.md`, the handoff.
 
-Layout, file roles, handoff shape and three observed failure modes: `references/repo-scaffold.md` (heading "Failures to design against"), `templates/handoff-template.md`.
+Layout, file roles, handoff shape and three observed failure modes: `references/repo-scaffold.md`, `templates/handoff-template.md`.
 
 ## Routing per-app bootstrap
 
@@ -177,7 +176,7 @@ Route each app's first build by the source type available **for that app**:
 | Source for that app | Route to |
 |---|---|
 | Visual or code design - screenshots, concept images, Figma frames, HTML, TSX/React | `../fulcrum-design-loop/SKILL.md`, entered at its Intake with Q1 (app creation) and Q7 (form factor, if applicable) pre-answered here and step ids from this plan; the intake steps it still runs are listed in its "Intake" section, and every unanswered batch B question is asked before capture. Per app: `.fulcrum/design/<app>/`, one `project.md` `design` entry, at most 6 screens |
-| Text only - derived brief, prose spec | `../fulcrum-mentor-turns/SKILL.md` per spec |
+| Text only - derived brief, prose spec | `../fulcrum-loop-engine/SKILL.md` phase 1, per spec |
 | Both | design loop for theme, chrome and screens; this skill's specs for entities and logic, so the design loop omits its P1.04 Data and P1.05 Seed steps when this plan already has the entity and seed steps |
 
 Fulcrum never runs an external bootstrap skill's procedure. Where `outsystems-design-to-app`
@@ -196,3 +195,4 @@ Do not hand off until all of these hold:
 5. The plan names apps, agents, workflows, entity owners and deployable units; `TASKS.md` holds the graph with its gate rows, no spike rows.
 6. Every step up to the first join has a spec file passing the right-sizing test.
 7. The handoff has a RULES part and a BRIEF part, and the BRIEF lists the current frontier.
+8. Every first build enters the loop at phase 1.

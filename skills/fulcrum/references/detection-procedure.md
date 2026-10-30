@@ -18,7 +18,8 @@ Three checks, in order, each answerable without opening a session file:
    Do not re-derive that list here - cite it.
 
 None of these three requires reading `plan.md`, `TASKS.md`, a session file, or
-any Mentor state. If a step needs a session file to answer, detection has
+any Mentor state. With `.fulcrum/` present, the last `JOURNAL.md` row and one read of
+`TASKS.md` answer rows 5-7. If a step needs a session file to answer, detection has
 already gone off cheap - stop and re-derive the answer from the index instead.
 
 ## The ladder, in full
@@ -31,14 +32,14 @@ already gone off cheap - stop and re-derive the answer from the index instead.
 | 2 | No `.fulcrum/`, no app, source material present | `../../fulcrum-solution-init/SKILL.md` | Source material is the trigger, not the user's framing of it, unless row 0b matched and the user confirmed. |
 | 3 | No `.fulcrum/`, app exists | `../../fulcrum-gap-analysis/SKILL.md` | An app with no `.fulcrum/` was built by something other than a Fulcrum-tracked session (a generator, a prior manual build, another agent). Never re-run `fulcrum-solution-init` against it - that skill is pre-build only. |
 | 4 | `.fulcrum/` present, `HALT.md` present | Stop, report, ask a human | See `../SKILL.md`, heading "HALT.md is absolute - state the mechanism". Absolute - no exceptions below override this row. |
-| 5 | `.fulcrum/` present, last `JOURNAL.md` row `State: open` | Resume at `../../fulcrum-loop-engine/SKILL.md` phase 4 (poll to terminal) | Possible crash or a run still executing - not a halt. See `../../fulcrum-project-state/references/resume-and-halt.md`, "Crash recovery". |
-| 6 | `.fulcrum/` present, last row `State: clean`, open task in `TASKS.md` | Resume -> `../../fulcrum-loop-engine/SKILL.md` phase 1 | Clean stop; select the runnable frontier. |
+| 5 | `.fulcrum/` present, last `JOURNAL.md` row `State: open` | Resume at `../../fulcrum-loop-engine/SKILL.md` phase 4 (poll to terminal) | Possible crash or a run still executing - not a halt. See `../../fulcrum-project-state/references/resume-and-halt.md`, "Crash recovery - the five signals of interrupted work". |
+| 6 | `.fulcrum/` present, last row `State: clean`, `aborted`, or `halted` with `HALT.md` cleared, open task in `TASKS.md` | Resume -> `../../fulcrum-loop-engine/SKILL.md` phase 1 | Nothing in flight: a crash was recovered, or a human resolved the halt. Select the runnable frontier. |
 | 7 | `.fulcrum/` present, all tasks closed: every row `done`, the final G2 row among them at `Verdict: pass` | Report status; offer next phase | This row can only mean G2 ran. A G2 row still open is row 6. No G2 row (a plan older than the rule): add it, then row 6. Read `plan.md` only now, to name what phase comes next. If none remains, offer `../../fulcrum-gap-analysis/SKILL.md` as a completeness check. |
 
 Rows 4-7 apply unchanged to a `.fulcrum/` on the micro profile (`profile: micro` in
 `project.md`); only its file set is smaller.
 
-Rows 5 and 6 both answer from the **last row alone** - never scan the whole
+Rows 5 and 6 split on the **last row's `State` alone** - never scan the whole
 index and never open `journal/<session-id>.md` to decide which of the two
 applies. That file is opened only by the loop engine, once it is already
 committed to resuming, to get recovery detail the row itself does not carry.
@@ -128,8 +129,9 @@ published. It is neither a crash nor a halt, and its age changes nothing: no Men
 session opens on that app until the user answers, because Studio work there is invisible
 and a second session on one app is the corruption path
 (`../../fulcrum-project-state/references/lease-and-concurrency.md`, heading "Studio
-hand-off"). Other apps route as usual. On "published":
-`../../fulcrum-design-loop/references/build-lanes.md`, heading "Studio lane", step 4.
+hand-off - `holder: user`"). Other apps route as usual. On "published": that heading's
+release step; in the design loop, `../../fulcrum-design-loop/references/build-lanes.md`,
+heading "Studio lane", step 4.
 
 Detection degrades honestly rather than picking silently. Each case names what
 the router does; none of them is resolved by guessing.
@@ -151,8 +153,8 @@ ask which is authoritative. Do not guess and do not auto-correct `project.md`.
 Route to `../../fulcrum-gap-analysis/SKILL.md` per row 3. Say explicitly in the
 handoff that provenance is unknown - gap analysis's own first step already
 establishes provenance before judging anything
-(`../../fulcrum-gap-analysis/SKILL.md`, "Gap analysis never assumes how the app
-got there," `../../../CONVENTIONS.md`), so the router does not need to determine
+(`../../fulcrum-gap-analysis/SKILL.md`, heading "Provenance is step one and it changes
+the meaning of every finding"), so the router does not need to determine
 it; it only needs to not assume the app is untouched Fulcrum work.
 
 ### `TASKS.md` has rows but `plan.md` is missing, empty, or unreadable

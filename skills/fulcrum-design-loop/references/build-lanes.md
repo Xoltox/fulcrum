@@ -22,7 +22,7 @@ complete and is not retired. (Fulcrum rule)
 | Phase | `image`, `studio` | `text` |
 |---|---|---|
 | Capture | Shared dispatch, then short-form screen files (`design-spec-format.md`, heading "Short form") | Full |
-| Gate | Checks 1, 9, 12 | All twelve |
+| Gate | The capturer's own one-pass check: 1, 9, 12 | Fresh gate-mode capturer, all twelve |
 | P1.02 Theme | `:root` overrides from `tokens.md` only; `theme.css` classes wait for a fix turn that needs them | As written |
 | P1.03 Chrome | Folded into the first screen step, one step fewer: the prompt names screens, access and menu labels | As written |
 | P1.04, P1.05 | Before the screen steps, unchanged | Unchanged |
@@ -44,10 +44,7 @@ prompt, or the same picture yields a different data model each time.
 
 ## Image lane
 
-**Upload.** In the session that will prompt: `mentor_request_upload`, PUT the bytes,
-then `attachmentRefs` on the `mentor_prompt`, at most 3 per prompt. A fourth rejects the
-call, so a batch never exceeds it. An attachment is read, not stored; it does not become
-an app resource (batch B Q6).
+**Upload.** In the session that will prompt, at most 3 per prompt: `mcp-surface.md`, heading "Tool families".
 
 **Starting batch.** One prompt, up to 3 related images, one Publish: related means same
 layout, same palette, same role. Split when fidelity drops: after a blocker or major
@@ -55,10 +52,10 @@ diff in a batch, fix it, then send the remaining screens in smaller batches.
 
 One-run comparison, 2026-10-30, `[SINGLE-OBSERVATION]`, simple screens, not a rule:
 
-| Shape | Prompt to published | Result |
+| Shape | Mentor time, publish included | Result |
 |---|---|---|
-| One prompt, 3 images | about 2m15s | High fidelity, one cosmetic defect |
-| One session, 3 prompts, one image each | about 2m36s | 1.7x events, more visible defects, classes not reused |
+| One prompt, 3 images | 2m13s | High fidelity, one cosmetic defect |
+| One session, 3 prompts, one image each | 2m36s | 1.7x events, more visible defects, classes not reused |
 
 One run each, so variance is not ruled out. Keep measuring on real designs.
 

@@ -3,8 +3,7 @@
 This is the only place in the Fulcrum family that defines question-asking
 discipline. `expert` mode does not use this file - the user invokes skills
 directly and no routing questions are asked, with one exception: `Rigor` is asked
-in every mode. Definitions: `../../../CONVENTIONS.md`, heading "Mode and posture" -
-not restated here.
+in every mode. Definitions: `mode-and-posture.md` - not restated here.
 
 ## What this router asks about, and what it never asks about
 

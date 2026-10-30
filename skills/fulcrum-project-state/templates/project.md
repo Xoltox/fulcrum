@@ -34,7 +34,7 @@ Do not re-derive these. Confusably named apps on the tenant are listed in
 | `design` | Optional: `.fulcrum/design/manifest.md` on the design loop only (full profile: a list, one `.fulcrum/design/<app>/manifest.md` per app run through it); delete the row otherwise |
 
 `collaborative` is the default. Definitions, the orthogonality rule, the failure
-mechanism and the opt-in rule: `../../../CONVENTIONS.md`, heading "Mode and posture".
+mechanism and the opt-in rule: `../../fulcrum/references/mode-and-posture.md`.
 `Rigor` has no default; what each value owes: `../../fulcrum-verification/SKILL.md`,
 heading "Gates and rigor".
 
@@ -49,8 +49,8 @@ decision and pins nothing.\>
 | `workhorse` | \<model\> |
 | `poller` | \<model\> |
 
-A project override is rank 1 in `../../../MODEL-TIERS.md`, heading "Resolution - how a
-tier becomes a concrete model", so anything written here wins over the machine-local
+A project override is rank 1 in `../../fulcrum-unattended-guardrails/references/model-tiers.md`,
+heading "Resolution - how a tier becomes a concrete model", so anything written here wins over the machine-local
 file. Record why, in `DECISIONS.md`.
 
 ## Tenant facts

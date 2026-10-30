@@ -72,7 +72,7 @@ Publish sequencing itself: `../../fulcrum-mentor-turns/SKILL.md`.
 
 Name every system outside ODC that the solution calls or is called by, and decide for
 each whether it already exists or is built in this engagement. Building one is out of
-family (`../../../CONVENTIONS.md`, the skill-boundaries table, row "Out of family"):
+family (`../../fulcrum/SKILL.md`, heading "Boundary", row "Out of family"):
 the plan carries it as `Turn: external` tasks, not Mentor steps. What the plan must
 do is order the contract first - `.fulcrum/external/<system>.md`, from
 `../../fulcrum-project-state/templates/external-system.md`, exists before the first
@@ -114,6 +114,9 @@ foundation (serial)      shared entities, cross-app contracts
   `<Name>` in Studio, publish it once, send the asset key." A Mentor-made shell has come
   out empty or unreferenceable, and an unpublished one is unreachable from another
   session (`../../fulcrum-engine-traps/references/agents.md`, entries 3 and 10).
+- **An agent's Mentor row carries a replay prompt** (`agents.md`, entry 4). The driver
+  writes it from the consult outcome and reports it; the orchestrator records it on the
+  row, so a refused publish costs one prompt to redo.
 - **Agent consumers need the index too.** Emit the row `blocked`, depending on the row
   that publishes the agent, `Blocked on` naming that producer, `Unblocks when` "service
   action shows in `context_actions`". The wait has run overnight, not minutes, so plan

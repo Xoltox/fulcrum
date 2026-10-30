@@ -13,12 +13,14 @@ reads it cold, every time, with no conversational history. Design it for that re
 <project>/
   DOMAIN.md             derived domain source of truth (step 1)
   .fulcrum/
+    project.md           identity and settings: mode, posture, profile, Rigor
     plan.md              phase labels, steps, apps/agents/workflows, entity owners
     TASKS.md             the task graph, schema v3 (step 5)
     tenant-profile.md    the capability probe result (step 3)
     HANDOFF.md           two parts: RULES (stable) + BRIEF (replaced each session)
     JOURNAL.md           session index; per-session detail in journal/<session-id>.md
     RUN-IDS.md           durable run-id log
+    DECISIONS.md         append-only decision record
     external/<system>.md contract per external system consumed (if any)
   specs/
     step-<NN>-<slug>.md one spec per step (step 6)
@@ -32,8 +34,8 @@ directories differently; where the repo already has a place for domain notes, sp
 source exports, use it and record the actual paths in `HANDOFF.md` PART 1, "File map".
 What is fixed is the `.fulcrum/` file set and that each fact has one home.
 
-`plan.md`, `tenant-profile.md`, `HANDOFF.md` and `RUN-IDS.md` live in `.fulcrum/`, not
-at the project root - full layout and file contracts:
+`project.md`, `plan.md`, `tenant-profile.md`, `HANDOFF.md`, `DECISIONS.md` and `RUN-IDS.md`
+live in `.fulcrum/`, not at the project root - full layout and file contracts:
 `../../fulcrum-project-state/SKILL.md`, `../../fulcrum-project-state/references/file-schemas.md`.
 
 ## File roles - one owner per fact
@@ -41,12 +43,14 @@ at the project root - full layout and file contracts:
 | File | Owns | Never contains |
 |---|---|---|
 | `DOMAIN.md` | Domain truth: personas, entities, screen inventory, resolved questions | Build mechanics, phase order |
+| `.fulcrum/project.md` | Identity and settings: `mode`, `posture`, `profile`, `Rigor`, apps | History, task state, tenant facts |
 | `.fulcrum/plan.md` | Scope: phase labels, steps, decomposition, entity owners | Mentor mechanics, per-step detail |
 | `.fulcrum/TASKS.md` | Current truth and the graph: `App`, `DependsOn`, `Batchable`, `Risk` per row | Narrative, prose in cells |
 | `.fulcrum/tenant-profile.md` | Every tenant-varying fact, with evidence, or `first-row` | Anything not observed |
 | `.fulcrum/HANDOFF.md` | Standing rules + the current session's brief | Narrative of past steps |
 | `.fulcrum/JOURNAL.md` + `.fulcrum/journal/*` | Append-only history - session index plus per-session action lines, including withdrawn claims | Rules, plans |
 | `.fulcrum/RUN-IDS.md` | Run ids and their outcomes, including publish records | Anything else |
+| `.fulcrum/DECISIONS.md` | Dated decisions, with the artifacts each affects | Platform facts, traps |
 | `.fulcrum/external/<system>.md` | One external system's endpoint, auth scheme, payload contract, error codes, verified log paths | The secret value; anything about the ODC side |
 | `specs/*` | Everything one step's build agent needs | Cross-step context |
 | `buildpatterns/*` | What was reliable or unreliable for one step | Rules for other steps |
@@ -117,8 +121,8 @@ a line number - line numbers rot on the first edit.
 One claim in the corpus had to be formally withdrawn after being written down as verified
 when it was an inference.
 
-**Rule.** Tag evidence strength on every non-obvious claim, per the evidence tags in the
-authoring contract. When a claim is withdrawn, **append a withdrawing line to the
+**Rule.** Tag evidence strength on every non-obvious claim, per
+`../../fulcrum-verification/references/evidence-tags.md`. When a claim is withdrawn, **append a withdrawing line to the
 session file that carries it** (`.fulcrum/journal/<session-id>.md` - see
 `../../fulcrum-project-state/references/file-schemas.md`, heading
 "journal/<session-id>.md") rather than deleting it - a silently deleted claim gets
@@ -148,7 +152,10 @@ stub explaining what belongs there:
 
 ## Scaffold checklist
 
-- [ ] Every file in the layout exists, even if a stub.
+- [ ] Every file in the layout exists, even if a stub. `.fulcrum/` state files come first:
+      the step 3 liveness check is a driver dispatch and needs them.
+- [ ] `.fulcrum/project.md` records `mode`, `posture`, `profile` and `Rigor`.
+- [ ] `.fulcrum/DECISIONS.md` exists and carries its schema marker.
 - [ ] Every stub states what belongs in it and who writes it.
 - [ ] No fact appears in two files at two strengths.
 - [ ] No rule list is duplicated by hand.
@@ -167,4 +174,5 @@ Three failures to design against, all observed in the reference corpus `[VERIFIE
 2. **Standing rules duplicated across three places, one copy silently missing a
    prohibition.** A build agent obeying the lossy copy breaks a rule it never saw.
 3. **Every section-anchored cross-reference dangling**, because target files had no
-   numbered headings. Link by relative path and quote the heading verbatim. Never `section `.
+   numbered headings. Link by relative path and quote the heading verbatim. Never a
+   section-number anchor.

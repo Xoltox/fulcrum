@@ -78,7 +78,7 @@ no basis for them and the interview format makes declining feel unhelpful.
 | Screen layout in pixel detail | Better captured from a mockup than from speech; asking invites invention | A design source, or the build |
 | Anything already answered in supplied material | Reads as inattention and spends budget for nothing | Read the material first |
 
-Under `posture: collaborative` (`../../../CONVENTIONS.md`, heading "Mode and posture") the
+Under `posture: collaborative` (`../../fulcrum/references/mode-and-posture.md`) the
 platform questions are Mentor's to answer anyway. Asking the user is strictly worse: it
 substitutes a guess for an expert answer, and writes the guess down as a requirement.
 

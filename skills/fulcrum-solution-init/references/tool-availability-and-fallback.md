@@ -16,7 +16,7 @@ that needs the op.
 This rhymes with this skill set's founding thesis: a clean platform signal
 proves nothing about the thing actually working. Zero validation errors and a
 clean publish don't prove correct rendering or logic
-(`../../../CONVENTIONS.md`); a listed, schema-complete tool doesn't prove it
+(`../../fulcrum-verification/SKILL.md`); a listed, schema-complete tool doesn't prove it
 dispatches. Same shape, one layer earlier.
 
 **One tenant, one harness, one point in time.** A tool confirmed unavailable
@@ -29,7 +29,7 @@ being hardcoded.
 
 Only for ops with a genuine alternative path. Where there is no fallback, the
 row says so - do not invent a workaround; halt instead
-(`../../fulcrum-unattended-guardrails/SKILL.md`, heading "Halt on an
+(`../../fulcrum-unattended-guardrails/references/halt-conditions.md`, heading "Halt on an
 unavailable op with no fallback").
 
 | Op confirmed unavailable | Fallback | Why |

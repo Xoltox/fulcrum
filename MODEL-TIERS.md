@@ -1,16 +1,14 @@
 # Fulcrum - model tiers
 
-The single source of truth for model tiering. This is the **only** file in Fulcrum
-that names a concrete model. Skills use the tier names - `deep-reasoning`,
-`workhorse`, `poller` - and nothing else.
+The vendor mapping, the install-time contract and the cost evidence for model
+tiering. This is the **only** file in Fulcrum that names a concrete model. Skills use
+the tier names - `deep-reasoning`, `workhorse`, `poller` - and nothing else.
 
 ## The three tiers
 
-| Tier | Job | What it is for |
-|---|---|---|
-| `deep-reasoning` | Derivation | Ingesting raw source artifacts, deriving a solution plan from ambiguous input, decomposing a solution into apps/agents/workflows, sizing phases and steps, authoring specs, authoring skills |
-| `workhorse` | Execution and orchestration | Every build session after init: reading state, writing subagent briefs, dispatching, reading reports, driving Mentor turns, verification, seed data, publish sequencing |
-| `poller` | Waiting | Every wait loop: `mentor_get_run` polling, `publish_status` polling (key from the "Publish" run), any long-running job supervision, any "sleep then re-check" cycle |
+`deep-reasoning`, `workhorse`, `poller`. What each is for:
+`skills/fulcrum-unattended-guardrails/references/model-tiers.md`, the installed copy an
+agent can reach at run time.
 
 ## Vendor mapping
 
@@ -31,15 +29,9 @@ work on the cheapest available and keep the loop bodies trivial.
 
 ## The policy - phase-based
 
-1. **Project init only:** `deep-reasoning`. This is the one phase whose output is
-   a *derivation* - the plan, the decomposition, the specs. Getting it wrong is
-   paid for in every session afterwards.
-2. **Every session after init:** `workhorse` orchestrator. Not "usually" - by
-   default. Build sessions execute a written plan; they do not derive one.
-3. **All poll loops and wait states:** `poller`.
-4. **Init on `workhorse` is an acceptable budget option.** It is a real
-   downgrade, not a free one: expect the plan to need more correction turns. It
-   is still better than skipping the planning phase.
+Phase-based: `deep-reasoning` for project init, `workhorse` after it, `poller` for
+every wait. The full policy is in the same skill reference, heading "The policy -
+phase-based".
 
 The Claude Code adapters in `agents/claude-code/` bind roles to models: the
 poller role to the Anthropic `poller` tier (Haiku), the workhorse roles to the
@@ -51,8 +43,10 @@ a row here changes, the adapters follow.
 The Claude Code adapters hardcode `model:` (`haiku` for the poller, `opus` for
 the capturer, `sonnet` for the other three). A `MODEL-TIERS.local.md` override reaches a role only if
 you edit that adapter's `model:` line in the installed copy. That one edit is
-allowed; `install.sh --force-agents` would overwrite it, so redo it after
-forcing.
+allowed, but a plain `install.sh` run overwrites it: the installed copy still
+carries the `Generated from agents/roles/` marker, so the installer treats it as its
+own. To keep an override, run `install.sh --no-agents` on upgrades, or redo the edit
+after each install.
 
 Set the tier **explicitly on every dispatch**. Subagents otherwise inherit the
 session's tier, and inheritance is what makes a tier policy silently untrue.
@@ -120,19 +114,10 @@ What survives from it, and is genuinely the rule:
 
 ## Resolution - how a tier becomes a concrete model
 
-A tier name (`deep-reasoning`, `workhorse`, `poller`) is not itself a model.
-At runtime it resolves to one, in this priority order, first match wins:
-
-1. **A project-level override**, if the project's own rules or handoff
-   document specifies one. Budget and vendor access are per-engagement, so a
-   project is allowed to pin tiers to something other than the default.
-2. **`MODEL-TIERS.local.md`**, written once by the install interview and kept
-   beside the installed skills. Available models and per-subagent capability
-   are per-machine and per-harness, so this is the second-most-specific
-   source.
-3. **The documented defaults in this file** - the vendor mapping above.
-4. **If none of the above resolve** - no project override, no local file, no
-   applicable default row - ask the user. Do not guess a model name.
+A tier name is not itself a model. The resolution order lives in
+`skills/fulcrum-unattended-guardrails/references/model-tiers.md`, heading "Resolution -
+how a tier becomes a concrete model": project override, then `MODEL-TIERS.local.md`,
+then the vendor mapping above, then ask the user.
 
 ### The install interview must not edit installed files
 

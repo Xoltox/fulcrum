@@ -9,7 +9,7 @@ different evidence and must not be collapsed into one counter.
 | Scope | One step or batch, one session | One task id, whole project history |
 | Evidence | Turns issued in this iteration | `:fail` entries in `.fulcrum/JOURNAL.md` |
 | Ceiling | 1 build (a pass of <= 4 short turns counts as one) + 2 fix turns | 2 `:fail` entries |
-| Owner of the number | `../../fulcrum-mentor-turns/references/granularity.md`, "Turn economics" | `../../../AGENTS.md`, "stuck twice" |
+| Owner of the number | `../../fulcrum-mentor-turns/references/granularity.md`, "Turn economics" | `../../fulcrum-unattended-guardrails/SKILL.md`, heading "Hard stops - halt and report to the user", row "Stuck twice" |
 | On breach | Stop the inner loop, record `fail` | Hand to guardrails: a lane stop |
 
 ## The fix-loop
@@ -55,7 +55,8 @@ Rules the loop adds:
   cheaper rung.
 - **Record each attempt before issuing the next.** An attempt held only in
   context is invisible to the crash-recovery path and to the scan below.
-- **Never escalate model tier** to break it (`../../../AGENTS.md`). A higher
+- **Never escalate model tier** to break it (`../../fulcrum-unattended-guardrails/SKILL.md`,
+  heading "Never escalate model tier to break a bug"). A higher
   tier buys a more expensive version of the same guess; the missing input is
   evidence about the live system, not reasoning capacity.
 - **The guard runs once per dispatch.** A fix turn runs in the session the guard

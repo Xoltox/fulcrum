@@ -47,13 +47,12 @@ dispatch, a checkpoint that survives the agent, and a halt rule that fires early
    underived plan is the highest-risk thing in this skill set. If the plan is
    not on disk, stop - that is init work, not build work. A user-confirmed micro
    plan counts (`../fulcrum-project-state/references/micro-profile.md`).
-2. **Set the model tier explicitly** per `../../MODEL-TIERS.md`. Never rely on
-   inheritance. Note the per-agent context ceiling in `MODEL-TIERS.local.md`.
+2. **Set the model tier explicitly** per `references/model-tiers.md`. Never rely on
+   inheritance. Agent context ceiling: `MODEL-TIERS.local.md`.
 3. **Verify the wait mechanism once.** Prefer a native wait primitive (any
    depth, no context cost), then a discardable delegated poller, then an
    in-process sleep. Confirm it actually suspends and reuse it all session - a
    silently-swallowed wait turns a poll loop into an unbounded spin.
-   Harness findings: `../../HARNESS-NOTES.md`.
 4. **Record the current app revision** - the baseline for every later "did this
    land / did this revert" question.
 5. **Name the checkpoint path** and the handoff path. Agents do not invent them.
@@ -179,6 +178,7 @@ input to the next failure. Honest vocabulary only: `OK` / `PARTIAL` / `PARKED` /
 |---|---|
 | Sizing an agent's budget, or an agent overran | `references/budgeting.md` |
 | Writing a brief, choosing a role, or tempted to nest a subagent | `references/delegation.md` |
+| Resolving a model tier | `references/model-tiers.md` |
 | Setting up checkpoints, or resuming after a death | `references/checkpoints.md` |
 | A step is failing repeatedly, a lane stalled, or a user action is needed, and you must decide whether to continue | `references/halt-conditions.md` |
 | A reading from the running app looks like a stop signal, or you are about to call an app healthy | `references/halt-conditions.md`, headings "The runtime-shaped stop" and "Never report an untouched app as healthy" |

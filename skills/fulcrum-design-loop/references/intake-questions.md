@@ -53,9 +53,10 @@ still asked - nothing is defaulted. Never one question per turn.
 4. **Render-compare instrument.** "(a) a browser a delegated agent can drive (I check
    it works); (b) you send a screenshot of each screen when asked; (c) skip - structure
    only, every visual check untested. Recommended: (a) if available."
-   - Only if (a) and a screen needs sign-in: "May the renderer use the generated sample
-     personas in Development? The first click registers a real identity-provider user
-     with a role. Or you sign in for it." (Mode b and c in
+   - Only if (a) and a screen needs sign-in: "May the renderer sign in through sample
+     personas in Development? A Mentor-created app has none, so a yes adds a Dev-only
+     sample sign-in that I build first. The first click registers a real
+     identity-provider user with a role. Or you sign in for it." (Mode b and c in
      `../../fulcrum-render-check/SKILL.md`, heading "Sign-in modes - in order of
      preference".)
 5. **Evidence in the repo.** "Commit (a) copies of your design under
@@ -88,6 +89,7 @@ still asked - nothing is defaulted. Never one question per turn.
 | Q2 | Access lines in every `screens/<SID>.md` header; render sign-in modes per screen |
 | Q3 | `manifest.md`, Policy line **Fidelity bar**; severity of `token` and `spacing` diffs (`render-compare.md`) |
 | Q4 (a) | Browser preflight runs at phase 0; a failed preflight re-asks Q4 with (a) removed |
+| Q4 sign-in yes | One `Risk: high` sign-in row built from the recipe, unless the app already has the pattern (`design-spec-format.md`, heading "Sample sign-in row"): a yes alone gives the renderer nothing to click |
 | Q4 (b) | Tier B: one `manual` row per screen per round, parked `Blocked on: the user` |
 | Q4 (c) | Tier C: rung 6 `untested`, so screen rows go `unproven` and park after the re-prove; the report leads with render-only classes |
 | Q5 | `manifest.md`, Policy line **Commit design source / render screenshots**; render briefs say whether screenshots may be written |

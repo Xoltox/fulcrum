@@ -53,9 +53,9 @@ naming convention. The actual variable namespace and set is tenant/theme
 specific - check `tenant-profile.md`.
 
 **Vocabulary changed at OutSystems UI v3.0.0** (2026-10-27, token theme),
-read from the repo, no tenant queried `[UNVERIFIED]`. `--space-*` and neutral
-ramps are pre-3.0 vocabulary; `--color-neutral-0..10` survive as legacy
-aliases the library says to avoid. On 3.x the allowed list is
+read from the repo, no tenant queried `[SCHEMA]`. `--space-<type>` and
+`--color-neutral-0..10` are pre-3.0 vocabulary that survives as legacy aliases
+the library says to avoid; a hex neutral ramp is pre-3.0 too. On 3.x the allowed list is
 `docs-ai/llms-tokens.txt` at the pinned tag (never `dev`; condensed in
 `../../fulcrum-design-loop/references/osui-v3.0.0-theme.md`), with the
 computed-style read as confirmation. Tell which you have by probing

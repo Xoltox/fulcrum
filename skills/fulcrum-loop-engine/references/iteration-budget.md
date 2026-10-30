@@ -55,7 +55,7 @@ orchestrator's own context turns the cheapest phase into the most expensive one,
 and the growth is cumulative and unrecoverable - nothing later gives the window
 back. If the harness offers no delegation, the iteration cost is dominated by
 polls and the 90 s floor applies to every one of them
-(`../../fulcrum-mentor-turns/SKILL.md`, heading "Polling").
+(`../../fulcrum-mentor-turns/SKILL.md`, heading "5. Polling").
 
 ## The one rule the loop owns
 

@@ -1,6 +1,6 @@
 # Sessions, context, and when to start fresh
 
-Detail behind `../SKILL.md`, heading "Sessions, conversation and the
+Detail behind `../SKILL.md`, heading "4. Sessions, conversation and the
 staleness guard". Tool facts cited here are recorded, dated and tagged in
 `mcp-surface.md`, heading "Sessions and context".
 
@@ -17,7 +17,7 @@ staleness guard". Tool facts cited here are recorded, dated and tagged in
   Nothing short of that clears Mentor's memory of the conversation.
 - Close discards whatever the session holds unpublished. On a session that
   created its asset and has not yet published, close loses the asset
-  `[UNVERIFIED]` - publish once early (`../SKILL.md`, heading "Publish
+  `[UNVERIFIED]` - publish once early (`../SKILL.md`, heading "7. Publish
   sequencing").
 
 ## One session per dispatch, or carry one across dispatches

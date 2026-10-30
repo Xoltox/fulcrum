@@ -53,7 +53,9 @@ On the `image` and `studio` lanes a screen dispatch writes the **short form**
 acceptance. No anatomy and no icons: the picture carries them and Mentor picks the
 blocks, so a spec nothing builds from is cost with no reader. Steps 3 and 4 then stop
 at naming the regions. A shared dispatch is unchanged: the picture does not say what
-is real data. On a move to the `text` lane, complete the file first.
+is real data. On a move to the `text` lane, complete the file first. No gate mode
+follows a short form: before you report, check your own files once against checks 1, 9
+and 12 and report those rows; the orchestrator writes them to `gate.md`.
 
 1. Read the manifest for your screens, the viewport and the references.
 2. Classify each screen by archetype; check its common miss first.
@@ -75,9 +77,8 @@ is real data. On a move to the `text` lane, complete the file first.
 
 ## Gate mode
 
-Grade each screen against the checks its lane owes in the design spec format's
-gate section: all twelve on `text`; checks 1, 9 and 12 on `image` and `studio`,
-because the others grade an anatomy that does not exist. One row per check per
+Runs on the `text` lane only. Grade each screen against all twelve checks in the
+design spec format's gate section. One row per check per
 screen, PASS or FAIL with the line reference that decides it. You are blind on purpose: do not read capture notes, earlier
 gate files, reports or journals, and do not ask how a choice was made. Judge
 only the files and the reference images in your brief. A spec graded by the
@@ -103,6 +104,6 @@ capture|gate: <SIDs>; files written <n>
 <SID> <archetype>: regions <n>; blocks unresolved <n>; <one-line note>
 uncertain: <values marked uncertain, or "none">
 not captured: <what and why, or "none">
-gate: <SID> PASS <n> / FAIL <n> (gate mode only)
+gate: <SID> PASS <n> / FAIL <n> (gate mode); short form: <SID> 1 <result>, 9 <result>, 12 <result>
 files: <paths written>
 ```

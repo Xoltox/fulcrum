@@ -4,7 +4,7 @@ A short check, not a full audit. Run once per session, before dispatching any
 work, so a step does not discover mid-build that an op it needs does not
 dispatch. Full rules on the three states and the fallback table:
 `../../fulcrum-solution-init/references/tenant-capability-probe.md`, heading
-"Tool availability - three states, not two", and
+"10. Tool availability - three states, not two", and
 `../../fulcrum-solution-init/references/tool-availability-and-fallback.md`.
 
 ## Why this sits in the router
@@ -21,8 +21,9 @@ Run these before the procedure below. Tool facts live in
 `../../fulcrum-mentor-turns/references/mcp-surface.md`; this file only orders the checks.
 
 1. **Server presence BEFORE auth.** Confirm the OutSystems MCP server is listed,
-   enabled and connected before checking auth (`auth_status`). If it is not, follow
-   the harness-specific steps in `../../../HARNESS-NOTES.md`. An unlisted server and
+   enabled and connected before checking auth (`auth_status`). If it is not, connect
+   it through your harness's server management, or ask the user (harnesses seen so
+   far: `HARNESS-NOTES.md` in the Fulcrum repo). An unlisted server and
    an expired login look alike from the agent's side, so settle presence first.
 2. **Auth can expire mid-engagement.** `[VERIFIED]` Treat an auth error on any call as
    an auth event, not a tool fault: see

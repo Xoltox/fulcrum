@@ -54,8 +54,8 @@ Do not re-scan these. They are resolved in `.fulcrum/tenant-profile.md`.
 
 ## Session start sequence
 
-1. Run no **Mentor liveness gate** yourself: it runs on the first staleness guard of the
-   first dispatch (`.fulcrum/tenant-profile.md`, row 0). On fail, halt.
+1. Run no **Mentor liveness gate** yourself: it runs on the staleness guard of the first
+   dispatch with an attached asset (`.fulcrum/tenant-profile.md`, row 0). On fail, halt.
 2. Read PART 2 - BRIEF. It lists the current frontier, one line per lane.
 3. Read the specs of the rows you dispatch. Read nothing else.
 4. Record each run id in `.fulcrum/RUN-IDS.md` before polling it.

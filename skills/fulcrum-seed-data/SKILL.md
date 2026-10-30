@@ -91,7 +91,7 @@ Express every foreign key and every lookup in seed source data as a
 generated/numeric Id. Resolve it to a real Id by lookup at load time. A
 generated or positional identifier breaks the moment the seed is re-run or
 reset, because the platform does not guarantee the same identifier next
-time: a re-run must **update** a row it recognizes, never duplicate it.
+time: a re-run must **skip** a row it recognizes, never duplicate it.
 `[VERIFIED]`
 
 ## Relative timestamps
@@ -109,7 +109,7 @@ rows dated in the last 7 days"), never as a fixed expected value.
 its rows each time, and a background loader then undoes decisions made in the
 app. Write one anchor date (a settings row) the first time, compute offsets from
 it, make loaders create-only, and allow null-fill only for missing links.
-Seeded figures still age: re-seed before any time-based KPI check
+Seeded figures still age: reset (it deletes the anchor), re-seed before any time-based KPI check
 (`references/loader-pattern.md`, heading "Anchor and create-only"). `[VERIFIED]`
 
 ## Static entities
@@ -189,4 +189,4 @@ them. Confirm via the design surface before reporting it absent.
 
 `references/loader-pattern.md` - worked loader/orchestrator structure,
 JSON-resource-per-entity layout, the anchor and create-only split, seeding from
-a file (an attachment is not a seed path), and reset-action ordering.
+a file, and reset-action ordering.

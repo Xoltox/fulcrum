@@ -112,5 +112,5 @@ Each is predictable, so each is preventable with the phrasing shown.
 
 ## Evidence tags
 
-Per `CONVENTIONS.md`, Hard rule 4. `[TENANT]`: check `tenant-profile.md`, never
+Per `../fulcrum-verification/references/evidence-tags.md`. `[TENANT]`: see the profile, never
 hardcode. `[UNVERIFIED]` includes vendor skill-set reports.

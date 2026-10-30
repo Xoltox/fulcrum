@@ -50,7 +50,7 @@ included. (Fulcrum rule)
 |---|---|---|---|
 | 0 | Intake | Design in hand; `Rigor` and batch B recorded; preflight done | orchestrator (`workhorse`) |
 | 1 | Capture | Screen list with SIDs, tokens, theme, data, then screen files drafted | `fulcrum-capturer` (`deep-reasoning`): one shared dispatch first, then one dispatch per <= 3 screens, parallel |
-| 2 | Gate | `design/gate.md` all PASS, or one re-capture per failing screen done | fresh `fulcrum-capturer` in gate mode (`workhorse`), blind to capture reasoning |
+| 2 | Gate | `design/gate.md` all PASS, or one re-capture per failing screen done | `text`: fresh `fulcrum-capturer` in gate mode (`workhorse`), blind; `image`, `studio`: the screen dispatch's one-pass check |
 | 3 | Plan, go/no-go | User says go (batch C) | orchestrator |
 | 4 | Build | Step's Publish passes the `env_app` revision gate | `fulcrum-mentor-driver` + `fulcrum-poller` |
 | 5 | Verify | Rungs in the row's `Verify` have evidence | `fulcrum-renderer`, `fulcrum-verifier` |
@@ -110,8 +110,7 @@ paths it may write; `reference/` is the orchestrator's. Recipes and dispatch rul
 Outputs (schemas and limits: `references/design-spec-format.md`): `screens/<SID>.md`
 (anatomy, regions, icons, interactions, F-items; <= 6 top-level regions, else two
 screens or two steps), `tokens.md`, `theme.css` (every custom class defined once),
-`data.md` (entities, seed rows with dates as day offset + time, KPI and chart
-decisions).
+`data.md` (entities, seed rows, KPI and chart decisions, dates as day offsets).
 
 **No Mentor prompt carries a whole file.** A region turn carries one region's subtree
 (<= ~25 anatomy lines), the class names, bindings and one-line trap mechanisms, within
@@ -123,8 +122,8 @@ and reports success. (Fulcrum rule)
 
 ## The block gate
 
-A fresh gate-mode capturer, given only the capture files and the reference images,
-writes `design/gate.md`: one row per check per screen, PASS/FAIL with a line ref. The
+On `text` a fresh gate-mode capturer, given only the capture files and the reference
+images, writes `design/gate.md`. Short forms take a one-pass check instead. The
 twelve checks are in `references/design-spec-format.md`, heading "gate.md". FAIL ->
 one re-capture of that screen, one re-gate; a second FAIL goes to batch C as an open
 risk. A distinct block stays `unresolved` until its first step pre-flights it
@@ -140,7 +139,7 @@ variant line), `TASKS.md`, `JOURNAL.md`, `RUN-IDS.md`, then ask batch C.
 |---|---|---|---|
 | P1.01 Shell | Create the app, or attach the user's shell (`assetRefs`) (per batch B); access on template screens; default screen; first Publish | 1,3,6 | A created asset exists only in its session until the first publish |
 | P1.02 Theme | `:root` overrides; `theme.css` groups, one turn each | 1,3,6 | Identical-shape groups may batch |
-| P1.03 Chrome | N empty screens with Layout and access; Menu links; title; user info; logo per batch B; icon probe if flagged | 1,3,6 | Navigation before content |
+| P1.03 Chrome | N empty screens with Layout and access; Menu links; title; user info; logo per batch B; icon probe if flagged; sample sign-in row on a Q4 yes | 1,3,6 | Navigation before content |
 | P1.04 Data | Entities, static entities (explicit Ids), KPI metric entity | 1,3 | Verify after the publish gate, lag-tolerant: `context_graph` first; empty `context_*` = not yet indexed; ceiling -> `untested` |
 | P1.05 Seed | Loaders from `data.md` per `../fulcrum-seed-data/SKILL.md` | its "Verifying a seed" | Own step; expect 3+ turns |
 | P1.06+ Screen | One screen per step: skeleton, then regions | 1,3,4,6 (+7 for create/edit) | Below |
@@ -164,8 +163,7 @@ When `project.md` has `design`, rung 6 on a screen row runs
 join at `demo` (that file, heading "When").
 
 1. **Capture** - `fulcrum-renderer` at the manifest viewport(s) (tier A); the user's
-   screenshot via a parked `manual` row (tier B); tier C has no capture. Curl is never
-   a render.
+   screenshot via a parked `manual` row (tier B); tier C has no capture.
 2. **Judge** - a fresh blind `fulcrum-verifier` with image inspection.
 3. **Triage** - blocker/major -> fix, minor -> `backlog.md`; a shared cause is a
    **pattern**: one `fix` row on the owning step, then re-compare every affected screen.
@@ -189,8 +187,8 @@ join at `demo` (that file, heading "When").
 ## Official skill present
 
 Where `outsystems-design-to-app` is installed, its reference data may be read as
-`[UNVERIFIED]` input; its procedure is never run or quoted - its batching, prompt,
-session and publish rules conflict with Fulcrum's. `references/official-skill-interop.md`.
+`[UNVERIFIED]` input; its procedure is never run or quoted - its rules
+conflict with Fulcrum's. `references/official-skill-interop.md`.
 
 ## Reference files
 

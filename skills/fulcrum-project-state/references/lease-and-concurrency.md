@@ -2,11 +2,10 @@
 
 ## What it enforces
 
-`../../../AGENTS.md`: **one Mentor session at a time per app.** `[VERIFIED]` The
-rule is stated there and the operational detail is in
-`../../fulcrum-unattended-guardrails/SKILL.md`, heading "Concurrency lock - one Mentor
-session per app". What neither provides is a mechanism that survives the agent that
-holds the rule in its own head. `lease.<app>.json` is that mechanism.
+**One Mentor session at a time per app.** `[VERIFIED]` The rule and its operational
+detail are in `../../fulcrum-unattended-guardrails/SKILL.md`, heading "Concurrency lock -
+one Mentor session per app". What that does not provide is a mechanism that survives
+the agent that holds the rule in its own head. `lease.<app>.json` is that mechanism.
 
 **What breaks without it.** An orchestrator can only refuse to dispatch two agents it
 knows about. A second session started by a different person, a different terminal, or
@@ -49,7 +48,7 @@ permits to run concurrently.
 identifier yet: key the lease by the intended app name from `plan.md` and
 `project.md`, write the journal `started` line, then send the creating prompt. The
 call returns a `runId`, not a key: record the `runId` in `RUN-IDS.md` before the wait.
-The key arrives in the first run as `assetKey` (`skills/fulcrum-mentor-turns/references/mcp-surface.md`,
+The key arrives in the first run as `assetKey` (`../../fulcrum-mentor-turns/references/mcp-surface.md`,
 heading "Creating and loading an asset"); once read, record it (`RUN-IDS.md` outcome
 line, then `project.md` at wave close) and keep the same lease file until release. In
 the field the first journal line and the lease came after creation, so a crash at that
@@ -73,7 +72,9 @@ re-read for the key; before it, the app may exist with no id on file.
 
 ## Protocol
 
-**Acquire** (the orchestrator), before a Mentor dispatch:
+### Acquire
+
+The orchestrator, before a Mentor dispatch:
 
 1. Read `lease.<app>.json`. Absent -> write it, append a session-file `acquire lease` line,
    proceed.
@@ -88,12 +89,16 @@ re-read for the key; before it, the app may exist with no id on file.
    its budget is exceeded), under the rules below. Never a `holder: user` lease: "Studio
    hand-off" below.
 
-**Release** (the orchestrator), when the dispatch returns `session_state: closed` -
+### Release
+
+The orchestrator, when the dispatch returns `session_state: closed` -
 including on a failed turn, a halt, and a deliberate handoff: delete the file and append a
 session-file `release lease` line. A lease released only on the success path is a lease that
 leaks on exactly the runs where recovery matters.
 
-**Hold** (the orchestrator), when the dispatch returns `session_state: open` (a budget stop,
+### Hold
+
+The orchestrator, when the dispatch returns `session_state: open` (a budget stop,
 or a halt or lane stop with `on_exit: keep-open`, typically with `unpublished_changes: yes`): do **not**
 release. The app still has a live Mentor session, and a second session on it is the
 corruption path this file exists to prevent. Rewrite the lease with `open_session` set to the
@@ -128,9 +133,11 @@ still a session on that app, and a second session there is the same corruption p
 
 ## Studio hand-off - `holder: user`
 
-Fulcrum rule. A `manual` row that hands an app to the user to build in Studio
-(`../../fulcrum-design-loop/references/build-lanes.md`, heading "Studio lane") holds the
-app too: a Studio session and a Mentor session on one app are two sessions building it,
+Fulcrum rule. Any `manual` row that hands an app to the user in Studio holds the app
+too, whichever skill emitted it: the design loop's Studio lane
+(`../../fulcrum-design-loop/references/build-lanes.md`, heading "Studio lane"), an agent
+replay (`../../fulcrum-engine-traps/references/agents.md`, entry 4), or any other Studio
+step on an app that exists. A Studio session and a Mentor session on one app are two sessions building it,
 and neither sees the other. A Studio session is invisible to this file, so the lease
 records the hand-off, not the session.
 

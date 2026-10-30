@@ -72,7 +72,10 @@ reliably").
 - Read-only page scripts, where the harness grants a script tool, are allowed
   for measurement only: element sizes,
   computed style, image natural width, resource timing entries. Never set
-  values, submit forms, read storage or cookies, or call app endpoints.
+  values, submit forms, read storage or cookies, or call app endpoints. Only
+  a brief's named grant goes further: an in-page file build, or a click on a
+  control the snapshot omits (`harness-limits.md`, heading "Inputs the browser
+  cannot drive reliably").
 
 ## Console and network limits
 

@@ -15,10 +15,9 @@ contract, and every other Fulcrum skill obeys it.
 
 Two hard properties:
 
-- **It lives in the project, never in the installed skill directory.** Same principle
-  as `../../MODEL-TIERS.md`, heading "The install interview must not edit installed
-  files": installed content that carries project state makes every update fight the
-  user's edits and lets the deployed copy drift from source. `[VERIFIED]`
+- **It lives in the project, never in the installed skill directory.** Installed
+  content that carries project state makes every update fight the user's edits and
+  lets the deployed copy drift from source. `[VERIFIED]`
 - **It is committed to git.** Git *is* the multi-session and multi-person mechanism -
   history, merge, blame, review. Do not build a sync protocol, a database, or a
   distributed lock on top of it. The one exception is the lease, below.
@@ -111,7 +110,7 @@ what lets `TASKS.md` drop closed rows at a phase boundary without losing anythin
 
 ## Write ordering - state before the wait, never after the result
 
-`../../AGENTS.md` requires capturing a run identifier durably before the first wait.
+`../fulcrum-mentor-turns/SKILL.md`, section 6, captures a run id durably before the first wait.
 That generalises to all state here. `[UNVERIFIED]`
 
 Before the first mutating call - **including app creation** - and before any wait:
@@ -180,7 +179,7 @@ here. Shape: `references/file-schemas.md`, heading "DECISIONS.md".
 
 `project.md` records three orthogonal settings. This skill owns only that they live
 there and what values are legal. **Definitions and the opt-in rule are owned by
-`../../CONVENTIONS.md`, heading "Mode and posture".** Not restated here.
+`../fulcrum/references/mode-and-posture.md`.** Not restated here.
 
 - `mode`: `guided` | `expert`
 - `posture`: `collaborative` (the default) | `directive`

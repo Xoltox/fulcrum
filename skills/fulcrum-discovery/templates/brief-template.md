@@ -10,7 +10,8 @@ Delete no section - an empty section is information. Write "None" or "Not applic
 
 Every requirement line carries `Confidence`: `held` | `elicited` | `assumed` |
 `undecided`. Definitions: `../SKILL.md`, step 5. This is a separate namespace from the
-`[VERIFIED]`/`[UNVERIFIED]` evidence tags in `../../../CONVENTIONS.md` - do not mix
+`[VERIFIED]`/`[UNVERIFIED]` evidence tags in
+`../../fulcrum-verification/references/evidence-tags.md` - do not mix
 them in one line.
 
 No line may be unfalsifiable. If it states no observable outcome, it belongs in **Open

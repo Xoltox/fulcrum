@@ -143,11 +143,14 @@ series -> populated aggregate over a seeded entity | minimum height [UNVERIFIED]
 ## gate.md
 
 Header `<!-- fulcrum-schema: design-gate v1 -->`. Table:
-`SID | check | PASS/FAIL | line ref | note`. Written by a fresh gate-mode capturer.
+`SID | check | PASS/FAIL | line ref | note`. Written by a fresh gate-mode capturer on the
+`text` lane. On `image` and `studio` there is no fresh dispatch: each screen dispatch
+checks its own short forms once and reports the rows, and the orchestrator writes them
+here, because nothing builds from a short form and render-compare grades the result.
 
 | # | Check |
 |---|---|
-| 1 | Every visible region of the reference is a node |
+| 1 | Every visible region of the reference is a node (short form: a line in `Regions`) |
 | 2 | Every node is a real OS UI block or stock widget; each distinct block `unresolved` until its first step pre-flights it by reference |
 | 3 | No section-level flex/grid; Adaptive blocks side by side; exceptions only as named `theme.css` classes; a wrapping grid is `Gallery` with its `List` (flex/wrap only if Gallery is unavailable) |
 | 4 | One explicit Layout per screen root |
@@ -155,7 +158,7 @@ Header `<!-- fulcrum-schema: design-gate v1 -->`. Table:
 | 6 | Only default children that neither repeat nor position are deleted |
 | 7 | No project ExtendedClass on overlay blocks |
 | 8 | Every class stock-confirmed or defined; no Tailwind names; page background applied; no reserved names |
-| 9 | Every data node bound; every chart series resolves to populated data; every KPI has a source decision; no literal dates |
+| 9 | Every data node bound (short form: every data region names its entity from `data.md`); every chart series resolves to populated data; every KPI has a source decision; no literal dates |
 | 10 | Icon count source == anatomy; names resolved via `tenant-profile.md` section 3 or flagged for the chrome step's icon probe; per-row icons as N literal icons under Ifs |
 | 11 | One primary action; no interactive widget inside a Link |
 | 12 | Acceptance items observable with an instrument; the screen and region limits above hold |
@@ -163,7 +166,8 @@ Header `<!-- fulcrum-schema: design-gate v1 -->`. Table:
 Mechanisms for checks 3, 6, 7, 10 and 11: `block-map.md` (vendor rows `[UNVERIFIED]`)
 and `../../fulcrum-engine-traps/` (Gallery/List collapse, overlay ExtendedClass, icon
 names). `image` and `studio` lanes run checks 1, 9 and 12 only; the others grade an
-anatomy that does not exist (`build-lanes.md`).
+anatomy that does not exist (`build-lanes.md`). A FAIL there is fixed by a new screen
+dispatch of that `SID`, which is the one re-capture.
 
 FAIL -> one re-capture, one re-gate; a second FAIL is an open risk at batch C. The count
 is per check per screen: a new reason on the same check is still a second FAIL, or a
@@ -198,7 +202,37 @@ pass, parked `Blocked on: the user`. A screen step whose build pass needs more t
 (skeleton plus regions) is split into two steps before batch C, each ending in
 Publish; the split steps count in the allowance and in batch C's estimate.
 
-Driver brief for a screen step, inline, composed by the orchestrator from that
+### Sample sign-in row
+
+On a batch B Q4 sign-in yes, unless the app already has the pattern
+(`../../fulcrum-render-check/references/sign-in-modes.md`, heading "Detecting it
+(published-state reads, after the lag)"): one `build` row at P1.03, `Risk: high`,
+`Traps: sample-signin`, `DependsOn` the Shell, before any screen that needs a sign-in to
+render. On `image` and `studio`, where Chrome folds away, it takes a `publish` row of its
+own. Its brief is the prompt scaffold in
+`../../fulcrum-engine-traps/references/sample-signin.md`, roster one persona per role from
+Q2. Proof is that file's first click: read-back is belief. (Fulcrum rule)
+
+### Image lane rows
+
+One step per image batch (`build-lanes.md`, heading "Image lane"): a `build` and a
+`publish` row, the `build` row covering up to 3 screens because they are one prompt.
+`Task` names the `SID`s. `DependsOn`: the Theme row, the Data and Seed rows the screens
+bind, and the first batch for every later batch, since Chrome folds into the first batch
+and there is no Chrome row. `Batchable: no`: the batch is already in the prompt.
+
+Verdict: one per screen, each with its fidelity file, journalled per `SID`; the row's
+`Verdict` is the worst of them (`fail`, then `unproven`, then `pass`), because one cell
+must not hide a failed screen. A fix row names its `SID`. (Fulcrum rule)
+
+Driver brief, inline: the guard invariant; the paths of the images to upload, at most 3;
+the prompt (`build-lanes.md`, heading "Image lane") filled from each screen's header,
+`Regions` and `Interactions` and from `data.md`; one-line trap mechanisms; the standard
+brief block (below). The image carries the layout, so no subtree is sent.
+
+### Driver brief for a screen step
+
+Inline, composed by the orchestrator from that
 screen's file (the one `screens/<SID>.md` it reads, only while composing that step's
 brief): the guard invariant; the consult question;
 the skeleton (Layout content, Columns/Card skeleton, containers R1..Rn); each region's
